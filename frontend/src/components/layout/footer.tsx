@@ -1,4 +1,4 @@
-//import { motion } from "framer-motion";
+
 import {
   ArrowRight,
   Facebook,
@@ -19,6 +19,8 @@ import { useTheme } from "../../contexts/ThemeContext";
 
 /* =========================================================
    FOOTER
+   DARK MODE  → FOOTER BLANC
+   LIGHT MODE → FOOTER SOMBRE
 ========================================================= */
 
 export default function Footer() {
@@ -31,6 +33,7 @@ export default function Footer() {
   ======================================================= */
 
   const adminClickCount = useRef(0);
+
   const adminClickTimer =
     useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -48,13 +51,14 @@ export default function Footer() {
 
   const [language, setLanguage] = useState<"FR" | "EN" | "MG">("FR");
 
-  const handleLanguageChange = (lang: "FR" | "EN" | "MG") => {
+  const handleLanguageChange = (
+    lang: "FR" | "EN" | "MG",
+  ) => {
     setLanguage(lang);
 
     /*
-      Si ton système i18n global est déjà configuré,
-      remplace uniquement cette fonction par ton mécanisme
-      existant de changement de langue.
+      Événement conservé afin de pouvoir connecter
+      ce sélecteur à ton système multilingue existant.
     */
 
     window.dispatchEvent(
@@ -97,7 +101,7 @@ export default function Footer() {
   };
 
   /* =======================================================
-     DATA
+     NAVIGATION
   ======================================================= */
 
   const navigationLinks = [
@@ -109,6 +113,10 @@ export default function Footer() {
     ["/contact", "Contact"],
   ];
 
+  /* =======================================================
+     SERVICES
+  ======================================================= */
+
   const serviceLinks = [
     ["/services", "Création de sites web"],
     ["/services", "Applications web"],
@@ -118,10 +126,10 @@ export default function Footer() {
     ["/solutions", "Solutions digitales"],
   ];
 
-  /*
-    Remplace les href "#" par tes vrais liens lorsque
-    les comptes sociaux Digital Work sont disponibles.
-  */
+  /* =======================================================
+     SOCIAL NETWORKS
+  ======================================================= */
+
   const socialLinks = [
     {
       name: "Facebook",
@@ -158,8 +166,8 @@ export default function Footer() {
           duration-300
           ${
             isDark
-              ? "border-slate-800 bg-slate-950 text-white"
-              : "border-slate-200 bg-white text-slate-900"
+              ? "border-slate-200 bg-slate-100 text-slate-900"
+              : "border-slate-800 bg-slate-950 text-white"
           }
         `}
       >
@@ -192,8 +200,8 @@ export default function Footer() {
                       tracking-tight
                       ${
                         isDark
-                          ? "text-white"
-                          : "text-slate-900"
+                          ? "text-slate-900"
+                          : "text-white"
                       }
                     `}
                   >
@@ -214,7 +222,7 @@ export default function Footer() {
                       ${
                         isDark
                           ? "text-slate-500"
-                          : "text-slate-500"
+                          : "text-slate-400"
                       }
                     `}
                   >
@@ -231,8 +239,8 @@ export default function Footer() {
                   leading-7
                   ${
                     isDark
-                      ? "text-slate-400"
-                      : "text-slate-600"
+                      ? "text-slate-600"
+                      : "text-slate-400"
                   }
                 `}
               >
@@ -240,6 +248,8 @@ export default function Footer() {
                 modernes, performantes et adaptées aux
                 besoins des entreprises.
               </p>
+
+              {/* CTA */}
 
               <Link
                 to="/contact"
@@ -260,7 +270,7 @@ export default function Footer() {
                 <ArrowRight size={16} />
               </Link>
 
-              {/* Trust points */}
+              {/* Expertise */}
 
               <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2">
                 <span
@@ -328,8 +338,8 @@ export default function Footer() {
                   font-semibold
                   ${
                     isDark
-                      ? "text-white"
-                      : "text-slate-900"
+                      ? "text-slate-900"
+                      : "text-white"
                   }
                 `}
               >
@@ -346,8 +356,8 @@ export default function Footer() {
                       transition-colors
                       ${
                         isDark
-                          ? "text-slate-400 hover:text-white"
-                          : "text-slate-600 hover:text-slate-900"
+                          ? "text-slate-600 hover:text-slate-900"
+                          : "text-slate-400 hover:text-white"
                       }
                     `}
                   >
@@ -368,8 +378,8 @@ export default function Footer() {
                   font-semibold
                   ${
                     isDark
-                      ? "text-white"
-                      : "text-slate-900"
+                      ? "text-slate-900"
+                      : "text-white"
                   }
                 `}
               >
@@ -386,8 +396,8 @@ export default function Footer() {
                       transition-colors
                       ${
                         isDark
-                          ? "text-slate-400 hover:text-white"
-                          : "text-slate-600 hover:text-slate-900"
+                          ? "text-slate-600 hover:text-slate-900"
+                          : "text-slate-400 hover:text-white"
                       }
                     `}
                   >
@@ -408,8 +418,8 @@ export default function Footer() {
                   font-semibold
                   ${
                     isDark
-                      ? "text-white"
-                      : "text-slate-900"
+                      ? "text-slate-900"
+                      : "text-white"
                   }
                 `}
               >
@@ -422,7 +432,6 @@ export default function Footer() {
                 <a
                   href="mailto:rrzafindrafita@gmail.com"
                   className={`
-                    group
                     flex
                     items-start
                     gap-3
@@ -430,8 +439,8 @@ export default function Footer() {
                     transition-colors
                     ${
                       isDark
-                        ? "text-slate-400 hover:text-white"
-                        : "text-slate-600 hover:text-slate-900"
+                        ? "text-slate-600 hover:text-slate-900"
+                        : "text-slate-400 hover:text-white"
                     }
                   `}
                 >
@@ -450,7 +459,6 @@ export default function Footer() {
                 <a
                   href="tel:+261348428652"
                   className={`
-                    group
                     flex
                     items-start
                     gap-3
@@ -458,8 +466,8 @@ export default function Footer() {
                     transition-colors
                     ${
                       isDark
-                        ? "text-slate-400 hover:text-white"
-                        : "text-slate-600 hover:text-slate-900"
+                        ? "text-slate-600 hover:text-slate-900"
+                        : "text-slate-400 hover:text-white"
                     }
                   `}
                 >
@@ -483,8 +491,8 @@ export default function Footer() {
                     text-sm
                     ${
                       isDark
-                        ? "text-slate-400"
-                        : "text-slate-600"
+                        ? "text-slate-600"
+                        : "text-slate-400"
                     }
                   `}
                 >
@@ -497,7 +505,9 @@ export default function Footer() {
                 </div>
               </div>
 
-              {/* Social networks */}
+              {/* =================================================
+                  SOCIAL NETWORKS
+              ================================================== */}
 
               <div className="mt-7">
                 <p
@@ -509,7 +519,7 @@ export default function Footer() {
                     ${
                       isDark
                         ? "text-slate-500"
-                        : "text-slate-500"
+                        : "text-slate-400"
                     }
                   `}
                 >
@@ -551,8 +561,8 @@ export default function Footer() {
                           transition-all
                           ${
                             isDark
-                              ? "border-white/10 text-slate-400 hover:border-dw-primary/40 hover:bg-white/5 hover:text-white"
-                              : "border-slate-200 text-slate-500 hover:border-dw-primary/40 hover:bg-slate-50 hover:text-slate-900"
+                              ? "border-slate-300 text-slate-500 hover:border-dw-primary/40 hover:bg-slate-200 hover:text-slate-900"
+                              : "border-white/10 text-slate-400 hover:border-dw-primary/40 hover:bg-white/5 hover:text-white"
                           }
                         `}
                       >
@@ -575,8 +585,8 @@ export default function Footer() {
             border-t
             ${
               isDark
-                ? "border-white/10"
-                : "border-slate-200"
+                ? "border-slate-300"
+                : "border-white/10"
             }
           `}
         >
@@ -608,8 +618,8 @@ export default function Footer() {
                     p-1
                     ${
                       isDark
-                        ? "border-white/10 bg-white/[0.03]"
-                        : "border-slate-200 bg-slate-50"
+                        ? "border-slate-300 bg-slate-200"
+                        : "border-white/10 bg-white/[0.03]"
                     }
                   `}
                 >
@@ -632,11 +642,10 @@ export default function Footer() {
                             language === lang
                               ? "bg-dw-primary text-white shadow-sm"
                               : isDark
-                                ? "text-slate-400 hover:text-white"
-                                : "text-slate-500 hover:text-slate-900"
+                                ? "text-slate-600 hover:text-slate-900"
+                                : "text-slate-400 hover:text-white"
                           }
                         `}
-                        aria-label={`Changer la langue en ${lang}`}
                       >
                         {lang}
                       </button>
@@ -645,15 +654,13 @@ export default function Footer() {
                 </div>
               </div>
 
-              {/* Social mini text */}
-
               <p
                 className={`
                   text-xs
                   ${
                     isDark
-                      ? "text-slate-600"
-                      : "text-slate-400"
+                      ? "text-slate-500"
+                      : "text-slate-500"
                   }
                 `}
               >
@@ -672,8 +679,8 @@ export default function Footer() {
             border-t
             ${
               isDark
-                ? "border-white/10"
-                : "border-slate-200"
+                ? "border-slate-300"
+                : "border-white/10"
             }
           `}
         >
@@ -710,8 +717,8 @@ export default function Footer() {
                 transition-colors
                 ${
                   isDark
-                    ? "text-slate-500 hover:text-slate-300"
-                    : "text-slate-500 hover:text-slate-700"
+                    ? "text-slate-500 hover:text-slate-700"
+                    : "text-slate-400 hover:text-slate-300"
                 }
               `}
               aria-label="Digital Work"
@@ -731,8 +738,8 @@ export default function Footer() {
                   transition-colors
                   ${
                     isDark
-                      ? "text-slate-500 hover:text-white"
-                      : "text-slate-500 hover:text-slate-900"
+                      ? "text-slate-500 hover:text-slate-900"
+                      : "text-slate-400 hover:text-white"
                   }
                 `}
               >
@@ -749,8 +756,8 @@ export default function Footer() {
                   transition-colors
                   ${
                     isDark
-                      ? "text-slate-500 hover:text-white"
-                      : "text-slate-500 hover:text-slate-900"
+                      ? "text-slate-500 hover:text-slate-900"
+                      : "text-slate-400 hover:text-white"
                   }
                 `}
               >

@@ -1,12 +1,22 @@
-import { motion, type Variants } from "framer-motion";
+import {
+  motion,
+  type Variants,
+} from "framer-motion";
+
 import {
   ArrowDown,
   ArrowRight,
   CheckCircle2,
   Code2,
+  ExternalLink,
   Globe2,
   Sparkles,
 } from "lucide-react";
+
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import Container from "../components/ui/Container";
 import SectionTitle from "../components/ui/SectionTitle";
@@ -16,6 +26,12 @@ import Button from "../components/ui/Button";
 import Problems from "../components/sections/Problems";
 import Solutions from "../components/sections/Solutions";
 import ServicesGrid from "../components/sections/ServicesGrid";
+
+import {
+  API_URL,
+  fetchProjects,
+  type Project,
+} from "../services/projectsApi";
 
 /* =========================================================
    ANIMATIONS
@@ -58,16 +74,20 @@ export default function Home() {
 
       <section className="relative isolate min-h-screen overflow-hidden bg-dw-background pt-20">
         {/* Background grid */}
+
         <div className="absolute inset-0 -z-20 dw-grid opacity-40" />
 
         {/* Main glow */}
+
         <div className="absolute left-1/2 top-0 -z-10 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-dw-primary/10 blur-[140px]" />
 
         {/* Cyan glow */}
+
         <div className="absolute right-[-10%] top-[20%] -z-10 h-[350px] w-[350px] rounded-full bg-dw-cyan/10 blur-[120px]" />
 
         <Container className="relative flex min-h-[calc(100vh-80px)] items-center py-16 lg:py-20">
           <div className="grid w-full items-center gap-16 lg:grid-cols-[1.05fr_0.95fr]">
+
             {/* =================================================
                 LEFT CONTENT
             ================================================== */}
@@ -81,7 +101,9 @@ export default function Home() {
               {/* Badge */}
 
               <motion.div variants={itemVariants}>
-                <Badge>Agence digitale</Badge>
+                <Badge>
+                  Agence digitale
+                </Badge>
               </motion.div>
 
               {/* Title */}
@@ -267,10 +289,10 @@ export default function Home() {
           sm:py-32
         "
       >
-        <Container >
-          <SectionTitle  
+        <Container>
+          <SectionTitle
             eyebrow="Nos expertises"
-            title={ 
+            title={
               <>
                 Des solutions digitales
                 <br />
@@ -299,6 +321,12 @@ export default function Home() {
       <Solutions />
 
       {/* =====================================================
+          REALISATIONS
+      ====================================================== */}
+
+      <HomeRealisations />
+
+      {/* =====================================================
           POSITIONING
       ====================================================== */}
 
@@ -313,12 +341,13 @@ export default function Home() {
       >
         <Container>
           <div className="grid items-center gap-12 lg:grid-cols-2">
-            {/* =================================================
-                LEFT
-            ================================================== */}
+
+            {/* LEFT */}
 
             <div>
-              <Badge>Plus qu'un site web</Badge>
+              <Badge>
+                Plus qu'un site web
+              </Badge>
 
               <h2
                 className="
@@ -357,9 +386,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* =================================================
-                RIGHT FEATURES
-            ================================================== */}
+            {/* RIGHT FEATURES */}
 
             <div className="grid gap-4 sm:grid-cols-2">
               <FeatureCard
@@ -427,6 +454,7 @@ export default function Home() {
             />
 
             <div className="relative">
+
               {/* Icon */}
 
               <div
@@ -497,12 +525,592 @@ export default function Home() {
 }
 
 /* =========================================================
+   REALISATIONS HOME
+========================================================= */
+
+function HomeRealisations() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProjects() {
+      try {
+        setLoading(true);
+
+        const data = await fetchProjects();
+
+        /*
+         * On privilégie les projets featured.
+         * S'il n'y en a aucun, on prend les 3 premiers.
+         */
+
+        const featuredProjects = data
+          .filter((project) => project.featured)
+          .slice(0, 3);
+
+        setProjects(
+          featuredProjects.length > 0
+            ? featuredProjects
+            : data.slice(0, 3)
+        );
+      } catch (error) {
+        console.error(
+          "Erreur chargement réalisations Home:",
+          error
+        );
+
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void loadProjects();
+  }, []);
+
+  /* =======================================================
+     IMAGE URL
+  ======================================================= */
+
+  function getImageUrl(project: Project): string {
+    if (!project.image_url) {
+      return "";
+    }
+
+    if (project.image_url.startsWith("http")) {
+      return project.image_url;
+    }
+
+    return `${API_URL}${project.image_url}`;
+  }
+
+  /* =======================================================
+     LOADING
+  ======================================================= */
+
+  if (loading) {
+    return (
+      <section className="bg-dw-background py-24 sm:py-32">
+        <Container>
+          <div className="flex justify-center">
+            <div
+              className="
+                h-8
+                w-8
+                animate-spin
+                rounded-full
+                border-2
+                border-dw-primary/20
+                border-t-dw-primary
+              "
+            />
+          </div>
+        </Container>
+      </section>
+    );
+  }
+
+  /* =======================================================
+     EMPTY
+  ======================================================= */
+
+  if (projects.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      className="
+        relative
+        overflow-hidden
+        border-t
+        border-dw-border
+        bg-dw-background
+        py-24
+        sm:py-32
+      "
+    >
+      {/* Background grid */}
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          -z-10
+          dw-grid
+          opacity-20
+        "
+      />
+
+      {/* Glow */}
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          left-1/2
+          top-0
+          -z-10
+          h-[500px]
+          w-[700px]
+          -translate-x-1/2
+          rounded-full
+          bg-dw-primary/10
+          blur-[150px]
+        "
+      />
+
+      <Container>
+
+        {/* HEADER */}
+
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{
+            once: true,
+            amount: 0.2,
+          }}
+          className="mx-auto max-w-3xl text-center"
+        >
+          <motion.div variants={itemVariants}>
+            <Badge>
+              Nos réalisations
+            </Badge>
+          </motion.div>
+
+          <motion.h2
+            variants={itemVariants}
+            className="
+              mt-6
+              text-4xl
+              font-black
+              tracking-[-0.035em]
+              text-dw-text
+              sm:text-5xl
+              lg:text-6xl
+            "
+          >
+            Des projets qui
+            <br />
+
+            <span className="dw-gradient-text">
+              deviennent des résultats.
+            </span>
+          </motion.h2>
+
+          <motion.p
+            variants={itemVariants}
+            className="
+              mx-auto
+              mt-6
+              max-w-2xl
+              text-base
+              leading-8
+              text-dw-muted
+              sm:text-lg
+            "
+          >
+            Découvrez quelques solutions digitales conçues et
+            développées par Digital Work pour répondre à des besoins
+            réels.
+          </motion.p>
+        </motion.div>
+
+        {/* PROJECTS */}
+
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{
+            once: true,
+            amount: 0.08,
+          }}
+          className="
+            mt-14
+            grid
+            gap-6
+            lg:grid-cols-3
+          "
+        >
+          {projects.map((project, index) => (
+            <HomeProjectCard
+              key={project.id}
+              project={project}
+              featured={index === 0}
+              getImageUrl={getImageUrl}
+            />
+          ))}
+        </motion.div>
+
+        {/* CTA */}
+
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{
+            once: true,
+            amount: 0.2,
+          }}
+          className="mt-12 flex justify-center"
+        >
+          <Button
+            to="/realisations"
+            variant="secondary"
+          >
+            Voir toutes nos réalisations
+            <ArrowRight size={17} />
+          </Button>
+        </motion.div>
+      </Container>
+    </section>
+  );
+}
+
+/* =========================================================
+   PROJECT CARD
+========================================================= */
+
+interface HomeProjectCardProps {
+  project: Project;
+  featured?: boolean;
+  getImageUrl: (
+    project: Project
+  ) => string;
+}
+
+function HomeProjectCard({
+  project,
+  featured = false,
+  getImageUrl,
+}: HomeProjectCardProps) {
+  const [imageError, setImageError] =
+    useState(false);
+
+  const imageUrl = getImageUrl(project);
+
+  const projectLink =
+    project.demo_url ||
+    project.project_url ||
+    "";
+
+  const hasLink =
+    Boolean(projectLink);
+
+  const isInternal =
+    projectLink.startsWith("/");
+
+  return (
+    <motion.article
+      variants={itemVariants}
+      className="
+        group
+        overflow-hidden
+        rounded-3xl
+        border
+        border-dw-border
+        bg-dw-card
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:border-dw-primary/30
+        hover:shadow-xl
+        hover:shadow-dw-primary/5
+      "
+    >
+      {/* IMAGE */}
+
+      <div
+        className="
+          relative
+          h-64
+          overflow-hidden
+          bg-dw-surface
+        "
+      >
+        {imageUrl && !imageError ? (
+          <img
+            src={imageUrl}
+            alt={project.title}
+            className="
+              absolute
+              inset-0
+              h-full
+              w-full
+              object-cover
+              transition-transform
+              duration-700
+              group-hover:scale-105
+            "
+            onError={() =>
+              setImageError(true)
+            }
+          />
+        ) : (
+          <div
+            className="
+              absolute
+              inset-0
+              flex
+              items-center
+              justify-center
+              bg-gradient-to-br
+              from-dw-primary/10
+              via-dw-surface
+              to-dw-background
+            "
+          >
+            <div
+              className="
+                flex
+                h-20
+                w-20
+                items-center
+                justify-center
+                rounded-2xl
+                border
+                border-dw-primary/20
+                bg-dw-primary/10
+                text-2xl
+                font-black
+                text-dw-primary
+              "
+            >
+              DW
+            </div>
+          </div>
+        )}
+
+        {/* Overlay */}
+
+        <div
+          className="
+            absolute
+            inset-0
+            bg-gradient-to-t
+            from-black/70
+            via-black/10
+            to-transparent
+            opacity-80
+          "
+        />
+
+        {/* Category */}
+
+        <div
+          className="
+            absolute
+            bottom-5
+            left-5
+          "
+        >
+          <span
+            className="
+              rounded-lg
+              border
+              border-white/15
+              bg-black/30
+              px-3
+              py-1.5
+              text-[11px]
+              font-semibold
+              uppercase
+              tracking-[0.12em]
+              text-white
+              backdrop-blur-md
+            "
+          >
+            {project.category}
+          </span>
+        </div>
+
+        {/* Featured */}
+
+        {featured && (
+          <div
+            className="
+              absolute
+              right-5
+              top-5
+              rounded-lg
+              bg-dw-primary
+              px-3
+              py-1.5
+              text-[11px]
+              font-bold
+              text-white
+              shadow-lg
+            "
+          >
+            Projet phare
+          </div>
+        )}
+      </div>
+
+      {/* CONTENT */}
+
+      <div className="p-6">
+
+        {/* Title */}
+
+        <div
+          className="
+            flex
+            items-start
+            justify-between
+            gap-4
+          "
+        >
+          <h3
+            className="
+              text-xl
+              font-bold
+              tracking-tight
+              text-dw-text
+            "
+          >
+            {project.title}
+          </h3>
+
+          {hasLink && (
+            <a
+              href={projectLink}
+              target={
+                isInternal
+                  ? undefined
+                  : "_blank"
+              }
+              rel={
+                isInternal
+                  ? undefined
+                  : "noopener noreferrer"
+              }
+              aria-label={`Voir ${project.title}`}
+              className="
+                flex
+                h-9
+                w-9
+                shrink-0
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-dw-border
+                bg-dw-surface
+                text-dw-muted
+                transition-all
+                hover:border-dw-primary/30
+                hover:text-dw-primary
+              "
+            >
+              <ExternalLink size={16} />
+            </a>
+          )}
+        </div>
+
+        {/* Description */}
+
+        <p
+          className="
+            mt-3
+            line-clamp-3
+            text-sm
+            leading-7
+            text-dw-muted
+          "
+        >
+          {project.description}
+        </p>
+
+        {/* Technologies */}
+
+        {project.technologies.length > 0 && (
+          <div
+            className="
+              mt-5
+              flex
+              flex-wrap
+              gap-2
+            "
+          >
+            {project.technologies
+              .slice(0, 5)
+              .map((technology) => (
+                <span
+                  key={technology}
+                  className="
+                    rounded-lg
+                    border
+                    border-dw-border
+                    bg-dw-surface
+                    px-2.5
+                    py-1
+                    text-[11px]
+                    font-medium
+                    text-dw-muted
+                  "
+                >
+                  {technology}
+                </span>
+              ))}
+          </div>
+        )}
+
+        {/* CTA */}
+
+        {hasLink && (
+          <a
+            href={projectLink}
+            target={
+              isInternal
+                ? undefined
+                : "_blank"
+            }
+            rel={
+              isInternal
+                ? undefined
+                : "noopener noreferrer"
+            }
+            className="
+              group/link
+              mt-6
+              inline-flex
+              items-center
+              gap-2
+              text-sm
+              font-semibold
+              text-dw-primary
+            "
+          >
+            Voir le projet
+
+            <ArrowRight
+              size={15}
+              className="
+                transition-transform
+                duration-300
+                group-hover/link:translate-x-1
+              "
+            />
+          </a>
+        )}
+      </div>
+    </motion.article>
+  );
+}
+
+/* =========================================================
    HERO VISUAL
 ========================================================= */
 
 function HeroVisual() {
   return (
     <div className="relative mx-auto aspect-square max-w-[540px]">
+
       {/* Outer glow */}
 
       <div
@@ -531,6 +1139,7 @@ function HeroVisual() {
           backdrop-blur-xl
         "
       >
+
         {/* Top bar */}
 
         <div
@@ -554,28 +1163,32 @@ function HeroVisual() {
         {/* Dashboard */}
 
         <div className="grid grid-cols-[80px_1fr] gap-4 p-5">
+
           {/* Sidebar */}
 
           <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map((item, index) => (
-              <div
-                key={item}
-                className={`
-                  h-8
-                  rounded-lg
-                  ${
-                    index === 0
-                      ? "bg-dw-primary/20"
-                      : "bg-dw-card"
-                  }
-                `}
-              />
-            ))}
+            {[1, 2, 3, 4, 5].map(
+              (item, index) => (
+                <div
+                  key={item}
+                  className={`
+                    h-8
+                    rounded-lg
+                    ${
+                      index === 0
+                        ? "bg-dw-primary/20"
+                        : "bg-dw-card"
+                    }
+                  `}
+                />
+              )
+            )}
           </div>
 
           {/* Dashboard content */}
 
           <div>
+
             {/* Stats */}
 
             <div className="grid grid-cols-3 gap-3">
@@ -619,7 +1232,9 @@ function HeroVisual() {
                         height: `${height}%`,
                       }}
                       transition={{
-                        delay: 0.7 + index * 0.08,
+                        delay:
+                          0.7 +
+                          index * 0.08,
                         duration: 0.7,
                         ease: "easeOut",
                       }}
