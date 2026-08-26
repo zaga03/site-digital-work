@@ -1,38 +1,16 @@
-digital-work/
-├── index.html
+frontend/
+│
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── contexts/
+│   ├── pages/
+│   ├── services/
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+│
+├── public/
 ├── package.json
-├── vite.config.ts
 ├── tsconfig.json
-│
-└── src/
-    ├── main.tsx
-    ├── App.tsx
-    ├── index.css
-    │
-    ├── components/
-    │   ├── layout/
-    │   │   └── Navbar.tsx
-    │   │
-    │   └── ui/
-    │       ├── Button.tsx
-    │       ├── Badge.tsx
-    │       ├── Container.tsx
-    │       └── SectionTitle.tsx
-    │
-    └── pages/
-        └── Home.tsx
-
-  PARTIE 2 
-  src/
-├── components/
-│   └── sections/
-│       ├── Problems.tsx
-│       ├── Solutions.tsx
-│       └── ServicesGrid.tsx
-│
-├── data/
-│   ├── services.ts
-│   └── solutions.ts
-│
-└── pages/
-    └── Services.tsx
+└── vite.config.ts
