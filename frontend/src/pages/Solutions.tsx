@@ -1,0 +1,603 @@
+import { motion, type Variants } from "framer-motion";
+import {
+  ArrowRight,
+  BarChart3,
+  Check,
+  Globe2,
+  Hotel,
+  Layers3,
+  Network,
+  Settings2,
+  Smartphone,
+  Sparkles,
+  Workflow,
+} from "lucide-react";
+
+import Container from "../components/ui/Container";
+import Badge from "../components/ui/Badge";
+import Button from "../components/ui/Button";
+import SectionTitle from "../components/ui/SectionTitle";
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+const containerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 24,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.55,
+      ease: "easeOut",
+    },
+  },
+};
+
+/* =========================================================
+   SOLUTIONS DATA
+========================================================= */
+
+const solutions = [
+  {
+    number: "01",
+    icon: Globe2,
+    title: "Présence digitale",
+    subtitle: "Soyez visible. Soyez crédible.",
+    description:
+      "Nous construisons une présence digitale professionnelle permettant à votre entreprise d'être trouvée, comprise et contactée facilement.",
+    features: [
+      "Site web professionnel",
+      "Landing pages",
+      "Référencement naturel",
+      "Google Business",
+      "Responsive mobile",
+      "Optimisation des performances",
+    ],
+  },
+  {
+    number: "02",
+    icon: BarChart3,
+    title: "Gestion d'entreprise",
+    subtitle: "Pilotez votre activité depuis un seul endroit.",
+    description:
+      "Nous développons des plateformes permettant de centraliser vos données, vos utilisateurs, vos opérations et vos indicateurs.",
+    features: [
+      "Dashboards",
+      "Gestion utilisateurs",
+      "Statistiques",
+      "Gestion clients",
+      "Gestion des opérations",
+      "Rapports",
+    ],
+  },
+  {
+    number: "03",
+    icon: Workflow,
+    title: "Digitalisation des processus",
+    subtitle: "Moins de tâches manuelles. Plus d'efficacité.",
+    description:
+      "Nous transformons vos processus papier ou Excel en workflows numériques simples, automatisés et traçables.",
+    features: [
+      "Workflows métier",
+      "Automatisation",
+      "Formulaires numériques",
+      "Notifications",
+      "Gestion documentaire",
+      "Suivi des opérations",
+    ],
+  },
+  {
+    number: "04",
+    icon: Hotel,
+    title: "Hôtellerie & restauration",
+    subtitle: "Une expérience digitale adaptée à votre établissement.",
+    description:
+      "Nous créons des solutions digitales pour les hôtels, restaurants et établissements touristiques afin d'améliorer leur visibilité et leur gestion.",
+    features: [
+      "Site hôtelier",
+      "Menu digital",
+      "Réservation",
+      "Galerie photos",
+      "WhatsApp Business",
+      "Gestion de contenu",
+    ],
+  },
+  {
+    number: "05",
+    icon: Network,
+    title: "Réseaux & Wi-Fi",
+    subtitle: "Connectez vos utilisateurs et contrôlez votre réseau.",
+    description:
+      "Nous développons et intégrons des solutions de gestion Wi-Fi et réseau pour les entreprises, hôtels, espaces publics et zones communautaires.",
+    features: [
+      "Hotspot Wi-Fi",
+      "Gestion vouchers",
+      "MikroTik",
+      "Gestion utilisateurs",
+      "Statistiques réseau",
+      "Portail captif",
+    ],
+  },
+];
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+export default function Solutions() {
+  return (
+    <>
+      {/* =====================================================
+          HERO
+      ====================================================== */}
+
+      <section className="relative isolate overflow-hidden pt-32 pb-20 sm:pb-28">
+        <div className="absolute inset-0 -z-20 dw-grid opacity-30" />
+
+        <div className="absolute left-1/2 top-0 -z-10 h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-dw-primary/10 blur-[150px]" />
+
+        <Container>
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="mx-auto max-w-4xl text-center"
+          >
+            <motion.div variants={itemVariants}>
+              <Badge>Solutions Digital Work</Badge>
+            </motion.div>
+
+            <motion.h1
+              variants={itemVariants}
+              className="mt-7 text-5xl font-black leading-[1.02] tracking-[-0.04em] text-dw-white sm:text-6xl lg:text-7xl"
+            >
+              Des solutions digitales
+              <br />
+              <span className="dw-gradient-text">
+                pensées pour votre activité.
+              </span>
+            </motion.h1>
+
+            <motion.p
+              variants={itemVariants}
+              className="mx-auto mt-7 max-w-2xl text-base leading-8 text-dw-muted sm:text-lg"
+            >
+              Digital Work analyse vos besoins et construit
+              des outils numériques adaptés à vos objectifs,
+              votre secteur et vos utilisateurs.
+            </motion.p>
+
+            <motion.div
+              variants={itemVariants}
+              className="mt-9 flex flex-col justify-center gap-3 sm:flex-row"
+            >
+              <Button to="/contact">
+                Définir mon besoin
+                <ArrowRight size={17} />
+              </Button>
+
+              <Button
+                to="/realisations"
+                variant="secondary"
+              >
+                Voir nos réalisations
+              </Button>
+            </motion.div>
+          </motion.div>
+        </Container>
+      </section>
+
+      {/* =====================================================
+          POSITIONING
+      ====================================================== */}
+
+      <section className="border-t border-white/[0.06] py-24 sm:py-32">
+        <Container>
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            <div>
+              <Badge>Notre philosophie</Badge>
+
+              <h2 className="mt-6 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                La technologie doit résoudre un problème.
+              </h2>
+
+              <p className="mt-5 max-w-xl text-base leading-8 text-dw-muted">
+                Nous commençons par comprendre votre activité
+                avant de proposer une solution technique.
+              </p>
+
+              <p className="mt-4 max-w-xl text-base leading-8 text-dw-muted">
+                L'objectif n'est pas de multiplier les outils,
+                mais de construire un système digital cohérent,
+                utile et capable d'évoluer avec votre entreprise.
+              </p>
+
+              <div className="mt-8">
+                <Button to="/services">
+                  Découvrir nos expertises
+                  <ArrowRight size={16} />
+                </Button>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 rounded-3xl bg-dw-primary/10 blur-[80px]" />
+
+              <div className="relative rounded-3xl border border-white/[0.07] bg-dw-card p-7">
+                <div className="grid grid-cols-2 gap-4">
+                  <MiniStat
+                    icon={Globe2}
+                    title="Visibilité"
+                    text="Attirer plus de clients"
+                  />
+
+                  <MiniStat
+                    icon={BarChart3}
+                    title="Pilotage"
+                    text="Décider avec vos données"
+                  />
+
+                  <MiniStat
+                    icon={Workflow}
+                    title="Automatisation"
+                    text="Gagner du temps"
+                  />
+
+                  <MiniStat
+                    icon={Settings2}
+                    title="Évolution"
+                    text="Grandir avec vos outils"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* =====================================================
+          SOLUTIONS
+      ====================================================== */}
+
+      <section className="border-y border-white/[0.06] bg-white/[0.015] py-24 sm:py-32">
+        <Container>
+          <SectionTitle
+            eyebrow="Nos solutions"
+            title={
+              <>
+                Une solution pour chaque
+                <br />
+                besoin métier.
+              </>
+            }
+            description="Nous combinons stratégie digitale, design et développement pour créer des solutions adaptées à chaque contexte."
+          />
+
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{
+              once: true,
+              amount: 0.08,
+            }}
+            className="mt-16 space-y-5"
+          >
+            {solutions.map((solution) => (
+              <SolutionCard
+                key={solution.number}
+                solution={solution}
+              />
+            ))}
+          </motion.div>
+        </Container>
+      </section>
+
+      {/* =====================================================
+          BUSINESS SECTORS
+      ====================================================== */}
+
+      <section className="py-24 sm:py-32">
+        <Container>
+          <SectionTitle
+            eyebrow="Secteurs"
+            title={
+              <>
+                Des solutions adaptées
+                <br />
+                à votre environnement.
+              </>
+            }
+            description="Notre approche s'adapte aux contraintes et aux objectifs de votre secteur d'activité."
+          />
+
+          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <SectorCard
+              icon={Hotel}
+              title="Hôtellerie"
+              text="Visibilité, réservation, présence digitale et outils de gestion."
+            />
+
+            <SectorCard
+              icon={Layers3}
+              title="PME"
+              text="Digitalisation des processus et centralisation des opérations."
+            />
+
+            <SectorCard
+              icon={Smartphone}
+              title="Commerces"
+              text="Solutions web et mobiles pour améliorer la relation client."
+            />
+
+            <SectorCard
+              icon={Network}
+              title="Réseaux"
+              text="Hotspot, Wi-Fi, gestion utilisateurs et supervision."
+            />
+          </div>
+        </Container>
+      </section>
+
+      {/* =====================================================
+          PROCESS
+      ====================================================== */}
+
+      <section className="border-y border-white/[0.06] bg-white/[0.015] py-24 sm:py-32">
+        <Container>
+          <SectionTitle
+            eyebrow="Comment ça fonctionne"
+            title={
+              <>
+                Votre besoin devient
+                <br />
+                une solution concrète.
+              </>
+            }
+            description="Un processus simple pour éviter les développements inutiles et concentrer les efforts sur ce qui crée réellement de la valeur."
+          />
+
+          <div className="mt-14 grid gap-5 md:grid-cols-3">
+            <ProcessStep
+              number="01"
+              title="Vous nous expliquez"
+              text="Nous échangeons sur votre activité, votre problème et vos objectifs."
+            />
+
+            <ProcessStep
+              number="02"
+              title="Nous concevons"
+              text="Nous définissons l'architecture, les fonctionnalités et l'expérience utilisateur."
+            />
+
+            <ProcessStep
+              number="03"
+              title="Nous construisons"
+              text="Nous développons et mettons en production votre solution."
+            />
+          </div>
+        </Container>
+      </section>
+
+      {/* =====================================================
+          CTA
+      ====================================================== */}
+
+      <section className="py-24 sm:py-32">
+        <Container>
+          <div className="relative overflow-hidden rounded-3xl border border-dw-primary/20 bg-dw-primary/[0.07] px-6 py-16 text-center sm:px-12">
+            <div className="absolute left-1/2 top-0 h-64 w-96 -translate-x-1/2 rounded-full bg-dw-primary/10 blur-[100px]" />
+
+            <div className="relative">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-dw-primary/20 bg-dw-primary/10 text-dw-primary">
+                <Sparkles size={22} />
+              </div>
+
+              <h2 className="mx-auto mt-6 max-w-3xl text-3xl font-bold tracking-tight text-dw-white sm:text-4xl">
+                Vous avez un problème à digitaliser ?
+              </h2>
+
+              <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-dw-muted">
+                Décrivez-nous votre situation. Nous vous
+                aiderons à identifier la solution digitale la
+                plus adaptée.
+              </p>
+
+              <div className="mt-8">
+                <Button to="/contact">
+                  Parler de mon projet
+                  <ArrowRight size={17} />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+    </>
+  );
+}
+
+/* =========================================================
+   SOLUTION CARD
+========================================================= */
+
+interface Solution {
+  number: string;
+  icon: typeof Globe2;
+  title: string;
+  subtitle: string;
+  description: string;
+  features: string[];
+}
+
+interface SolutionCardProps {
+  solution: Solution;
+}
+
+function SolutionCard({ solution }: SolutionCardProps) {
+  const Icon = solution.icon;
+
+  return (
+    <motion.article
+      variants={itemVariants}
+      className="group rounded-3xl border border-white/[0.07] bg-dw-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-dw-primary/20 sm:p-9"
+    >
+      <div className="grid gap-8 lg:grid-cols-[80px_1fr_1fr] lg:items-start">
+        {/* Number */}
+
+        <div className="flex items-center justify-between lg:block">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-dw-primary/20 bg-dw-primary/10 text-dw-primary">
+            <Icon size={25} />
+          </div>
+
+          <span className="text-xs font-bold tracking-[0.18em] text-dw-primary/70 lg:mt-5 lg:block">
+            {solution.number}
+          </span>
+        </div>
+
+        {/* Text */}
+
+        <div>
+          <h3 className="text-2xl font-bold text-dw-white">
+            {solution.title}
+          </h3>
+
+          <p className="mt-2 text-sm font-medium text-dw-primary">
+            {solution.subtitle}
+          </p>
+
+          <p className="mt-4 max-w-xl text-sm leading-7 text-dw-muted">
+            {solution.description}
+          </p>
+        </div>
+
+        {/* Features */}
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+          {solution.features.map((feature) => (
+            <div
+              key={feature}
+              className="flex items-center gap-2 text-sm text-dw-muted"
+            >
+              <Check
+                size={15}
+                className="shrink-0 text-emerald-400"
+              />
+
+              <span>{feature}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+/* =========================================================
+   MINI STAT
+========================================================= */
+
+interface MiniStatProps {
+  icon: typeof Globe2;
+  title: string;
+  text: string;
+}
+
+function MiniStat({
+  icon: Icon,
+  title,
+  text,
+}: MiniStatProps) {
+  return (
+    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.025] p-5">
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-dw-primary/10 text-dw-primary">
+        <Icon size={19} />
+      </div>
+
+      <h3 className="mt-4 text-sm font-bold text-dw-white">
+        {title}
+      </h3>
+
+      <p className="mt-1 text-xs leading-5 text-dw-muted">
+        {text}
+      </p>
+    </div>
+  );
+}
+
+/* =========================================================
+   SECTOR CARD
+========================================================= */
+
+interface SectorCardProps {
+  icon: typeof Hotel;
+  title: string;
+  text: string;
+}
+
+function SectorCard({
+  icon: Icon,
+  title,
+  text,
+}: SectorCardProps) {
+  return (
+    <div className="group rounded-2xl border border-white/[0.07] bg-dw-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-dw-primary/20">
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.025] text-dw-primary">
+        <Icon size={21} />
+      </div>
+
+      <h3 className="mt-6 text-lg font-bold text-dw-white">
+        {title}
+      </h3>
+
+      <p className="mt-2 text-sm leading-6 text-dw-muted">
+        {text}
+      </p>
+    </div>
+  );
+}
+
+/* =========================================================
+   PROCESS STEP
+========================================================= */
+
+interface ProcessStepProps {
+  number: string;
+  title: string;
+  text: string;
+}
+
+function ProcessStep({
+  number,
+  title,
+  text,
+}: ProcessStepProps) {
+  return (
+    <div className="rounded-2xl border border-white/[0.07] bg-dw-card p-7">
+      <span className="text-xs font-bold tracking-[0.15em] text-dw-primary">
+        {number}
+      </span>
+
+      <h3 className="mt-5 text-xl font-bold text-dw-white">
+        {title}
+      </h3>
+
+      <p className="mt-3 text-sm leading-7 text-dw-muted">
+        {text}
+      </p>
+    </div>
+  );
+}

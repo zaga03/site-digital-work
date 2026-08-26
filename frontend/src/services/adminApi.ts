@@ -1,0 +1,213 @@
+const API_URL = "http://localhost:4000";
+
+const TOKEN_KEY = "digital-work-admin-token";
+
+export interface Project {
+  id: string;
+  title: string;
+  short_title: string | null;
+  description: string;
+  details: string | null;
+  category: string;
+  image_url: string | null;
+  technologies: string[];
+  benefits: string[];
+  project_url: string | null;
+  demo_url: string | null;
+  featured: boolean;
+  status:
+    | "completed"
+    | "in-progress"
+    | "maintenance";
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  message?: string;
+}
+
+export function getAdminToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function adminLogout() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(
+    "digital-work-admin"
+  );
+}
+
+async function request<T>(
+  path: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const token = getAdminToken();
+
+  const headers = new Headers(
+    options.headers
+  );
+
+  headers.set(
+    "Content-Type",
+    "application/json"
+  );
+
+  if (token) {
+    headers.set(
+      "Authorization",
+      `Bearer ${token}`
+    );
+  }
+
+  const response = await fetch(
+    `${API_URL}${path}`,
+    {
+      ...options,
+      headers,
+    }
+  );
+
+  const data =
+    (await response.json()) as ApiResponse<T>;
+
+  if (!response.ok || !data.success) {
+    if (response.status === 401) {
+      adminLogout();
+
+      window.location.href =
+        "/admin/login";
+    }
+
+    throw new Error(
+      data.message ??
+        "Une erreur est survenue."
+    );
+  }
+
+  return data.data as T;
+}
+
+export function getProjects() {
+  return request<Project[]>(
+    "/api/projects"
+  );
+}
+
+export function getProject(id: string) {
+  return request<Project>(
+    `/api/projects/${id}`
+  );
+}
+
+export function createProject(
+  data: Omit<
+    Project,
+    "id" |
+      "created_at" |
+      "updated_at"
+  >
+) {
+  return request<Project>(
+    "/api/projects",
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+    }
+  );
+}
+
+export function updateProject(
+  id: string,
+  data: Partial<
+    Omit<
+      Project,
+      "id" |
+        "created_at" |
+        "updated_at"
+    >
+  >
+) {
+  return request<Project>(
+    `/api/projects/${id}`,
+    {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }
+  );
+}
+
+export function deleteProject(
+  id: string
+) {
+  return request<void>(
+    `/api/projects/${id}`,
+    {
+      method: "DELETE",
+    }
+  );
+}
+
+export interface UploadResponse {
+  filename: string;
+  url: string;
+  size: number;
+  mimetype: string;
+}
+
+export async function uploadProjectImage(
+  file: File
+): Promise<UploadResponse> {
+  const token = getAdminToken();
+
+  if (!token) {
+    throw new Error(
+      "Session administrateur inexistante."
+    );
+  }
+
+  const formData = new FormData();
+
+  formData.append(
+    "image",
+    file
+  );
+
+  const response = await fetch(
+    `${API_URL}/api/uploads/project`,
+    {
+      method: "POST",
+
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+
+      body: formData,
+    }
+  );
+
+  const data =
+    (await response.json()) as {
+      success: boolean;
+      data?: UploadResponse;
+      message?: string;
+    };
+
+  if (!response.ok || !data.success) {
+    throw new Error(
+      data.message ??
+        "Impossible d'envoyer l'image."
+    );
+  }
+
+  if (!data.data) {
+    throw new Error(
+      "Réponse upload invalide."
+    );
+  }
+
+  return data.data;
+}
