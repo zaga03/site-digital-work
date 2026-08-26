@@ -1,20 +1,6 @@
-import {
-  motion,
-  type Variants,
-} from "framer-motion";
-
-import {
-  ArrowRight,
-  Check,
-  CheckCircle2,
-  ExternalLink,
-} from "lucide-react";
-
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { motion, type Variants } from "framer-motion";
+import { ArrowRight, ExternalLink,   CheckCircle2,   Check, } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import Container from "../components/ui/Container";
 import Badge from "../components/ui/Badge";
@@ -32,7 +18,6 @@ import {
 
 const containerVariants: Variants = {
   hidden: {},
-
   visible: {
     transition: {
       staggerChildren: 0.08,
@@ -45,11 +30,9 @@ const itemVariants: Variants = {
     opacity: 0,
     y: 24,
   },
-
   visible: {
     opacity: 1,
     y: 0,
-
     transition: {
       duration: 0.55,
       ease: "easeOut",
@@ -62,17 +45,10 @@ const itemVariants: Variants = {
 ========================================================= */
 
 export default function Realisations() {
-  const [projects, setProjects] =
-    useState<Project[]>([]);
-
-  const [activeCategory, setActiveCategory] =
-    useState<string>("Tous");
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [error, setError] =
-    useState("");
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>("Tous");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   /* =======================================================
      CHARGEMENT DES PROJETS
@@ -84,8 +60,7 @@ export default function Realisations() {
         setLoading(true);
         setError("");
 
-        const data =
-          await fetchProjects();
+        const data = await fetchProjects();
 
         setProjects(data);
       } catch (error) {
@@ -112,43 +87,30 @@ export default function Realisations() {
   ======================================================= */
 
   const categories = useMemo(() => {
-    const uniqueCategories =
-      Array.from(
-        new Set(
-          projects
-            .map(
-              (project) =>
-                project.category
-            )
-            .filter(Boolean)
-        )
-      );
+    const uniqueCategories = Array.from(
+      new Set(
+        projects
+          .map((project) => project.category)
+          .filter(Boolean)
+      )
+    );
 
-    return [
-      "Tous",
-      ...uniqueCategories,
-    ];
+    return ["Tous", ...uniqueCategories];
   }, [projects]);
 
   /* =======================================================
      FILTRAGE
   ======================================================= */
 
-  const filteredProjects =
-    useMemo(() => {
-      if (activeCategory === "Tous") {
-        return projects;
-      }
+  const filteredProjects = useMemo(() => {
+    if (activeCategory === "Tous") {
+      return projects;
+    }
 
-      return projects.filter(
-        (project) =>
-          project.category ===
-          activeCategory
-      );
-    }, [
-      projects,
-      activeCategory,
-    ]);
+    return projects.filter(
+      (project) => project.category === activeCategory
+    );
+  }, [projects, activeCategory]);
 
   return (
     <>
@@ -194,9 +156,7 @@ export default function Realisations() {
 
         <Container>
           <motion.div
-            variants={
-              containerVariants
-            }
+            variants={containerVariants}
             initial="hidden"
             animate="visible"
             className="
@@ -205,12 +165,8 @@ export default function Realisations() {
               text-center
             "
           >
-            <motion.div
-              variants={itemVariants}
-            >
-              <Badge>
-                Nos réalisations
-              </Badge>
+            <motion.div variants={itemVariants}>
+              <Badge>Nos réalisations</Badge>
             </motion.div>
 
             <motion.h1
@@ -228,7 +184,6 @@ export default function Realisations() {
             >
               Des projets conçus
               <br />
-
               <span className="dw-gradient-text">
                 pour produire des résultats.
               </span>
@@ -246,10 +201,10 @@ export default function Realisations() {
                 sm:text-lg
               "
             >
-              Découvrez une sélection de projets
-              web, mobiles, métiers et réseaux
-              réalisés avec des technologies modernes
-              et adaptées aux besoins de chaque entreprise.
+              Découvrez une sélection de projets web,
+              mobiles, métiers et réseaux réalisés avec
+              des technologies modernes et adaptées aux
+              besoins de chaque entreprise.
             </motion.p>
           </motion.div>
         </Container>
@@ -269,7 +224,7 @@ export default function Realisations() {
         "
       >
         <Container>
-          {/* Filters */}
+          {/* FILTRES */}
 
           <div
             className="
@@ -279,56 +234,51 @@ export default function Realisations() {
               gap-2
             "
           >
-            {categories.map(
-              (category) => {
-                const active =
-                  activeCategory ===
-                  category;
+            {categories.map((category) => {
+              const active =
+                activeCategory === category;
 
-                return (
-                  <button
-                    key={category}
-                    type="button"
-                    onClick={() =>
-                      setActiveCategory(
-                        category
-                      )
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() =>
+                    setActiveCategory(category)
+                  }
+                  className={`
+                    rounded-xl
+                    border
+                    px-4
+                    py-2.5
+                    text-sm
+                    font-medium
+                    transition-all
+                    duration-200
+
+                    ${
+                      active
+                        ? `
+                          border-dw-primary/30
+                          bg-dw-primary/10
+                          text-dw-primary
+                        `
+                        : `
+                          border-dw-border
+                          bg-dw-card
+                          text-dw-muted
+                          hover:border-dw-primary/30
+                          hover:text-dw-text
+                        `
                     }
-                    className={`
-                      rounded-xl
-                      border
-                      px-4
-                      py-2.5
-                      text-sm
-                      font-medium
-                      transition-all
-                      duration-200
-
-                      ${
-                        active
-                          ? `
-                            border-dw-primary/30
-                            bg-dw-primary/10
-                            text-dw-primary
-                          `
-                          : `
-                            border-dw-border
-                            bg-dw-card
-                            text-dw-muted
-                            hover:border-dw-primary/30
-                            hover:text-dw-text
-                          `
-                      }
-                    `}
-                  >
-                    {category}
-                  </button>
-                );
-              }
-            )}
+                  `}
+                >
+                  {category}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Error */}
+          {/* ERREUR */}
 
           {error && (
             <div
@@ -348,7 +298,7 @@ export default function Realisations() {
             </div>
           )}
 
-          {/* Loading */}
+          {/* LOADING */}
 
           {loading && (
             <div className="py-20 text-center">
@@ -358,12 +308,11 @@ export default function Realisations() {
             </div>
           )}
 
-          {/* Empty */}
+          {/* EMPTY */}
 
           {!loading &&
             !error &&
-            filteredProjects.length ===
-              0 && (
+            filteredProjects.length === 0 && (
               <div className="py-20 text-center">
                 <p className="text-dw-muted">
                   Aucun projet dans cette catégorie.
@@ -371,16 +320,14 @@ export default function Realisations() {
               </div>
             )}
 
-          {/* Projects */}
+          {/* PROJECT GRID */}
 
           {!loading &&
             !error &&
             filteredProjects.length > 0 && (
               <motion.div
                 layout
-                variants={
-                  containerVariants
-                }
+                variants={containerVariants}
                 initial="hidden"
                 animate="visible"
                 className="
@@ -388,16 +335,15 @@ export default function Realisations() {
                   grid
                   gap-6
                   md:grid-cols-2
+                  lg:grid-cols-3
                 "
               >
-                {filteredProjects.map(
-                  (project) => (
-                    <ProjectCard
-                      key={project.id}
-                      project={project}
-                    />
-                  )
-                )}
+                {filteredProjects.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                  />
+                ))}
               </motion.div>
             )}
         </Container>
@@ -426,9 +372,7 @@ export default function Realisations() {
             "
           >
             <div>
-              <Badge>
-                Notre approche projet
-              </Badge>
+              <Badge>Notre approche projet</Badge>
 
               <h2
                 className="
@@ -454,10 +398,10 @@ export default function Realisations() {
                   text-dw-muted
                 "
               >
-                Chaque projet commence par la
-                compréhension du besoin. L'objectif
-                est de construire un outil réellement
-                utile à l'entreprise et à ses utilisateurs.
+                Chaque projet commence par la compréhension
+                du besoin. L'objectif est de construire un outil
+                réellement utile à l'entreprise et à ses
+                utilisateurs.
               </p>
 
               <div className="mt-8">
@@ -615,29 +559,38 @@ function ProjectCard({
   const [imageError, setImageError] =
     useState(false);
 
+  /*
+   * Lien de production.
+   *
+   * Priorité :
+   * 1. demo_url
+   * 2. project_url
+   */
   const projectLink =
     project.demo_url ||
     project.project_url ||
-    undefined;
+    "";
 
-  const hasLink =
-    Boolean(projectLink);
+  const hasLink = Boolean(projectLink);
 
-  const imageUrl =
-    project.image_url
-      ? project.image_url.startsWith(
-          "http"
-        )
-        ? project.image_url
-        : `${API_URL}${project.image_url}`
-      : "";
+  /*
+   * Construction de l'URL de l'image.
+   */
+  const imageUrl = project.image_url
+    ? project.image_url.startsWith("http")
+      ? project.image_url
+      : `${API_URL}${project.image_url}`
+    : "";
 
   return (
     <motion.article
       layout
       variants={itemVariants}
-      className={`
+      className="
         group
+        flex
+        h-full
+        flex-col
         overflow-hidden
         rounded-3xl
         border
@@ -646,88 +599,44 @@ function ProjectCard({
         transition-all
         duration-300
         hover:-translate-y-1
-        hover:border-dw-primary/25
-
-        ${
-          project.featured
-            ? "md:col-span-2"
-            : ""
-        }
-      `}
+        hover:border-dw-primary/30
+        hover:shadow-xl
+        hover:shadow-dw-primary/5
+      "
     >
       {/* =================================================
-          VISUAL
+          IMAGE
       ================================================== */}
 
       <div
-        className={`
+        className="
           relative
+          aspect-[16/10]
           overflow-hidden
           border-b
           border-dw-border
-          bg-gradient-to-br
-          from-dw-primary/[0.12]
-          via-dw-surface
-          to-transparent
-
-          ${
-            project.featured
-              ? "h-72 sm:h-80"
-              : "h-60"
-          }
-        `}
+          bg-dw-surface
+        "
       >
-        <div
-          className="
-            absolute
-            inset-0
-            dw-grid
-            opacity-20
-          "
-        />
-
-        {/* Image */}
-
-        {imageUrl &&
-          !imageError && (
-            <img
-              src={imageUrl}
-              alt={project.title}
-              className="
-                absolute
-                inset-0
-                h-full
-                w-full
-                object-cover
-                opacity-70
-                transition-all
-                duration-500
-                group-hover:scale-105
-                group-hover:opacity-90
-              "
-              onError={() =>
-                setImageError(true)
-              }
-            />
-          )}
-
-        {/* Overlay */}
-
-        <div
-          className="
-            absolute
-            inset-0
-            bg-gradient-to-t
-            from-dw-background/80
-            via-transparent
-            to-transparent
-          "
-        />
-
-        {/* Fallback */}
-
-        {(!imageUrl ||
-          imageError) && (
+        {imageUrl && !imageError ? (
+          <img
+            src={imageUrl}
+            alt={project.title}
+            className="
+              absolute
+              inset-0
+              h-full
+              w-full
+              object-cover
+              transition-transform
+              duration-500
+              group-hover:scale-105
+            "
+            onError={() =>
+              setImageError(true)
+            }
+          />
+        ) : (
           <div
             className="
               absolute
@@ -735,25 +644,26 @@ function ProjectCard({
               flex
               items-center
               justify-center
+              bg-gradient-to-br
+              from-dw-primary/10
+              via-dw-surface
+              to-dw-background
             "
           >
             <div
               className="
                 flex
-                h-24
-                w-24
+                h-20
+                w-20
                 items-center
                 justify-center
-                rounded-3xl
+                rounded-2xl
                 border
                 border-dw-primary/20
                 bg-dw-primary/10
-                text-3xl
+                text-2xl
                 font-black
                 text-dw-primary
-                shadow-2xl
-                shadow-dw-primary/10
-                backdrop-blur-md
               "
             >
               DW
@@ -761,145 +671,81 @@ function ProjectCard({
           </div>
         )}
 
-        {/* Decorative panels */}
+        {/* OVERLAY */}
 
         <div
           className="
+            pointer-events-none
             absolute
-            left-6
-            top-6
-            h-20
-            w-32
-            rounded-xl
-            border
-            border-dw-border
-            bg-dw-card/50
-            backdrop-blur
+            inset-0
+            bg-gradient-to-t
+            from-black/40
+            via-transparent
+            to-transparent
+            opacity-70
           "
         />
 
-        <div
-          className="
-            absolute
-            bottom-6
-            right-6
-            h-16
-            w-28
-            rounded-xl
-            border
-            border-dw-border
-            bg-dw-card/50
-            backdrop-blur
-          "
-        />
-
-        {/* Project label */}
+        {/* CATEGORY */}
 
         <div
           className="
             absolute
-            bottom-7
-            left-8
-            flex
-            items-center
-            gap-2
+            bottom-4
+            left-4
           "
         >
           <span
             className="
-              h-2
-              w-2
-              rounded-full
-              bg-dw-success
-            "
-          />
-
-          <span className="text-xs font-medium text-dw-muted">
-            Digital Work
-          </span>
-        </div>
-
-        {/* Featured */}
-
-        {project.featured && (
-          <div
-            className="
-              absolute
-              right-6
-              top-6
               rounded-lg
               border
-              border-dw-primary/20
-              bg-dw-primary/10
+              border-white/10
+              bg-black/40
               px-3
               py-1.5
               text-xs
               font-semibold
-              text-dw-primary
-              backdrop-blur
+              text-white
+              backdrop-blur-md
             "
           >
-            Projet principal
-          </div>
-        )}
+            {project.category}
+          </span>
+        </div>
       </div>
 
       {/* =================================================
           CONTENT
       ================================================== */}
 
-      <div className="p-6 sm:p-7">
-        <div
-          className="
-            flex
-            items-start
-            justify-between
-            gap-4
-          "
-        >
-          <div>
-            <span
-              className="
-                text-xs
-                font-semibold
-                uppercase
-                tracking-[0.15em]
-                text-dw-primary
-              "
-            >
-              {project.category}
-            </span>
+      <div
+        className="
+          flex
+          flex-1
+          flex-col
+          p-6
+        "
+      >
+        {/* TITLE */}
 
-            <h3
-              className="
-                mt-2
-                text-xl
-                font-bold
-                text-dw-text
-              "
-            >
-              {project.title}
-            </h3>
-          </div>
+        <div className="flex items-start justify-between gap-4">
+          <h3
+            className="
+              text-xl
+              font-bold
+              leading-tight
+              text-dw-text
+            "
+          >
+            {project.title}
+          </h3>
 
           {hasLink && (
             <a
               href={projectLink}
-              target={
-                projectLink?.startsWith(
-                  "/"
-                )
-                  ? undefined
-                  : "_blank"
-              }
-              rel={
-                projectLink?.startsWith(
-                  "/"
-                )
-                  ? undefined
-                  : "noopener noreferrer"
-              }
-              aria-label={`Voir le projet ${project.title}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Voir ${project.title} en production`}
               className="
                 flex
                 h-9
@@ -914,6 +760,7 @@ function ProjectCard({
                 text-dw-muted
                 transition-all
                 hover:border-dw-primary/30
+                hover:bg-dw-primary/10
                 hover:text-dw-primary
               "
             >
@@ -922,7 +769,7 @@ function ProjectCard({
           )}
         </div>
 
-        {/* Description */}
+        {/* DESCRIPTION */}
 
         <p
           className="
@@ -935,94 +782,84 @@ function ProjectCard({
           {project.description}
         </p>
 
-        {/* Details */}
+        {/* =================================================
+    POINTS CLÉS
+================================================== */}
+{project.benefits && project.benefits.length > 0 && (
+  <div
+    className="
+      mt-1
+      rounded-lg
+      border
+      border-dw-border
+      bg-dw-surface
+      p-2
+    "
+  >
+    <div className="flex items-start gap-3">
+      <div
+        className="
+          flex
+          h-8
+          w-8
+          shrink-0
+          items-center
+          justify-center
+          rounded-lg
+          bg-dw-success/10
+          text-dw-success
+        "
+      >
+        <CheckCircle2 size={17} />
+      </div>
 
-        {project.details && (
-          <p
-            className="
-              mt-3
-              text-sm
-              leading-7
-              text-dw-muted
-            "
-          >
-            {project.details}
-          </p>
-        )}
+      <div className="min-w-0 flex-1">
+        <p
+          className="
+            text-xs
+            font-bold
+            uppercase
+            tracking-[0.12em]
+            text-dw-success
+          "
+        >
+          Points clés
+        </p>
 
-        {/* Benefits */}
-
-        {project.benefits.length > 0 && (
-          <div
-            className="
-              mt-5
-              rounded-xl
-              border
-              border-dw-border
-              bg-dw-surface
-              p-4
-            "
-          >
-            <div className="flex gap-3">
-              <CheckCircle2
-                size={18}
+        <ul className="mt-3 space-y-2">
+          {project.benefits.slice(0, 4).map((benefit) => (
+            <li
+              key={benefit}
+              className="
+                flex
+                items-start
+                gap-2
+                text-xs
+                leading-5
+                text-dw-muted
+              "
+            >
+              <Check
+                size={14}
                 className="
                   mt-0.5
                   shrink-0
-                  text-dw-success
+                  text-dw-primary
                 "
               />
 
-              <div>
-                <p
-                  className="
-                    text-xs
-                    font-semibold
-                    text-dw-success
-                  "
-                >
-                  Points clés
-                </p>
+              <span>{benefit}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+)}
 
-                <ul className="mt-2 space-y-1.5">
-                  {project.benefits
-                    .slice(0, 4)
-                    .map((benefit) => (
-                      <li
-                        key={benefit}
-                        className="
-                          flex
-                          items-start
-                          gap-2
-                          text-xs
-                          leading-5
-                          text-dw-muted
-                        "
-                      >
-                        <Check
-                          size={13}
-                          className="
-                            mt-1
-                            shrink-0
-                            text-dw-primary
-                          "
-                        />
+        {/* TECHNOLOGIES */}
 
-                        <span>
-                          {benefit}
-                        </span>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Technologies */}
-
-        {project.technologies.length >
-          0 && (
+        {project.technologies.length > 0 && (
           <div
             className="
               mt-6
@@ -1054,42 +891,62 @@ function ProjectCard({
           </div>
         )}
 
-        {/* Project link */}
+        {/* PROJECT BUTTON */}
 
-        {hasLink && (
-          <a
-            href={projectLink}
-            target={
-              projectLink?.startsWith("/")
-                ? undefined
-                : "_blank"
-            }
-            rel={
-              projectLink?.startsWith("/")
-                ? undefined
-                : "noopener noreferrer"
-            }
-            className="
-              mt-7
-              inline-flex
-              items-center
-              gap-2
-              text-sm
-              font-semibold
-              text-dw-primary
-            "
-          >
-            Voir le projet
-
-            <ArrowRight
-              size={15}
+        <div className="mt-auto pt-7">
+          {hasLink ? (
+            <a
+              href={projectLink}
+              target="_blank"
+              rel="noopener noreferrer"
               className="
-                transition-transform
-                group-hover:translate-x-1
+                inline-flex
+                items-center
+                gap-2
+                rounded-xl
+                border
+                border-dw-primary/20
+                bg-dw-primary/10
+                px-4
+                py-2.5
+                text-sm
+                font-semibold
+                text-dw-primary
+                transition-all
+                hover:border-dw-primary/40
+                hover:bg-dw-primary/15
               "
-            />
-          </a>
-        )}
+            >
+              Voir le projet
+              <ArrowRight
+                size={15}
+                className="
+                  transition-transform
+                  duration-200
+                  group-hover:translate-x-1
+                "
+              />
+            </a>
+          ) : (
+            <span
+              className="
+                inline-flex
+                items-center
+                rounded-xl
+                border
+                border-dw-border
+                bg-dw-surface
+                px-4
+                py-2.5
+                text-sm
+                font-medium
+                text-dw-muted
+              "
+            >
+              Projet indisponible
+            </span>
+          )}
+        </div>
       </div>
     </motion.article>
   );
