@@ -1,6 +1,19 @@
-import { ArrowRight, Mail, MapPin, Phone, X } from "lucide-react";
+//import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  Facebook,
+  Github,
+  Instagram,
+  Linkedin,
+  Mail,
+  MapPin,
+  Phone,
+  X,
+} from "lucide-react";
+
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
+
 import logo from "../../assets/logo.png";
 import { useTheme } from "../../contexts/ThemeContext";
 
@@ -29,8 +42,34 @@ export default function Footer() {
     "mentions" | "confidentialite" | null
   >(null);
 
+  /* =======================================================
+     LANGUAGE
+  ======================================================= */
+
+  const [language, setLanguage] = useState<"FR" | "EN" | "MG">("FR");
+
+  const handleLanguageChange = (lang: "FR" | "EN" | "MG") => {
+    setLanguage(lang);
+
+    /*
+      Si ton système i18n global est déjà configuré,
+      remplace uniquement cette fonction par ton mécanisme
+      existant de changement de langue.
+    */
+
+    window.dispatchEvent(
+      new CustomEvent("digital-work-language-change", {
+        detail: lang,
+      }),
+    );
+  };
+
+  /* =======================================================
+     ADMIN ACCESS
+  ======================================================= */
+
   const handleAdminAccess = (
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.preventDefault();
 
@@ -57,6 +96,55 @@ export default function Footer() {
     }
   };
 
+  /* =======================================================
+     DATA
+  ======================================================= */
+
+  const navigationLinks = [
+    ["/", "Accueil"],
+    ["/services", "Services"],
+    ["/solutions", "Solutions"],
+    ["/realisations", "Réalisations"],
+    ["/a-propos", "À propos"],
+    ["/contact", "Contact"],
+  ];
+
+  const serviceLinks = [
+    ["/services", "Création de sites web"],
+    ["/services", "Applications web"],
+    ["/services", "Applications mobiles"],
+    ["/solutions", "Solutions métiers"],
+    ["/solutions", "Automatisation"],
+    ["/solutions", "Solutions digitales"],
+  ];
+
+  /*
+    Remplace les href "#" par tes vrais liens lorsque
+    les comptes sociaux Digital Work sont disponibles.
+  */
+  const socialLinks = [
+    {
+      name: "Facebook",
+      href: "#",
+      icon: Facebook,
+    },
+    {
+      name: "Instagram",
+      href: "#",
+      icon: Instagram,
+    },
+    {
+      name: "LinkedIn",
+      href: "#",
+      icon: Linkedin,
+    },
+    {
+      name: "GitHub",
+      href: "#",
+      icon: Github,
+    },
+  ];
+
   return (
     <>
       {/* =====================================================
@@ -70,8 +158,8 @@ export default function Footer() {
           duration-300
           ${
             isDark
-              ? "border-slate-200 bg-slate-100 text-slate-900"
-              : "border-slate-800 bg-slate-950 text-white"
+              ? "border-slate-800 bg-slate-950 text-white"
+              : "border-slate-200 bg-white text-slate-900"
           }
         `}
       >
@@ -80,13 +168,12 @@ export default function Footer() {
         ====================================================== */}
 
         <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
-          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
-
+          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-12">
             {/* =================================================
                 BRAND
             ================================================== */}
 
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-4">
               <Link
                 to="/"
                 className="inline-flex items-center gap-3"
@@ -94,29 +181,42 @@ export default function Footer() {
                 <img
                   src={logo}
                   alt="Digital Work"
-                  className="h-11 w-11 object-contain"
+                  className="h-12 w-12 object-contain"
                 />
 
                 <div className="leading-none">
                   <div
-                    className={`text-xl font-bold tracking-tight ${
-                      isDark
-                        ? "text-slate-900"
-                        : "text-white"
-                    }`}
+                    className={`
+                      text-xl
+                      font-bold
+                      tracking-tight
+                      ${
+                        isDark
+                          ? "text-white"
+                          : "text-slate-900"
+                      }
+                    `}
                   >
                     Digital
                     <span className="text-dw-primary">
+                      {" "}
                       Work
                     </span>
                   </div>
 
                   <div
-                    className={`mt-1 text-[9px] font-medium uppercase tracking-[0.25em] ${
-                      isDark
-                        ? "text-slate-500"
-                        : "text-slate-400"
-                    }`}
+                    className={`
+                      mt-1
+                      text-[9px]
+                      font-medium
+                      uppercase
+                      tracking-[0.25em]
+                      ${
+                        isDark
+                          ? "text-slate-500"
+                          : "text-slate-500"
+                      }
+                    `}
                   >
                     Solutions digitales
                   </div>
@@ -124,57 +224,172 @@ export default function Footer() {
               </Link>
 
               <p
-                className={`mt-6 max-w-md text-sm leading-7 ${
-                  isDark
-                    ? "text-slate-600"
-                    : "text-slate-400"
-                }`}
+                className={`
+                  mt-6
+                  max-w-md
+                  text-sm
+                  leading-7
+                  ${
+                    isDark
+                      ? "text-slate-400"
+                      : "text-slate-600"
+                  }
+                `}
               >
-                Nous concevons des solutions digitales modernes,
-                performantes et adaptées aux besoins des entreprises.
+                Nous concevons des solutions digitales
+                modernes, performantes et adaptées aux
+                besoins des entreprises.
               </p>
 
               <Link
                 to="/contact"
-                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-dw-primary transition-colors hover:opacity-80"
+                className="
+                  mt-6
+                  inline-flex
+                  items-center
+                  gap-2
+                  text-sm
+                  font-semibold
+                  text-dw-primary
+                  transition-all
+                  hover:gap-3
+                  hover:opacity-80
+                "
               >
                 Démarrer un projet
                 <ArrowRight size={16} />
               </Link>
+
+              {/* Trust points */}
+
+              <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2">
+                <span
+                  className={`
+                    text-xs
+                    ${
+                      isDark
+                        ? "text-slate-500"
+                        : "text-slate-500"
+                    }
+                  `}
+                >
+                  Web
+                </span>
+
+                <span
+                  className={`
+                    text-xs
+                    ${
+                      isDark
+                        ? "text-slate-500"
+                        : "text-slate-500"
+                    }
+                  `}
+                >
+                  Mobile
+                </span>
+
+                <span
+                  className={`
+                    text-xs
+                    ${
+                      isDark
+                        ? "text-slate-500"
+                        : "text-slate-500"
+                    }
+                  `}
+                >
+                  Solutions métiers
+                </span>
+
+                <span
+                  className={`
+                    text-xs
+                    ${
+                      isDark
+                        ? "text-slate-500"
+                        : "text-slate-500"
+                    }
+                  `}
+                >
+                  Automatisation
+                </span>
+              </div>
+            </div>
+
+            {/* =================================================
+                SERVICES
+            ================================================== */}
+
+            <div className="lg:col-span-2">
+              <h3
+                className={`
+                  text-sm
+                  font-semibold
+                  ${
+                    isDark
+                      ? "text-white"
+                      : "text-slate-900"
+                  }
+                `}
+              >
+                Services
+              </h3>
+
+              <nav className="mt-5 flex flex-col gap-3">
+                {serviceLinks.map(([to, label]) => (
+                  <Link
+                    key={`${to}-${label}`}
+                    to={to}
+                    className={`
+                      text-sm
+                      transition-colors
+                      ${
+                        isDark
+                          ? "text-slate-400 hover:text-white"
+                          : "text-slate-600 hover:text-slate-900"
+                      }
+                    `}
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </nav>
             </div>
 
             {/* =================================================
                 NAVIGATION
             ================================================== */}
 
-            <div>
+            <div className="lg:col-span-2">
               <h3
-                className={`text-sm font-semibold ${
-                  isDark
-                    ? "text-slate-900"
-                    : "text-white"
-                }`}
+                className={`
+                  text-sm
+                  font-semibold
+                  ${
+                    isDark
+                      ? "text-white"
+                      : "text-slate-900"
+                  }
+                `}
               >
                 Navigation
               </h3>
 
               <nav className="mt-5 flex flex-col gap-3">
-                {[
-                  ["/", "Accueil"],
-                  ["/services", "Services"],
-                  ["/solutions", "Solutions"],
-                  ["/realisations", "Réalisations"],
-                  ["/a-propos", "À propos"],
-                  ["/contact", "Contact"],
-                ].map(([to, label]) => (
+                {navigationLinks.map(([to, label]) => (
                   <Link
                     key={to}
                     to={to}
-                    className={`text-sm transition-colors ${
-                      isDark
-                        ? "text-slate-600 hover:text-slate-900"
-                        : "text-slate-400 hover:text-white"
-                    }`}
+                    className={`
+                      text-sm
+                      transition-colors
+                      ${
+                        isDark
+                          ? "text-slate-400 hover:text-white"
+                          : "text-slate-600 hover:text-slate-900"
+                      }
+                    `}
                   >
                     {label}
                   </Link>
@@ -186,27 +401,39 @@ export default function Footer() {
                 CONTACT
             ================================================== */}
 
-            <div>
+            <div className="lg:col-span-4">
               <h3
-                className={`text-sm font-semibold ${
-                  isDark
-                    ? "text-slate-900"
-                    : "text-white"
-                }`}
+                className={`
+                  text-sm
+                  font-semibold
+                  ${
+                    isDark
+                      ? "text-white"
+                      : "text-slate-900"
+                  }
+                `}
               >
                 Contact
               </h3>
 
               <div className="mt-5 flex flex-col gap-4">
-
                 {/* Email */}
+
                 <a
-                  href="mailto:contact@digital-work.mg"
-                  className={`group flex items-start gap-3 text-sm transition-colors ${
-                    isDark
-                      ? "text-slate-600 hover:text-slate-900"
-                      : "text-slate-400 hover:text-white"
-                  }`}
+                  href="mailto:rrzafindrafita@gmail.com"
+                  className={`
+                    group
+                    flex
+                    items-start
+                    gap-3
+                    text-sm
+                    transition-colors
+                    ${
+                      isDark
+                        ? "text-slate-400 hover:text-white"
+                        : "text-slate-600 hover:text-slate-900"
+                    }
+                  `}
                 >
                   <Mail
                     size={17}
@@ -219,13 +446,22 @@ export default function Footer() {
                 </a>
 
                 {/* Phone */}
+
                 <a
                   href="tel:+261348428652"
-                  className={`group flex items-start gap-3 text-sm transition-colors ${
-                    isDark
-                      ? "text-slate-600 hover:text-slate-900"
-                      : "text-slate-400 hover:text-white"
-                  }`}
+                  className={`
+                    group
+                    flex
+                    items-start
+                    gap-3
+                    text-sm
+                    transition-colors
+                    ${
+                      isDark
+                        ? "text-slate-400 hover:text-white"
+                        : "text-slate-600 hover:text-slate-900"
+                    }
+                  `}
                 >
                   <Phone
                     size={17}
@@ -238,12 +474,19 @@ export default function Footer() {
                 </a>
 
                 {/* Location */}
+
                 <div
-                  className={`flex items-start gap-3 text-sm ${
-                    isDark
-                      ? "text-slate-600"
-                      : "text-slate-400"
-                  }`}
+                  className={`
+                    flex
+                    items-start
+                    gap-3
+                    text-sm
+                    ${
+                      isDark
+                        ? "text-slate-400"
+                        : "text-slate-600"
+                    }
+                  `}
                 >
                   <MapPin
                     size={17}
@@ -253,6 +496,169 @@ export default function Footer() {
                   <span>Madagascar</span>
                 </div>
               </div>
+
+              {/* Social networks */}
+
+              <div className="mt-7">
+                <p
+                  className={`
+                    text-xs
+                    font-semibold
+                    uppercase
+                    tracking-[0.15em]
+                    ${
+                      isDark
+                        ? "text-slate-500"
+                        : "text-slate-500"
+                    }
+                  `}
+                >
+                  Suivez-nous
+                </p>
+
+                <div className="mt-4 flex items-center gap-2">
+                  {socialLinks.map(
+                    ({
+                      name,
+                      href,
+                      icon: Icon,
+                    }) => (
+                      <a
+                        key={name}
+                        href={href}
+                        target={
+                          href !== "#" ? "_blank" : undefined
+                        }
+                        rel={
+                          href !== "#"
+                            ? "noopener noreferrer"
+                            : undefined
+                        }
+                        aria-label={name}
+                        onClick={(event) => {
+                          if (href === "#") {
+                            event.preventDefault();
+                          }
+                        }}
+                        className={`
+                          flex
+                          h-9
+                          w-9
+                          items-center
+                          justify-center
+                          rounded-xl
+                          border
+                          transition-all
+                          ${
+                            isDark
+                              ? "border-white/10 text-slate-400 hover:border-dw-primary/40 hover:bg-white/5 hover:text-white"
+                              : "border-slate-200 text-slate-500 hover:border-dw-primary/40 hover:bg-slate-50 hover:text-slate-900"
+                          }
+                        `}
+                      >
+                        <Icon size={16} />
+                      </a>
+                    ),
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* =====================================================
+            LANGUAGE BAR
+        ====================================================== */}
+
+        <div
+          className={`
+            border-t
+            ${
+              isDark
+                ? "border-white/10"
+                : "border-slate-200"
+            }
+          `}
+        >
+          <div className="mx-auto max-w-7xl px-5 py-5 sm:px-6 lg:px-8">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              {/* Language */}
+
+              <div className="flex items-center gap-3">
+                <span
+                  className={`
+                    text-xs
+                    font-medium
+                    ${
+                      isDark
+                        ? "text-slate-500"
+                        : "text-slate-500"
+                    }
+                  `}
+                >
+                  Langue
+                </span>
+
+                <div
+                  className={`
+                    flex
+                    items-center
+                    rounded-lg
+                    border
+                    p-1
+                    ${
+                      isDark
+                        ? "border-white/10 bg-white/[0.03]"
+                        : "border-slate-200 bg-slate-50"
+                    }
+                  `}
+                >
+                  {(["FR", "EN", "MG"] as const).map(
+                    (lang) => (
+                      <button
+                        key={lang}
+                        type="button"
+                        onClick={() =>
+                          handleLanguageChange(lang)
+                        }
+                        className={`
+                          rounded-md
+                          px-3
+                          py-1.5
+                          text-xs
+                          font-semibold
+                          transition-all
+                          ${
+                            language === lang
+                              ? "bg-dw-primary text-white shadow-sm"
+                              : isDark
+                                ? "text-slate-400 hover:text-white"
+                                : "text-slate-500 hover:text-slate-900"
+                          }
+                        `}
+                        aria-label={`Changer la langue en ${lang}`}
+                      >
+                        {lang}
+                      </button>
+                    ),
+                  )}
+                </div>
+              </div>
+
+              {/* Social mini text */}
+
+              <p
+                className={`
+                  text-xs
+                  ${
+                    isDark
+                      ? "text-slate-600"
+                      : "text-slate-400"
+                  }
+                `}
+              >
+                Web · Mobile · Solutions digitales
+              </p>
             </div>
           </div>
         </div>
@@ -262,11 +668,14 @@ export default function Footer() {
         ====================================================== */}
 
         <div
-          className={`border-t ${
-            isDark
-              ? "border-slate-300"
-              : "border-white/10"
-          }`}
+          className={`
+            border-t
+            ${
+              isDark
+                ? "border-white/10"
+                : "border-slate-200"
+            }
+          `}
         >
           <div
             className="
@@ -289,11 +698,22 @@ export default function Footer() {
             <button
               type="button"
               onClick={handleAdminAccess}
-              className={`m-0 cursor-default border-0 bg-transparent p-0 text-left text-sm outline-none transition-colors ${
-                isDark
-                  ? "text-slate-500 hover:text-slate-700"
-                  : "text-slate-400 hover:text-slate-300"
-              }`}
+              className={`
+                m-0
+                cursor-default
+                border-0
+                bg-transparent
+                p-0
+                text-left
+                text-sm
+                outline-none
+                transition-colors
+                ${
+                  isDark
+                    ? "text-slate-500 hover:text-slate-300"
+                    : "text-slate-500 hover:text-slate-700"
+                }
+              `}
               aria-label="Digital Work"
             >
               © {new Date().getFullYear()} Digital Work.
@@ -306,11 +726,15 @@ export default function Footer() {
               <button
                 type="button"
                 onClick={() => setLegalModal("mentions")}
-                className={`text-xs transition-colors ${
-                  isDark
-                    ? "text-slate-500 hover:text-slate-900"
-                    : "text-slate-400 hover:text-white"
-                }`}
+                className={`
+                  text-xs
+                  transition-colors
+                  ${
+                    isDark
+                      ? "text-slate-500 hover:text-white"
+                      : "text-slate-500 hover:text-slate-900"
+                  }
+                `}
               >
                 Mentions légales
               </button>
@@ -320,11 +744,15 @@ export default function Footer() {
                 onClick={() =>
                   setLegalModal("confidentialite")
                 }
-                className={`text-xs transition-colors ${
-                  isDark
-                    ? "text-slate-500 hover:text-slate-900"
-                    : "text-slate-400 hover:text-white"
-                }`}
+                className={`
+                  text-xs
+                  transition-colors
+                  ${
+                    isDark
+                      ? "text-slate-500 hover:text-white"
+                      : "text-slate-500 hover:text-slate-900"
+                  }
+                `}
               >
                 Confidentialité
               </button>
@@ -357,22 +785,47 @@ export default function Footer() {
           }}
         >
           <div
-            className={`relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-3xl border p-6 shadow-2xl sm:p-8 ${
-              isDark
-                ? "border-slate-200 bg-white text-slate-900"
-                : "border-white/10 bg-slate-950 text-white"
-            }`}
+            className={`
+              relative
+              max-h-[85vh]
+              w-full
+              max-w-2xl
+              overflow-y-auto
+              rounded-3xl
+              border
+              p-6
+              shadow-2xl
+              sm:p-8
+              ${
+                isDark
+                  ? "border-slate-200 bg-white text-slate-900"
+                  : "border-white/10 bg-slate-950 text-white"
+              }
+            `}
           >
             {/* Close */}
 
             <button
               type="button"
               onClick={() => setLegalModal(null)}
-              className={`absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-xl border transition ${
-                isDark
-                  ? "border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                  : "border-white/10 text-slate-400 hover:bg-white/5 hover:text-white"
-              }`}
+              className={`
+                absolute
+                right-5
+                top-5
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-xl
+                border
+                transition
+                ${
+                  isDark
+                    ? "border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                    : "border-white/10 text-slate-400 hover:bg-white/5 hover:text-white"
+                }
+              `}
               aria-label="Fermer"
             >
               <X size={18} />
@@ -390,49 +843,67 @@ export default function Footer() {
                   </p>
 
                   <h2
-                    className={`mt-2 text-2xl font-bold ${
-                      isDark
-                        ? "text-slate-900"
-                        : "text-white"
-                    }`}
+                    className={`
+                      mt-2
+                      text-2xl
+                      font-bold
+                      ${
+                        isDark
+                          ? "text-slate-900"
+                          : "text-white"
+                      }
+                    `}
                   >
                     Mentions légales
                   </h2>
                 </div>
 
                 <div
-                  className={`space-y-6 text-sm leading-7 ${
-                    isDark
-                      ? "text-slate-600"
-                      : "text-slate-400"
-                  }`}
+                  className={`
+                    space-y-6
+                    text-sm
+                    leading-7
+                    ${
+                      isDark
+                        ? "text-slate-600"
+                        : "text-slate-400"
+                    }
+                  `}
                 >
                   <section>
                     <h3
-                      className={`mb-2 font-semibold ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }`}
+                      className={`
+                        mb-2
+                        font-semibold
+                        ${
+                          isDark
+                            ? "text-slate-900"
+                            : "text-white"
+                        }
+                      `}
                     >
                       Éditeur du site
                     </h3>
 
                     <p>
-                      Le présent site est édité par Digital Work,
-                      entreprise spécialisée dans la conception,
-                      le développement et la mise en œuvre de
-                      solutions digitales.
+                      Le présent site est édité par Digital
+                      Work, entreprise spécialisée dans la
+                      conception, le développement et la mise
+                      en œuvre de solutions digitales.
                     </p>
                   </section>
 
                   <section>
                     <h3
-                      className={`mb-2 font-semibold ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }`}
+                      className={`
+                        mb-2
+                        font-semibold
+                        ${
+                          isDark
+                            ? "text-slate-900"
+                            : "text-white"
+                        }
+                      `}
                     >
                       Activité
                     </h3>
@@ -448,11 +919,15 @@ export default function Footer() {
 
                   <section>
                     <h3
-                      className={`mb-2 font-semibold ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }`}
+                      className={`
+                        mb-2
+                        font-semibold
+                        ${
+                          isDark
+                            ? "text-slate-900"
+                            : "text-white"
+                        }
+                      `}
                     >
                       Contact
                     </h3>
@@ -468,18 +943,22 @@ export default function Footer() {
 
                   <section>
                     <h3
-                      className={`mb-2 font-semibold ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }`}
+                      className={`
+                        mb-2
+                        font-semibold
+                        ${
+                          isDark
+                            ? "text-slate-900"
+                            : "text-white"
+                        }
+                      `}
                     >
                       Propriété intellectuelle
                     </h3>
 
                     <p>
-                      L'ensemble des éléments présents sur ce site,
-                      notamment les textes, images, logos,
+                      L'ensemble des éléments présents sur ce
+                      site, notamment les textes, images, logos,
                       interfaces, graphismes et éléments
                       logiciels, est protégé par les règles
                       applicables en matière de propriété
@@ -495,11 +974,15 @@ export default function Footer() {
 
                   <section>
                     <h3
-                      className={`mb-2 font-semibold ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }`}
+                      className={`
+                        mb-2
+                        font-semibold
+                        ${
+                          isDark
+                            ? "text-slate-900"
+                            : "text-white"
+                        }
+                      `}
                     >
                       Responsabilité
                     </h3>
@@ -528,30 +1011,44 @@ export default function Footer() {
                   </p>
 
                   <h2
-                    className={`mt-2 text-2xl font-bold ${
-                      isDark
-                        ? "text-slate-900"
-                        : "text-white"
-                    }`}
+                    className={`
+                      mt-2
+                      text-2xl
+                      font-bold
+                      ${
+                        isDark
+                          ? "text-slate-900"
+                          : "text-white"
+                      }
+                    `}
                   >
                     Politique de confidentialité
                   </h2>
                 </div>
 
                 <div
-                  className={`space-y-6 text-sm leading-7 ${
-                    isDark
-                      ? "text-slate-600"
-                      : "text-slate-400"
-                  }`}
+                  className={`
+                    space-y-6
+                    text-sm
+                    leading-7
+                    ${
+                      isDark
+                        ? "text-slate-600"
+                        : "text-slate-400"
+                    }
+                  `}
                 >
                   <section>
                     <h3
-                      className={`mb-2 font-semibold ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }`}
+                      className={`
+                        mb-2
+                        font-semibold
+                        ${
+                          isDark
+                            ? "text-slate-900"
+                            : "text-white"
+                        }
+                      `}
                     >
                       Protection de vos données
                     </h3>
@@ -566,11 +1063,15 @@ export default function Footer() {
 
                   <section>
                     <h3
-                      className={`mb-2 font-semibold ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }`}
+                      className={`
+                        mb-2
+                        font-semibold
+                        ${
+                          isDark
+                            ? "text-slate-900"
+                            : "text-white"
+                        }
+                      `}
                     >
                       Données collectées
                     </h3>
@@ -587,11 +1088,15 @@ export default function Footer() {
 
                   <section>
                     <h3
-                      className={`mb-2 font-semibold ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }`}
+                      className={`
+                        mb-2
+                        font-semibold
+                        ${
+                          isDark
+                            ? "text-slate-900"
+                            : "text-white"
+                        }
+                      `}
                     >
                       Utilisation des informations
                     </h3>
@@ -607,11 +1112,15 @@ export default function Footer() {
 
                   <section>
                     <h3
-                      className={`mb-2 font-semibold ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }`}
+                      className={`
+                        mb-2
+                        font-semibold
+                        ${
+                          isDark
+                            ? "text-slate-900"
+                            : "text-white"
+                        }
+                      `}
                     >
                       Conservation et sécurité
                     </h3>
@@ -629,11 +1138,15 @@ export default function Footer() {
 
                   <section>
                     <h3
-                      className={`mb-2 font-semibold ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }`}
+                      className={`
+                        mb-2
+                        font-semibold
+                        ${
+                          isDark
+                            ? "text-slate-900"
+                            : "text-white"
+                        }
+                      `}
                     >
                       Vos droits
                     </h3>
@@ -650,11 +1163,15 @@ export default function Footer() {
 
                   <section>
                     <h3
-                      className={`mb-2 font-semibold ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }`}
+                      className={`
+                        mb-2
+                        font-semibold
+                        ${
+                          isDark
+                            ? "text-slate-900"
+                            : "text-white"
+                        }
+                      `}
                     >
                       Contact
                     </h3>
@@ -673,13 +1190,25 @@ export default function Footer() {
               </div>
             )}
 
-            {/* CLOSE */}
+            {/* =================================================
+                CLOSE
+            ================================================== */}
 
             <div className="mt-8 flex justify-end">
               <button
                 type="button"
                 onClick={() => setLegalModal(null)}
-                className="rounded-xl bg-dw-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+                className="
+                  rounded-xl
+                  bg-dw-primary
+                  px-5
+                  py-2.5
+                  text-sm
+                  font-semibold
+                  text-white
+                  transition
+                  hover:opacity-90
+                "
               >
                 Fermer
               </button>
@@ -690,3 +1219,4 @@ export default function Footer() {
     </>
   );
 }
+
