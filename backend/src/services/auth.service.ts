@@ -16,7 +16,7 @@ export interface AuthTokenPayload {
 }
 
 function getJwtSecret(): string {
-  const secret = process.env.JWT_SECRET;
+  const secret = process.env.JWT_SECRET?.trim();
 
   if (!secret) {
     throw new Error(
@@ -30,6 +30,12 @@ function getJwtSecret(): string {
 export async function findAdminByUsername(
   username: string
 ): Promise<AdminUser | null> {
+  const normalizedUsername = username.trim();
+
+  if (!normalizedUsername) {
+    return null;
+  }
+
   const result = await pool.query<AdminUser>(
     `
       SELECT
@@ -38,10 +44,10 @@ export async function findAdminByUsername(
         password_hash,
         is_active
       FROM admin_users
-      WHERE username = $1
+      WHERE LOWER(username) = LOWER($1)
       LIMIT 1
     `,
-    [username]
+    [normalizedUsername]
   );
 
   return result.rows[0] ?? null;
@@ -51,17 +57,37 @@ export async function verifyAdminPassword(
   password: string,
   passwordHash: string
 ): Promise<boolean> {
-  return bcrypt.compare(password, passwordHash);
+  if (!password || !passwordHash) {
+    return false;
+  }
+
+  try {
+    return await bcrypt.compare(
+      password,
+      passwordHash
+    );
+  } catch (error) {
+    console.error(
+      "verifyAdminPassword:",
+      error
+    );
+
+    return false;
+  }
 }
 
 export function createAccessToken(
   payload: AuthTokenPayload
 ): string {
   return jwt.sign(
-    payload,
+    {
+      id: payload.id,
+      username: payload.username,
+    },
     getJwtSecret(),
     {
-      expiresIn: process.env.JWT_EXPIRES_IN ?? "8h",
+      expiresIn:
+        process.env.JWT_EXPIRES_IN ?? "8h",
     } as jwt.SignOptions
   );
 }

@@ -1,5 +1,10 @@
 import { motion, type Variants } from "framer-motion";
-import { ArrowRight, ExternalLink,   CheckCircle2,   Check, } from "lucide-react";
+import {
+  ArrowRight,
+  ExternalLink,
+  CheckCircle2,
+  Check,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import Container from "../components/ui/Container";
@@ -7,8 +12,13 @@ import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 
 import {
-  API_URL,
+  getUniqueProjectCategories,
+  getCanonicalProjectCategory,
+} from "../constants/projectCategories";
+
+import {
   fetchProjects,
+  getProjectImageUrl,
   type Project,
 } from "../services/projectsApi";
 
@@ -83,20 +93,44 @@ export default function Realisations() {
   }, []);
 
   /* =======================================================
+     PROJETS NORMALISÉS
+  ======================================================= */
+
+  /**
+   * On normalise la catégorie provenant de l'API.
+   *
+   * Exemple :
+   *
+   * "développement web"
+   * "Développement Web "
+   *
+   * deviennent :
+   *
+   * "Développement Web"
+   */
+  const normalizedProjects = useMemo(() => {
+    return projects.map((project) => ({
+      ...project,
+      category: getCanonicalProjectCategory(
+        project.category
+      ),
+    }));
+  }, [projects]);
+
+  /* =======================================================
      CATEGORIES
   ======================================================= */
 
   const categories = useMemo(() => {
-    const uniqueCategories = Array.from(
-      new Set(
-        projects
-          .map((project) => project.category)
-          .filter(Boolean)
-      )
+    const projectCategories = normalizedProjects.map(
+      (project) => project.category
     );
 
-    return ["Tous", ...uniqueCategories];
-  }, [projects]);
+    return [
+      "Tous",
+      ...getUniqueProjectCategories(projectCategories),
+    ];
+  }, [normalizedProjects]);
 
   /* =======================================================
      FILTRAGE
@@ -104,13 +138,33 @@ export default function Realisations() {
 
   const filteredProjects = useMemo(() => {
     if (activeCategory === "Tous") {
-      return projects;
+      return normalizedProjects;
     }
 
-    return projects.filter(
-      (project) => project.category === activeCategory
+    return normalizedProjects.filter(
+      (project) =>
+        getCanonicalProjectCategory(project.category) ===
+        getCanonicalProjectCategory(activeCategory)
     );
-  }, [projects, activeCategory]);
+  }, [normalizedProjects, activeCategory]);
+
+  /* =======================================================
+     RESET CATÉGORIE
+  ======================================================= */
+
+  /**
+   * Sécurité :
+   * si une catégorie n'existe plus après rechargement,
+   * on revient automatiquement sur "Tous".
+   */
+  useEffect(() => {
+    if (
+      activeCategory !== "Tous" &&
+      !categories.includes(activeCategory)
+    ) {
+      setActiveCategory("Tous");
+    }
+  }, [activeCategory, categories]);
 
   return (
     <>
@@ -184,6 +238,7 @@ export default function Realisations() {
             >
               Des projets conçus
               <br />
+
               <span className="dw-gradient-text">
                 pour produire des résultats.
               </span>
@@ -559,29 +614,16 @@ function ProjectCard({
   const [imageError, setImageError] =
     useState(false);
 
-  /*
-   * Lien de production.
-   *
-   * Priorité :
-   * 1. demo_url
-   * 2. project_url
-   */
   const projectLink =
     project.demo_url ||
     project.project_url ||
     "";
 
   const hasLink = Boolean(projectLink);
-
-  /*
-   * Construction de l'URL de l'image.
-   */
-  const imageUrl = project.image_url
-    ? project.image_url.startsWith("http")
-      ? project.image_url
-      : `${API_URL}${project.image_url}`
-    : "";
-
+const imageUrl =
+  getProjectImageUrl(
+    project.image_url
+  );
   return (
     <motion.article
       layout
@@ -604,9 +646,7 @@ function ProjectCard({
         hover:shadow-dw-primary/5
       "
     >
-      {/* =================================================
-          IMAGE
-      ================================================== */}
+      {/* IMAGE */}
 
       <div
         className="
@@ -709,14 +749,14 @@ function ProjectCard({
               backdrop-blur-md
             "
           >
-            {project.category}
+            {getCanonicalProjectCategory(
+              project.category
+            )}
           </span>
         </div>
       </div>
 
-      {/* =================================================
-          CONTENT
-      ================================================== */}
+      {/* CONTENT */}
 
       <div
         className="
@@ -782,114 +822,119 @@ function ProjectCard({
           {project.description}
         </p>
 
-        {/* =================================================
-    POINTS CLÉS
-================================================== */}
-{project.benefits && project.benefits.length > 0 && (
-  <div
-    className="
-      mt-1
-      rounded-lg
-      border
-      border-dw-border
-      bg-dw-surface
-      p-2
-    "
-  >
-    <div className="flex items-start gap-3">
-      <div
-        className="
-          flex
-          h-8
-          w-8
-          shrink-0
-          items-center
-          justify-center
-          rounded-lg
-          bg-dw-success/10
-          text-dw-success
-        "
-      >
-        <CheckCircle2 size={17} />
-      </div>
+        {/* POINTS CLÉS */}
 
-      <div className="min-w-0 flex-1">
-        <p
-          className="
-            text-xs
-            font-bold
-            uppercase
-            tracking-[0.12em]
-            text-dw-success
-          "
-        >
-          Points clés
-        </p>
-
-        <ul className="mt-3 space-y-2">
-          {project.benefits.slice(0, 4).map((benefit) => (
-            <li
-              key={benefit}
+        {project.benefits &&
+          project.benefits.length > 0 && (
+            <div
               className="
-                flex
-                items-start
-                gap-2
-                text-xs
-                leading-5
-                text-dw-muted
+                mt-4
+                rounded-lg
+                border
+                border-dw-border
+                bg-dw-surface
+                p-3
               "
             >
-              <Check
-                size={14}
-                className="
-                  mt-0.5
-                  shrink-0
-                  text-dw-primary
-                "
-              />
+              <div className="flex items-start gap-3">
+                <div
+                  className="
+                    flex
+                    h-8
+                    w-8
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-lg
+                    bg-dw-success/10
+                    text-dw-success
+                  "
+                >
+                  <CheckCircle2 size={17} />
+                </div>
 
-              <span>{benefit}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  </div>
-)}
+                <div className="min-w-0 flex-1">
+                  <p
+                    className="
+                      text-xs
+                      font-bold
+                      uppercase
+                      tracking-[0.12em]
+                      text-dw-success
+                    "
+                  >
+                    Points clés
+                  </p>
+
+                  <ul className="mt-3 space-y-2">
+                    {project.benefits
+                      .slice(0, 4)
+                      .map((benefit, index) => (
+                        <li
+                          key={`${project.id}-benefit-${index}`}
+                          className="
+                            flex
+                            items-start
+                            gap-2
+                            text-xs
+                            leading-5
+                            text-dw-muted
+                          "
+                        >
+                          <Check
+                            size={14}
+                            className="
+                              mt-0.5
+                              shrink-0
+                              text-dw-primary
+                            "
+                          />
+
+                          <span>
+                            {benefit}
+                          </span>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
 
         {/* TECHNOLOGIES */}
 
-        {project.technologies.length > 0 && (
-          <div
-            className="
-              mt-6
-              flex
-              flex-wrap
-              gap-2
-            "
-          >
-            {project.technologies.map(
-              (technology) => (
-                <span
-                  key={technology}
-                  className="
-                    rounded-lg
-                    border
-                    border-dw-border
-                    bg-dw-surface
-                    px-2.5
-                    py-1
-                    text-[11px]
-                    font-medium
-                    text-dw-muted
-                  "
-                >
-                  {technology}
-                </span>
-              )
-            )}
-          </div>
-        )}
+        {project.technologies &&
+          project.technologies.length > 0 && (
+            <div
+              className="
+                mt-6
+                flex
+                flex-wrap
+                gap-2
+              "
+            >
+              {project.technologies.map(
+                (technology, index) => (
+                  <span
+                    key={`${project.id}-technology-${index}`}
+                    className="
+                      rounded-lg
+                      border
+                      border-dw-border
+                      bg-dw-surface
+                      px-2.5
+                      py-1
+                      text-[11px]
+                      font-medium
+                      text-dw-muted
+                    "
+                  >
+                    {technology}
+                  </span>
+                )
+              )}
+            </div>
+          )}
 
         {/* PROJECT BUTTON */}
 
@@ -918,6 +963,7 @@ function ProjectCard({
               "
             >
               Voir le projet
+
               <ArrowRight
                 size={15}
                 className="

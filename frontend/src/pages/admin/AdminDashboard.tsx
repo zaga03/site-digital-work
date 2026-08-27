@@ -25,8 +25,6 @@ import {
   adminLogout,
   deleteProject,
   getProjects,
-  createProject,
-  updateProject,
   type Project,
 } from "../../services/adminApi";
 

@@ -2,6 +2,8 @@ import "dotenv/config";
 
 import express from "express";
 import cors from "cors";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import pool from "./database/db.js";
 
@@ -9,31 +11,90 @@ import authRoutes from "./routes/auth.routes.js";
 import projectsRoutes from "./routes/projects.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 
+/* =========================================================
+   PATHS
+========================================================= */
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/*
+ * server.ts
+ *
+ * backend/src/server.ts
+ *
+ * backend/
+ * ├── src/
+ * │   └── server.ts
+ * │
+ * └── uploads/
+ *
+ * Depuis src :
+ * ../uploads
+ */
+
+const uploadsPath = path.resolve(
+  __dirname,
+  "../uploads"
+);
+
+console.log(
+  "[UPLOAD] Static uploads directory:",
+  uploadsPath
+);
+
+/* =========================================================
+   APP
+========================================================= */
+
 const app = express();
 
-const PORT = Number(process.env.PORT ?? 4000);
+const PORT = Number(
+  process.env.PORT ?? 4000
+);
+
+/* =========================================================
+   CORS
+========================================================= */
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+    ],
     credentials: true,
   })
 );
 
+/* =========================================================
+   BODY PARSER
+========================================================= */
+
 app.use(express.json());
 
-// ======================================================
-// FICHIERS UPLOADÉS
-// ======================================================
+/* =========================================================
+   STATIC UPLOADS
+========================================================= */
+
+/*
+ * Les fichiers présents dans :
+ *
+ * backend/uploads/...
+ *
+ * sont accessibles avec :
+ *
+ * http://localhost:4000/uploads/...
+ */
 
 app.use(
   "/uploads",
-  express.static("uploads")
+  express.static(uploadsPath)
 );
 
-// ======================================================
-// HEALTH CHECK
-// ======================================================
+/* =========================================================
+   HEALTH CHECK
+========================================================= */
 
 app.get(
   "/api/health",
@@ -45,9 +106,11 @@ app.get(
 
       res.status(200).json({
         success: true,
-        message: "Digital Work API opérationnelle",
+        message:
+          "Digital Work API opérationnelle",
         database: "connected",
-        databaseTime: result.rows[0]?.database_time,
+        databaseTime:
+          result.rows[0]?.database_time,
       });
     } catch (error) {
       console.error(
@@ -64,52 +127,60 @@ app.get(
   }
 );
 
-// ======================================================
-// AUTHENTIFICATION
-// ======================================================
+/* =========================================================
+   AUTHENTIFICATION
+========================================================= */
 
 app.use(
   "/api/auth",
   authRoutes
 );
 
-// ======================================================
-// PROJETS
-// ======================================================
+/* =========================================================
+   PROJETS
+========================================================= */
 
 app.use(
   "/api/projects",
   projectsRoutes
 );
 
-// ======================================================
-// UPLOADS
-// ======================================================
+/* =========================================================
+   UPLOADS API
+========================================================= */
 
 app.use(
-  "/api/uploads", 
+  "/api/uploads",
   uploadRoutes
 );
 
-// ======================================================
-// ROUTE 404
-// ======================================================
+/* =========================================================
+   404 API
+========================================================= */
 
 app.use(
   (_req, res) => {
     res.status(404).json({
       success: false,
-      message: "Route API introuvable.",
+      message:
+        "Route API introuvable.",
     });
   }
 );
 
-// ======================================================
-// START SERVER
-// ======================================================
+/* =========================================================
+   START SERVER
+========================================================= */
 
-app.listen(PORT, () => {
-  console.log(
-    `Digital Work API démarrée sur http://localhost:${PORT}`
-  );
-});
+app.listen(
+  PORT,
+  () => {
+    console.log(
+      `Digital Work API démarrée sur http://localhost:${PORT}`
+    );
+
+    console.log(
+      `Images disponibles sur http://localhost:${PORT}/uploads`
+    );
+  }
+);

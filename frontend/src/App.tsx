@@ -2,12 +2,11 @@ import {
   Navigate,
   Route,
   Routes,
-  useParams,
   useLocation,
 } from "react-router-dom";
 
 import Navbar from "./components/layout/Navbar";
-import Footer from "./components/layout/Footer";
+import Footer from "./components/layout/footer";
 
 import Home from "./pages/Home";
 import Services from "./pages/Services";
@@ -21,56 +20,26 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProtectedRoute from "./pages/admin/AdminProtectedRoute";
 import ProjectForm from "./pages/admin/ProjectForm";
 
-/* =========================================================
-   PROJECT EDIT ROUTE
-========================================================= */
-
-function ProjectEditRoute() {
-  const { id } = useParams<{ id: string }>();
-
-  if (!id) {
-    return (
-      <div className="min-h-screen bg-dw-background p-10 text-dw-text">
-        Identifiant du projet invalide.
-      </div>
-    );
-  }
-
-  return <ProjectForm projectId={id} />;
-}
-
-/* =========================================================
-   APP
-========================================================= */
-
 function App() {
   const location = useLocation();
 
-  /*
-   * Toutes les routes commençant par /admin
-   * sont considérées comme des routes administrateur.
-   */
   const isAdminRoute =
     location.pathname.startsWith("/admin");
 
   return (
     <div className="flex min-h-screen flex-col bg-dw-background text-dw-text">
-
-      {/* ===================================================
+      {/* =====================================================
           PUBLIC NAVBAR
-      ==================================================== */}
-
+      ===================================================== */}
       {!isAdminRoute && <Navbar />}
 
-      {/* ===================================================
+      {/* =====================================================
           MAIN CONTENT
-      ==================================================== */}
-
+      ===================================================== */}
       <main className="flex-1">
         <Routes>
-
           {/* =================================================
-              PUBLIC
+              PUBLIC ROUTES
           ================================================== */}
 
           <Route
@@ -140,13 +109,16 @@ function App() {
 
           {/* =================================================
               EDIT PROJECT
+
+              ProjectForm récupère lui-même l'id avec
+              useParams().
           ================================================== */}
 
           <Route
             path="/admin/projects/:id/edit"
             element={
               <AdminProtectedRoute>
-                <ProjectEditRoute />
+                <ProjectForm />
               </AdminProtectedRoute>
             }
           />
@@ -164,16 +136,13 @@ function App() {
               />
             }
           />
-
         </Routes>
       </main>
 
-      {/* ===================================================
+      {/* =====================================================
           PUBLIC FOOTER
-      ==================================================== */}
-
+      ===================================================== */}
       {!isAdminRoute && <Footer />}
-
     </div>
   );
 }

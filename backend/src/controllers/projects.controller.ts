@@ -12,19 +12,21 @@ import {
 /* =========================================================
    VALIDATION
 ========================================================= */
-
+// Validation du schéma de projet pour la création et la mise à jour
 const projectSchema = z.object({
   title: z.string().min(1).max(150),
 
   short_title: z
     .string()
     .max(100)
+    .nullable()
     .optional(),
 
   description: z.string().min(1),
 
   details: z
     .string()
+    .nullable()
     .optional(),
 
   category: z
@@ -34,6 +36,7 @@ const projectSchema = z.object({
 
   image_url: z
     .string()
+    .nullable()
     .optional(),
 
   technologies: z
@@ -46,15 +49,21 @@ const projectSchema = z.object({
 
   project_url: z
     .string()
+    .nullable()
     .optional(),
 
   demo_url: z
     .string()
+    .nullable()
     .optional(),
 
   featured: z
     .boolean()
     .default(false),
+
+  published: z
+    .boolean()
+    .default(true),
 
   status: z
     .enum([
@@ -189,15 +198,28 @@ export async function createProjectController(
       data: project,
     });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      res.status(400).json({
-        success: false,
-        message: "Données invalides.",
-        errors: error.flatten(),
-      });
 
-      return;
-    }
+    //changement pour afficher les erreurs temporaire dans la console 
+    // bugg sur la validation 5fois
+   if (error instanceof z.ZodError) {
+  console.error(
+    "❌ Validation projet échouée:",
+    JSON.stringify(error.flatten(), null, 2)
+  );
+
+  console.error(
+    "❌ Payload reçu:",
+    JSON.stringify(req.body, null, 2)
+  );
+
+  res.status(400).json({
+    success: false,
+    message: "Données invalides.",
+    errors: error.flatten(),
+  });
+
+  return;
+}
 
     console.error(
       "createProjectController:",
@@ -247,15 +269,28 @@ export async function updateProjectController(
       data: project,
     });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      res.status(400).json({
-        success: false,
-        message: "Données invalides.",
-        errors: error.flatten(),
-      });
 
-      return;
-    }
+    //changement pour afficher les erreurs temporaire dans la console 
+    // bugg sur la validation 5fois pour la update
+   if (error instanceof z.ZodError) {
+  console.error(
+    "❌ Validation projet échouée:",
+    JSON.stringify(error.flatten(), null, 2)
+  );
+
+  console.error(
+    "❌ Payload reçu:",
+    JSON.stringify(req.body, null, 2)
+  );
+
+  res.status(400).json({
+    success: false,
+    message: "Données invalides.",
+    errors: error.flatten(),
+  });
+
+  return;
+}
 
     console.error(
       "updateProjectController:",

@@ -1,59 +1,65 @@
 import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import type {
+  ChangeEvent,
+  FormEvent,
+  KeyboardEvent,
+} from "react";
+
+import { useNavigate, useParams } from "react-router-dom";
+
+import {
   ArrowLeft,
+  Check,
   Image as ImageIcon,
   Plus,
   Save,
+  Trash2,
+  Upload,
   X,
 } from "lucide-react";
 
-import {
-  useEffect,
-  useState,
-  type FormEvent,
-} from "react";
-
-import {
-  Link,
-  useNavigate,
-} from "react-router-dom";
-
-import Button from "../../components/ui/Button";
-
+import Container from "../../components/ui/Container";
 
 import {
   createProject,
-  getProject,
+  fetchProjectById,
+  getProjectImageUrl,
   updateProject,
   uploadProjectImage,
-  type Project,
-} from "../../services/adminApi";
+} from "../../services/projectsApi";
 
-/* =========================================================
-   CONFIGURATION API
-========================================================= */
+import type {
+  Project,
+  ProjectPayload,
+} from "../../services/projectsApi";
 
-import { API_URL } from "../../services/projectsApi";
+import {
+  PROJECT_CATEGORIES,
+  getUniqueProjectCategories,
+} from "../../constants/projectCategories";
 
 /* =========================================================
    TYPES
 ========================================================= */
 
-interface ProjectFormProps {
-  projectId?: string;
-}
-
-interface FormData {
+interface FormState {
   title: string;
   short_title: string;
   description: string;
   details: string;
   category: string;
   image_url: string;
-  technologies: string[];
-  benefits: string[];
   project_url: string;
   demo_url: string;
+  technologies: string[];
+  benefits: string[];
   featured: boolean;
+  published: boolean;
   status:
     | "completed"
     | "in-progress"
@@ -62,52 +68,143 @@ interface FormData {
 }
 
 /* =========================================================
-   INITIAL FORM
+   CONSTANTES
 ========================================================= */
 
-const initialForm: FormData = {
+const EMPTY_FORM: FormState = {
   title: "",
   short_title: "",
   description: "",
   details: "",
   category: "",
   image_url: "",
-  technologies: [],
-  benefits: [],
   project_url: "",
   demo_url: "",
+  technologies: [],
+  benefits: [],
   featured: false,
+  published: true,
   status: "completed",
   sort_order: 0,
 };
 
 /* =========================================================
-   COMPONENT
+   HELPERS
 ========================================================= */
 
-export default function ProjectForm({
-  projectId,
-}: ProjectFormProps) {
+function normalizeCategory(value: string): string {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+function normalizeArray(values: string[]): string[] {
+  return Array.from(
+    new Set(
+      values
+        .map((value) => value.trim())
+        .filter(Boolean)
+    )
+  );
+}
+
+function projectToForm(project: Project): FormState {
+  const published =
+    project.published !== undefined
+      ? Boolean(project.published)
+      : project.status !== "maintenance";
+
+  return {
+    title: project.title ?? "",
+    short_title: project.short_title ?? "",
+    description: project.description ?? "",
+    details: project.details ?? "",
+    category: project.category ?? "",
+    image_url: project.image_url ?? "",
+    project_url: project.project_url ?? "",
+    demo_url: project.demo_url ?? "",
+    technologies: Array.isArray(project.technologies)
+      ? project.technologies
+      : [],
+    benefits: Array.isArray(project.benefits)
+      ? project.benefits
+      : [],
+    featured: Boolean(project.featured),
+    published,
+    status: project.status ?? "completed",
+    sort_order:
+      typeof project.sort_order === "number"
+        ? project.sort_order
+        : 0,
+  };
+}
+
+function isValidUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+
+    return (
+      url.protocol === "http:" ||
+      url.protocol === "https:"
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Une image peut être :
+ *
+ * https://example.com/image.jpg
+ *
+ * ou :
+ *
+ * /uploads/projects/image.jpg
+ *
+ * ou :
+ *
+ * uploads/projects/image.jpg
+ */
+function isValidImageReference(value: string): boolean {
+  const normalized = value.trim();
+
+  if (!normalized) {
+    return true;
+  }
+
+  if (
+    normalized.startsWith("/") ||
+    normalized.startsWith("uploads/")
+  ) {
+    return true;
+  }
+
+  return isValidUrl(normalized);
+}
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+export default function ProjectForm() {
   const navigate = useNavigate();
 
-  const isEdit = Boolean(projectId);
+  const { id } = useParams<{ id: string }>();
+
+  const isEditMode = Boolean(id);
+
+  /* =======================================================
+     STATE
+  ======================================================= */
 
   const [form, setForm] =
-    useState<FormData>(initialForm);
-
-  const [technologyInput, setTechnologyInput] =
-    useState("");
-
-  const [benefitInput, setBenefitInput] =
-    useState("");
+    useState<FormState>(EMPTY_FORM);
 
   const [loading, setLoading] =
-    useState(isEdit);
+    useState(isEditMode);
 
   const [saving, setSaving] =
     useState(false);
 
-  const [uploadingImage, setUploadingImage] =
+  const [uploading, setUploading] =
     useState(false);
 
   const [error, setError] =
@@ -116,151 +213,120 @@ export default function ProjectForm({
   const [success, setSuccess] =
     useState("");
 
+  const [technologyInput, setTechnologyInput] =
+    useState("");
+
+  const [benefitInput, setBenefitInput] =
+    useState("");
+
+  const [customCategory, setCustomCategory] =
+    useState("");
+
+  const [showCustomCategory, setShowCustomCategory] =
+    useState(false);
+
+  const [imagePreview, setImagePreview] =
+    useState("");
+
   /* =======================================================
-     UPDATE FIELD
+     CATEGORIES
   ======================================================= */
 
-  function updateField<
-    K extends keyof FormData
-  >(
+  const categories = useMemo(() => {
+    const predefined = Array.isArray(PROJECT_CATEGORIES)
+      ? PROJECT_CATEGORIES
+      : [];
+
+    const currentCategory = form.category
+      ? [form.category]
+      : [];
+
+    return getUniqueProjectCategories([
+      ...predefined,
+      ...currentCategory,
+    ]);
+  }, [form.category]);
+
+  /* =======================================================
+     LOAD PROJECT
+  ======================================================= */
+
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadProject() {
+      try {
+        setLoading(true);
+        setError("");
+        setSuccess("");
+
+        const project =
+          await fetchProjectById(id);
+
+        if (cancelled) {
+          return;
+        }
+
+        if (!project) {
+          setError("Projet introuvable.");
+          return;
+        }
+
+        const nextForm =
+          projectToForm(project);
+
+        setForm(nextForm);
+
+        setImagePreview(
+          getProjectImageUrl(
+            nextForm.image_url
+          )
+        );
+      } catch (err) {
+        console.error(
+          "Erreur chargement projet:",
+          err
+        );
+
+        if (!cancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Impossible de charger le projet."
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void loadProject();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  /* =======================================================
+     FORM UPDATE
+  ======================================================= */
+
+  function updateField<K extends keyof FormState>(
     field: K,
-    value: FormData[K]
+    value: FormState[K]
   ) {
     setForm((current) => ({
       ...current,
       [field]: value,
     }));
   }
-
-  /* =======================================================
-     LOAD PROJECT FOR EDIT
-  ======================================================= */
-
-  useEffect(() => {
-    if (!projectId) {
-      setForm(initialForm);
-      setLoading(false);
-      return;
-    }
-
-    async function loadProject() {
-      try {
-        setLoading(true);
-        setError("");
-
-        const project =
-          await getProject(projectId);
-
-        setForm({
-          title: project.title,
-          short_title:
-            project.short_title ?? "",
-          description:
-            project.description,
-          details:
-            project.details ?? "",
-          category:
-            project.category,
-          image_url:
-            project.image_url ?? "",
-          technologies:
-            project.technologies ?? [],
-          benefits:
-            project.benefits ?? [],
-          project_url:
-            project.project_url ?? "",
-          demo_url:
-            project.demo_url ?? "",
-          featured:
-            project.featured,
-          status:
-            project.status,
-          sort_order:
-            project.sort_order,
-        });
-      } catch (error) {
-        console.error(
-          "Erreur chargement projet:",
-          error
-        );
-
-        setError(
-          error instanceof Error
-            ? error.message
-            : "Impossible de charger le projet."
-        );
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    void loadProject();
-  }, [projectId]);
-
-  /* =======================================================
-     IMAGE UPLOAD
-  ======================================================= */
-
- async function handleImageUpload(
-  file: File
-) {
-  setError("");
-  setSuccess("");
-
-  const allowedTypes = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/gif",
-  ];
-
-  if (!allowedTypes.includes(file.type)) {
-    setError(
-      "Format non autorisé. Utilisez JPG, PNG, WEBP ou GIF."
-    );
-
-    return;
-  }
-
-  const maxSize = 5 * 1024 * 1024;
-
-  if (file.size > maxSize) {
-    setError(
-      "L'image ne doit pas dépasser 5 Mo."
-    );
-
-    return;
-  }
-
-  try {
-    setUploadingImage(true);
-
-    const result =
-      await uploadProjectImage(file);
-
-    updateField(
-      "image_url",
-      result.url
-    );
-
-    setSuccess(
-      "Image téléchargée avec succès."
-    );
-  } catch (error) {
-    console.error(
-      "Erreur upload image:",
-      error
-    );
-
-    setError(
-      error instanceof Error
-        ? error.message
-        : "Impossible d'envoyer l'image."
-    );
-  } finally {
-    setUploadingImage(false);
-  }
-}
 
   /* =======================================================
      TECHNOLOGIES
@@ -274,31 +340,43 @@ export default function ProjectForm({
       return;
     }
 
-    if (
-      form.technologies.includes(value)
-    ) {
-      setTechnologyInput("");
-      return;
-    }
+    const exists =
+      form.technologies.some(
+        (technology) =>
+          technology.toLowerCase() ===
+          value.toLowerCase()
+      );
 
-    updateField("technologies", [
-      ...form.technologies,
-      value,
-    ]);
+    if (!exists) {
+      updateField(
+        "technologies",
+        [
+          ...form.technologies,
+          value,
+        ]
+      );
+    }
 
     setTechnologyInput("");
   }
 
-  function removeTechnology(
-    technology: string
-  ) {
+  function removeTechnology(index: number) {
     updateField(
       "technologies",
       form.technologies.filter(
-        (item) =>
-          item !== technology
+        (_, currentIndex) =>
+          currentIndex !== index
       )
     );
+  }
+
+  function handleTechnologyKeyDown(
+    event: KeyboardEvent<HTMLInputElement>
+  ) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addTechnology();
+    }
   }
 
   /* =======================================================
@@ -313,23 +391,367 @@ export default function ProjectForm({
       return;
     }
 
-    updateField("benefits", [
-      ...form.benefits,
-      value,
-    ]);
+    const exists =
+      form.benefits.some(
+        (benefit) =>
+          benefit.toLowerCase() ===
+          value.toLowerCase()
+      );
+
+    if (!exists) {
+      updateField(
+        "benefits",
+        [
+          ...form.benefits,
+          value,
+        ]
+      );
+    }
 
     setBenefitInput("");
   }
 
-  function removeBenefit(
-    benefit: string
-  ) {
+  function removeBenefit(index: number) {
     updateField(
       "benefits",
       form.benefits.filter(
-        (item) => item !== benefit
+        (_, currentIndex) =>
+          currentIndex !== index
       )
     );
+  }
+
+  function handleBenefitKeyDown(
+    event: KeyboardEvent<HTMLInputElement>
+  ) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addBenefit();
+    }
+  }
+
+  /* =======================================================
+     CATEGORY
+  ======================================================= */
+
+  function handleCategoryChange(
+    value: string
+  ) {
+    if (value === "__custom__") {
+      setShowCustomCategory(true);
+      return;
+    }
+
+    setShowCustomCategory(false);
+    setCustomCategory("");
+
+    updateField(
+      "category",
+      normalizeCategory(value)
+    );
+  }
+
+  function addCustomCategory() {
+    const value =
+      normalizeCategory(
+        customCategory
+      );
+
+    if (!value) {
+      return;
+    }
+
+    const existingCategory =
+      categories.find(
+        (category) =>
+          category.toLowerCase() ===
+          value.toLowerCase()
+      );
+
+    updateField(
+      "category",
+      existingCategory ?? value
+    );
+
+    setCustomCategory("");
+    setShowCustomCategory(false);
+  }
+
+  function cancelCustomCategory() {
+    setCustomCategory("");
+    setShowCustomCategory(false);
+  }
+
+  /* =======================================================
+     IMAGE UPLOAD
+  ======================================================= */
+
+  async function handleImageChange(
+    event: ChangeEvent<HTMLInputElement>
+  ) {
+    const file =
+      event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setError("");
+    setSuccess("");
+
+    /* TYPE */
+
+    if (!file.type.startsWith("image/")) {
+      setError(
+        "Veuillez sélectionner une image valide."
+      );
+
+      event.target.value = "";
+      return;
+    }
+
+    /* SIZE */
+
+    const maxSize =
+      5 * 1024 * 1024;
+
+    if (file.size > maxSize) {
+      setError(
+        "L'image ne doit pas dépasser 5 Mo."
+      );
+
+      event.target.value = "";
+      return;
+    }
+
+    /* PREVIEW LOCAL */
+
+    const localPreview =
+      URL.createObjectURL(file);
+
+    setImagePreview(localPreview);
+
+    try {
+      setUploading(true);
+
+      /*
+       * Upload via projectsApi.ts
+       *
+       * POST:
+       * /api/uploads/project
+       *
+       * multipart/form-data
+       *
+       * field:
+       * image
+       */
+
+      const uploaded =
+        await uploadProjectImage(file);
+
+      /*
+       * Le backend peut retourner :
+       *
+       * {
+       *   url: "/uploads/projects/xxx.jpg"
+       * }
+       *
+       * ou :
+       *
+       * {
+       *   image_url: "/uploads/projects/xxx.jpg"
+       * }
+       */
+
+      const imageUrl =
+        uploaded.image_url ??
+        uploaded.url ??
+        "";
+
+      if (!imageUrl.trim()) {
+        throw new Error(
+          "Le serveur n'a pas retourné le chemin de l'image."
+        );
+      }
+
+      /*
+       * IMPORTANT
+       *
+       * On sauvegarde EXACTEMENT la valeur
+       * retournée par l'API.
+       *
+       * Exemple :
+       *
+       * /uploads/projects/project-123.jpg
+       *
+       * Cette valeur sera ensuite envoyée
+       * dans ProjectPayload.image_url.
+       */
+
+      updateField(
+        "image_url",
+        imageUrl.trim()
+      );
+
+      /*
+       * Aperçu avec transformation du chemin
+       * en URL complète.
+       */
+
+      setImagePreview(
+        getProjectImageUrl(
+          imageUrl
+        )
+      );
+
+      setSuccess(
+        "Image téléchargée avec succès. Elle sera enregistrée avec le projet."
+      );
+    } catch (err) {
+      console.error(
+        "Erreur upload image:",
+        err
+      );
+
+      /*
+       * On restaure l'image précédente.
+       */
+
+      setImagePreview(
+        getProjectImageUrl(
+          form.image_url
+        )
+      );
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Impossible de télécharger l'image."
+      );
+    } finally {
+      setUploading(false);
+
+      URL.revokeObjectURL(
+        localPreview
+      );
+
+      event.target.value = "";
+    }
+  }
+
+  /* =======================================================
+     IMAGE REMOVE
+  ======================================================= */
+
+  function removeImage() {
+    updateField(
+      "image_url",
+      ""
+    );
+
+    setImagePreview("");
+  }
+
+  /* =======================================================
+     VALIDATION
+  ======================================================= */
+
+  function validateForm(): string | null {
+    const title =
+      form.title.trim();
+
+    const shortTitle =
+      form.short_title.trim();
+
+    const description =
+      form.description.trim();
+
+    const details =
+      form.details.trim();
+
+    const category =
+      normalizeCategory(
+        form.category
+      );
+
+    const imageUrl =
+      form.image_url.trim();
+
+    if (!title) {
+      return "Le titre du projet est obligatoire.";
+    }
+
+    if (title.length < 2) {
+      return "Le titre du projet est trop court.";
+    }
+
+    if (shortTitle.length > 150) {
+      return "Le titre court ne doit pas dépasser 150 caractères.";
+    }
+
+    if (!description) {
+      return "La description du projet est obligatoire.";
+    }
+
+    if (description.length < 10) {
+      return "La description du projet est trop courte.";
+    }
+
+    if (!category) {
+      return "Veuillez sélectionner une catégorie.";
+    }
+
+    if (details.length > 10000) {
+      return "Les détails du projet sont trop longs.";
+    }
+
+    /*
+     * IMPORTANT :
+     *
+     * image_url accepte :
+     *
+     * /uploads/projects/image.jpg
+     *
+     * uploads/projects/image.jpg
+     *
+     * https://...
+     */
+
+    if (
+      imageUrl &&
+      !isValidImageReference(imageUrl)
+    ) {
+      return "Le chemin ou l'URL de l'image est invalide.";
+    }
+
+    if (
+      form.project_url.trim() &&
+      !isValidUrl(
+        form.project_url.trim()
+      )
+    ) {
+      return "L'URL du projet est invalide.";
+    }
+
+    if (
+      form.demo_url.trim() &&
+      !isValidUrl(
+        form.demo_url.trim()
+      )
+    ) {
+      return "L'URL de démonstration est invalide.";
+    }
+
+    if (
+      !Number.isInteger(
+        form.sort_order
+      ) ||
+      form.sort_order < 0
+    ) {
+      return "L'ordre d'affichage doit être un nombre entier positif ou nul.";
+    }
+
+    return null;
   }
 
   /* =======================================================
@@ -344,115 +766,127 @@ export default function ProjectForm({
     setError("");
     setSuccess("");
 
-    if (uploadingImage) {
-      setError(
-        "Veuillez attendre la fin de l'upload de l'image."
-      );
+    /*
+     * Sécurité :
+     * impossible d'enregistrer pendant
+     * l'upload de l'image.
+     */
 
+    if (uploading) {
+      setError(
+        "Veuillez attendre la fin du téléchargement de l'image."
+      );
       return;
     }
 
-    if (
-      !form.title.trim() ||
-      !form.description.trim() ||
-      !form.category.trim()
-    ) {
-      setError(
-        "Le titre, la description et la catégorie sont obligatoires."
-      );
+    const validationError =
+      validateForm();
 
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     try {
       setSaving(true);
 
-      const payload = {
-        title: form.title.trim(),
+      const status =
+        form.published
+          ? form.status
+          : "maintenance";
 
-        short_title:
-          form.short_title.trim() ||
-          undefined,
+      /*
+       * IMPORTANT :
+       *
+       * On construit le payload au dernier moment
+       * à partir de form.image_url.
+       *
+       * C'est cette valeur qui sera réellement
+       * envoyée à l'API.
+       */
 
-        description:
-          form.description.trim(),
+      const imageUrl =
+        form.image_url.trim();
 
-        details:
-          form.details.trim() ||
-          undefined,
+   const payload: ProjectPayload = {
+      title: form.title.trim(),
+      short_title: form.short_title.trim() || null,
+      description: form.description.trim(),
+      details: form.details.trim() || null,
+      category: normalizeCategory(form.category),
+      image_url: imageUrl || null,
+      project_url: form.project_url.trim() || null,
+      demo_url: form.demo_url.trim() || null,
+      technologies: normalizeArray(form.technologies),
+      benefits: normalizeArray(form.benefits),
+      featured: Boolean(form.featured),
+      published: Boolean(form.published),
+      status,
+      ...(isEditMode
+        ? {
+            sort_order: Number.isInteger(form.sort_order)
+              ? form.sort_order
+              : 0,
+          }
+        : {}),
+    };
+      /*
+       * Debug utile pendant les tests.
+       *
+       * Dans la console du navigateur tu dois voir :
+       *
+       * image_url: "/uploads/projects/..."
+       */
 
-        category:
-          form.category.trim(),
+      console.log(
+        "[ProjectForm] Payload envoyé:",
+        payload
+      );
 
-        image_url:
-          form.image_url.trim() ||
-          undefined,
-
-        technologies:
-          form.technologies,
-
-        benefits:
-          form.benefits,
-
-        project_url:
-          form.project_url.trim() ||
-          undefined,
-
-        demo_url:
-          form.demo_url.trim() ||
-          undefined,
-
-        featured:
-          form.featured,
-
-        status:
-          form.status,
-
-        sort_order:
-          form.sort_order,
-      };
-
-      if (projectId) {
+      if (isEditMode && id) {
         await updateProject(
-          projectId,
+          id,
           payload
         );
 
         setSuccess(
-          "La réalisation a été modifiée avec succès."
+          "Projet modifié avec succès."
         );
-
-        window.setTimeout(() => {
-          navigate("/admin");
-        }, 700);
       } else {
         await createProject(
-          payload as Omit<
-            Project,
-            "id" |
-              "created_at" |
-              "updated_at"
-          >
+          payload
         );
 
         setSuccess(
-          "La réalisation a été créée avec succès."
+          "Projet créé avec succès."
         );
 
-        window.setTimeout(() => {
-          navigate("/admin");
-        }, 700);
+        setForm({
+          ...EMPTY_FORM,
+        });
+
+        setImagePreview("");
+
+        setTechnologyInput("");
+
+        setBenefitInput("");
       }
-    } catch (error) {
+
+      window.setTimeout(() => {
+        navigate(
+          "/admin/projects"
+        );
+      }, 700);
+    } catch (err) {
       console.error(
-        "Erreur enregistrement:",
-        error
+        "Erreur sauvegarde projet:",
+        err
       );
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Impossible d'enregistrer la réalisation."
+        err instanceof Error
+          ? err.message
+          : "Impossible d'enregistrer le projet."
       );
     } finally {
       setSaving(false);
@@ -460,29 +894,22 @@ export default function ProjectForm({
   }
 
   /* =======================================================
-     IMAGE URL
-  ======================================================= */
-
-  const imagePreviewUrl =
-    form.image_url
-      ? form.image_url.startsWith("http")
-        ? form.image_url
-        : `${API_URL}${form.image_url}`
-      : "";
-
-  /* =======================================================
      LOADING
   ======================================================= */
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-dw-background">
-        <div className="mx-auto max-w-5xl px-5 py-20 text-center">
-          <p className="text-dw-muted">
-            Chargement du projet...
-          </p>
+      <Container>
+        <div className="flex min-h-[500px] items-center justify-center">
+          <div className="text-center">
+            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-dw-border border-t-dw-primary" />
+
+            <p className="mt-4 text-sm text-dw-muted">
+              Chargement du projet...
+            </p>
+          </div>
         </div>
-      </main>
+      </Container>
     );
   }
 
@@ -491,1072 +918,895 @@ export default function ProjectForm({
   ======================================================= */
 
   return (
-    <main className="min-h-screen bg-dw-background">
-      {/* =====================================================
-          HEADER
-      ====================================================== */}
+    <Container>
+      <div className="py-8 sm:py-10">
 
-      <header
-        className="
-          border-b
-          border-dw-border
-          bg-dw-surface
-        "
-      >
-        <div
-          className="
-            mx-auto
-            flex
-            h-20
-            max-w-5xl
-            items-center
-            gap-4
-            px-5
-            sm:px-6
-          "
-        >
-          <Link
-            to="/admin"
-            className="
-              flex
-              h-10
-              w-10
-              items-center
-              justify-center
-              rounded-xl
-              border
-              border-dw-border
-              bg-dw-card
-              text-dw-muted
-              transition
-              hover:text-dw-primary
-            "
-          >
-            <ArrowLeft size={17} />
-          </Link>
+        {/* HEADER */}
 
+        <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p
-              className="
-                text-xs
-                font-semibold
-                uppercase
-                tracking-[0.15em]
-                text-dw-primary
-              "
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  "/admin/projects"
+                )
+              }
+              className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-dw-muted transition hover:text-dw-text"
             >
-              Digital Work
-            </p>
+              <ArrowLeft size={16} />
+              Retour aux projets
+            </button>
 
-            <h1
-              className="
-                mt-1
-                text-xl
-                font-bold
-                text-dw-text
-              "
-            >
-              {isEdit
-                ? "Modifier une réalisation"
-                : "Nouvelle réalisation"}
+            <h1 className="text-3xl font-bold tracking-tight text-dw-text">
+              {isEditMode
+                ? "Modifier le projet"
+                : "Nouveau projet"}
             </h1>
+
+            <p className="mt-2 text-sm leading-6 text-dw-muted">
+              {isEditMode
+                ? "Modifiez les informations de cette réalisation."
+                : "Ajoutez une nouvelle réalisation à votre portfolio."}
+            </p>
           </div>
         </div>
-      </header>
 
-      {/* =====================================================
-          FORM
-      ====================================================== */}
+        {/* ERROR */}
 
-      <section className="py-10">
-        <div className="mx-auto max-w-5xl px-5 sm:px-6">
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6"
-          >
-            {/* =================================================
-                MESSAGES
-            ================================================== */}
+        {error && (
+          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-500">
+            <X
+              size={18}
+              className="mt-0.5 shrink-0"
+            />
 
-            {error && (
-              <div
-                className="
-                  rounded-2xl
-                  border
-                  border-red-500/20
-                  bg-red-500/10
-                  p-4
-                  text-sm
-                  text-red-500
-                "
-              >
-                {error}
-              </div>
-            )}
+            <p>{error}</p>
+          </div>
+        )}
 
-            {success && (
-              <div
-                className="
-                  rounded-2xl
-                  border
-                  border-dw-success/20
-                  bg-dw-success/10
-                  p-4
-                  text-sm
-                  text-dw-success
-                "
-              >
-                {success}
-              </div>
-            )}
+        {/* SUCCESS */}
 
-            {/* =================================================
-                INFORMATIONS
-            ================================================== */}
+        {success && (
+          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-green-500/20 bg-green-500/10 p-4 text-sm text-green-600">
+            <Check
+              size={18}
+              className="mt-0.5 shrink-0"
+            />
 
-            <section
-              className="
-                rounded-3xl
-                border
-                border-dw-border
-                bg-dw-card
-                p-6
-                sm:p-8
-              "
-            >
+            <p>{success}</p>
+          </div>
+        )}
+
+        {/* FORM */}
+
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
+
+          {/* =================================================
+              INFORMATIONS PRINCIPALES
+          ================================================= */}
+
+          <section className="rounded-3xl border border-dw-border bg-dw-card p-6 shadow-sm sm:p-8">
+            <div className="mb-6">
               <h2 className="text-lg font-bold text-dw-text">
-                Informations générales
+                Informations principales
               </h2>
 
-              <div className="mt-6 grid gap-5 md:grid-cols-2">
-                {/* Title */}
-
-                <div className="md:col-span-2">
-                  <label
-                    htmlFor="title"
-                    className="
-                      mb-2
-                      block
-                      text-sm
-                      font-medium
-                      text-dw-text
-                    "
-                  >
-                    Titre *
-                  </label>
-
-                  <input
-                    id="title"
-                    value={form.title}
-                    onChange={(event) =>
-                      updateField(
-                        "title",
-                        event.target.value
-                      )
-                    }
-                    placeholder="Ex. Hotspot Management V2"
-                    className="
-                      w-full
-                      rounded-xl
-                      border
-                      border-dw-border
-                      bg-dw-surface
-                      px-4
-                      py-3
-                      text-sm
-                      text-dw-text
-                      outline-none
-                      placeholder:text-dw-muted/60
-                      focus:border-dw-primary
-                    "
-                  />
-                </div>
-
-                {/* Short title */}
-
-                <div>
-                  <label
-                    htmlFor="short_title"
-                    className="
-                      mb-2
-                      block
-                      text-sm
-                      font-medium
-                      text-dw-text
-                    "
-                  >
-                    Titre court
-                  </label>
-
-                  <input
-                    id="short_title"
-                    value={form.short_title}
-                    onChange={(event) =>
-                      updateField(
-                        "short_title",
-                        event.target.value
-                      )
-                    }
-                    placeholder="Hotspot Management"
-                    className="
-                      w-full
-                      rounded-xl
-                      border
-                      border-dw-border
-                      bg-dw-surface
-                      px-4
-                      py-3
-                      text-sm
-                      text-dw-text
-                      outline-none
-                      placeholder:text-dw-muted/60
-                      focus:border-dw-primary
-                    "
-                  />
-                </div>
-
-                {/* Category */}
-
-                <div>
-                  <label
-                    htmlFor="category"
-                    className="
-                      mb-2
-                      block
-                      text-sm
-                      font-medium
-                      text-dw-text
-                    "
-                  >
-                    Catégorie *
-                  </label>
-
-                  <input
-                    id="category"
-                    value={form.category}
-                    onChange={(event) =>
-                      updateField(
-                        "category",
-                        event.target.value
-                      )
-                    }
-                    placeholder="Réseau, Web, Mobile..."
-                    className="
-                      w-full
-                      rounded-xl
-                      border
-                      border-dw-border
-                      bg-dw-surface
-                      px-4
-                      py-3
-                      text-sm
-                      text-dw-text
-                      outline-none
-                      placeholder:text-dw-muted/60
-                      focus:border-dw-primary
-                    "
-                  />
-                </div>
-
-                {/* Description */}
-
-                <div className="md:col-span-2">
-                  <label
-                    htmlFor="description"
-                    className="
-                      mb-2
-                      block
-                      text-sm
-                      font-medium
-                      text-dw-text
-                    "
-                  >
-                    Description *
-                  </label>
-
-                  <textarea
-                    id="description"
-                    rows={4}
-                    value={
-                      form.description
-                    }
-                    onChange={(event) =>
-                      updateField(
-                        "description",
-                        event.target.value
-                      )
-                    }
-                    placeholder="Présentez brièvement le projet..."
-                    className="
-                      w-full
-                      resize-y
-                      rounded-xl
-                      border
-                      border-dw-border
-                      bg-dw-surface
-                      px-4
-                      py-3
-                      text-sm
-                      leading-6
-                      text-dw-text
-                      outline-none
-                      placeholder:text-dw-muted/60
-                      focus:border-dw-primary
-                    "
-                  />
-                </div>
-
-                {/* Details */}
-
-                <div className="md:col-span-2">
-                  <label
-                    htmlFor="details"
-                    className="
-                      mb-2
-                      block
-                      text-sm
-                      font-medium
-                      text-dw-text
-                    "
-                  >
-                    Détails
-                  </label>
-
-                  <textarea
-                    id="details"
-                    rows={5}
-                    value={form.details}
-                    onChange={(event) =>
-                      updateField(
-                        "details",
-                        event.target.value
-                      )
-                    }
-                    placeholder="Décrivez le projet plus en détail..."
-                    className="
-                      w-full
-                      resize-y
-                      rounded-xl
-                      border
-                      border-dw-border
-                      bg-dw-surface
-                      px-4
-                      py-3
-                      text-sm
-                      leading-6
-                      text-dw-text
-                      outline-none
-                      placeholder:text-dw-muted/60
-                      focus:border-dw-primary
-                    "
-                  />
-                </div>
-              </div>
-            </section>
-
-        {/* =================================================
-                IMAGE & LIENS
-            ================================================== */}
-
-            <section
-            className="
-                rounded-3xl
-                border
-                border-dw-border
-                bg-dw-card
-                p-6
-                sm:p-8
-            "
-            >
-            <div className="flex items-center gap-3">
-                <ImageIcon
-                size={20}
-                className="text-dw-primary"
-                />
-
-                <h2 className="text-lg font-bold text-dw-text">
-                Visuel et liens
-                </h2>
+              <p className="mt-1 text-sm text-dw-muted">
+                Les informations affichées sur la page Réalisations.
+              </p>
             </div>
 
-            <div className="mt-6 grid gap-6">
-                {/* =================================================
-                    UPLOAD IMAGE
-                ================================================== */}
+            <div className="grid gap-6">
 
-                <div>
+              {/* TITLE */}
+
+              <div>
                 <label
-                    className="
-                    mb-2
-                    block
-                    text-sm
-                    font-medium
-                    text-dw-text
-                    "
+                  htmlFor="title"
+                  className="mb-2 block text-sm font-semibold text-dw-text"
                 >
-                    Image du projet
+                  Titre
+                  <span className="ml-1 text-red-500">
+                    *
+                  </span>
                 </label>
 
-                <div className="flex flex-wrap items-center gap-3">
-                    {/* Bouton visible */}
+                <input
+                  id="title"
+                  type="text"
+                  value={form.title}
+                  onChange={(event) =>
+                    updateField(
+                      "title",
+                      event.target.value
+                    )
+                  }
+                  placeholder="Ex. Site web hôtelier"
+                  className="w-full rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm text-dw-text outline-none transition placeholder:text-dw-muted/60 focus:border-dw-primary/50 focus:ring-2 focus:ring-dw-primary/10"
+                />
+              </div>
 
-                    <label
-                    htmlFor="project-image"
-                    className="
-                        inline-flex
-                        cursor-pointer
-                        items-center
-                        gap-2
-                        rounded-xl
-                        bg-dw-primary
-                        px-5
-                        py-3
-                        text-sm
-                        font-semibold
-                        text-white
-                        shadow-lg
-                        shadow-dw-primary/20
-                        transition-all
-                        duration-200
-                        hover:-translate-y-0.5
-                        hover:bg-dw-primary-hover
-                    "
-                    >
-                    <ImageIcon size={17} />
+              {/* SHORT TITLE */}
 
-                    {uploadingImage
-                        ? "Upload en cours..."
-                        : "Choisir une image"}
-                    </label>
+              <div>
+                <label
+                  htmlFor="short_title"
+                  className="mb-2 block text-sm font-semibold text-dw-text"
+                >
+                  Titre court
+                </label>
 
-                    {/* Input réel, invisible */}
-
-                    <input
-                    id="project-image"
-                    name="image"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
-                    disabled={
-                        uploadingImage ||
-                        saving
-                    }
-                    onChange={(event) => {
-                        const file =
-                        event.currentTarget.files?.[0];
-
-                        if (!file) {
-                        return;
-                        }
-
-                        void handleImageUpload(file);
-
-                        event.currentTarget.value = "";
-                    }}
-                    className="sr-only"
-                    />
-                </div>
+                <input
+                  id="short_title"
+                  type="text"
+                  value={form.short_title}
+                  onChange={(event) =>
+                    updateField(
+                      "short_title",
+                      event.target.value
+                    )
+                  }
+                  placeholder="Ex. Site hôtelier"
+                  className="w-full rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm text-dw-text outline-none transition placeholder:text-dw-muted/60 focus:border-dw-primary/50 focus:ring-2 focus:ring-dw-primary/10"
+                />
 
                 <p className="mt-2 text-xs text-dw-muted">
-                    JPG, PNG, WEBP ou GIF — 5 Mo maximum.
+                  Optionnel. Utilisé lorsque le titre complet est trop long.
+                </p>
+              </div>
+
+              {/* CATEGORY */}
+
+              <div>
+                <label
+                  htmlFor="category"
+                  className="mb-2 block text-sm font-semibold text-dw-text"
+                >
+                  Catégorie
+                  <span className="ml-1 text-red-500">
+                    *
+                  </span>
+                </label>
+
+                <select
+                  id="category"
+                  value={
+                    showCustomCategory
+                      ? "__custom__"
+                      : form.category
+                  }
+                  onChange={(event) =>
+                    handleCategoryChange(
+                      event.target.value
+                    )
+                  }
+                  className="w-full rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm text-dw-text outline-none transition focus:border-dw-primary/50 focus:ring-2 focus:ring-dw-primary/10"
+                >
+                  <option value="">
+                    Sélectionner une catégorie
+                  </option>
+
+                  {categories.map(
+                    (category) => (
+                      <option
+                        key={`category-${category}`}
+                        value={category}
+                      >
+                        {category}
+                      </option>
+                    )
+                  )}
+
+                  <option value="__custom__">
+                    + Ajouter une nouvelle catégorie
+                  </option>
+                </select>
+
+                {showCustomCategory && (
+                  <div className="mt-3 rounded-2xl border border-dw-primary/20 bg-dw-primary/5 p-4">
+                    <label
+                      htmlFor="custom-category"
+                      className="mb-2 block text-xs font-semibold uppercase tracking-wide text-dw-primary"
+                    >
+                      Nouvelle catégorie
+                    </label>
+
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <input
+                        id="custom-category"
+                        type="text"
+                        value={
+                          customCategory
+                        }
+                        onChange={(event) =>
+                          setCustomCategory(
+                            event.target.value
+                          )
+                        }
+                        onKeyDown={(event) => {
+                          if (
+                            event.key ===
+                            "Enter"
+                          ) {
+                            event.preventDefault();
+                            addCustomCategory();
+                          }
+                        }}
+                        placeholder="Ex. Data & IA"
+                        className="min-w-0 flex-1 rounded-xl border border-dw-border bg-dw-surface px-4 py-2.5 text-sm text-dw-text outline-none focus:border-dw-primary/50"
+                        autoFocus
+                      />
+
+                      <button
+                        type="button"
+                        onClick={
+                          addCustomCategory
+                        }
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-dw-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+                      >
+                        <Plus size={16} />
+                        Ajouter
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={
+                          cancelCustomCategory
+                        }
+                        className="inline-flex items-center justify-center gap-2 rounded-xl border border-dw-border bg-dw-surface px-4 py-2.5 text-sm font-medium text-dw-muted transition hover:text-dw-text"
+                      >
+                        <X size={16} />
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* DESCRIPTION */}
+
+              <div>
+                <label
+                  htmlFor="description"
+                  className="mb-2 block text-sm font-semibold text-dw-text"
+                >
+                  Description
+                  <span className="ml-1 text-red-500">
+                    *
+                  </span>
+                </label>
+
+                <textarea
+                  id="description"
+                  rows={6}
+                  value={
+                    form.description
+                  }
+                  onChange={(event) =>
+                    updateField(
+                      "description",
+                      event.target.value
+                    )
+                  }
+                  placeholder="Décrivez le projet, son objectif et la solution développée..."
+                  className="w-full resize-y rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm leading-6 text-dw-text outline-none transition placeholder:text-dw-muted/60 focus:border-dw-primary/50 focus:ring-2 focus:ring-dw-primary/10"
+                />
+              </div>
+
+              {/* DETAILS */}
+
+              <div>
+                <label
+                  htmlFor="details"
+                  className="mb-2 block text-sm font-semibold text-dw-text"
+                >
+                  Détails du projet
+                </label>
+
+                <textarea
+                  id="details"
+                  rows={5}
+                  value={form.details}
+                  onChange={(event) =>
+                    updateField(
+                      "details",
+                      event.target.value
+                    )
+                  }
+                  placeholder="Informations complémentaires sur le projet..."
+                  className="w-full resize-y rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm leading-6 text-dw-text outline-none transition placeholder:text-dw-muted/60 focus:border-dw-primary/50 focus:ring-2 focus:ring-dw-primary/10"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* =================================================
+              IMAGE
+          ================================================= */}
+
+          <section className="rounded-3xl border border-dw-border bg-dw-card p-6 shadow-sm sm:p-8">
+            <div className="mb-6">
+              <h2 className="text-lg font-bold text-dw-text">
+                Image du projet
+              </h2>
+
+              <p className="mt-1 text-sm text-dw-muted">
+                Image principale affichée sur la carte de réalisation.
+              </p>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+
+              {/* PREVIEW */}
+
+              <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-dw-border bg-dw-surface">
+                {imagePreview ? (
+                  <>
+                    <img
+                      src={imagePreview}
+                      alt={
+                        form.title ||
+                        "Aperçu du projet"
+                      }
+                      className="h-full w-full object-cover"
+                      onError={() => {
+                        setImagePreview("");
+                      }}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={
+                        removeImage
+                      }
+                      className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-black/60 text-white backdrop-blur transition hover:bg-red-500"
+                      aria-label="Supprimer l'image"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center text-center">
+                    <ImageIcon
+                      size={40}
+                      className="text-dw-muted/50"
+                    />
+
+                    <p className="mt-3 text-sm font-medium text-dw-muted">
+                      Aucune image
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* UPLOAD */}
+
+              <div className="flex flex-col justify-center">
+
+                <label
+                  htmlFor="project-image"
+                  className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dw-border bg-dw-surface px-5 py-3 text-sm font-semibold text-dw-text transition hover:border-dw-primary/30 hover:text-dw-primary ${
+                    uploading
+                      ? "pointer-events-none opacity-60"
+                      : ""
+                  }`}
+                >
+                  {uploading ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-dw-border border-t-dw-primary" />
+
+                      Téléchargement...
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={17} />
+
+                      Choisir une image
+                    </>
+                  )}
+                </label>
+
+                <input
+                  id="project-image"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  onChange={
+                    handleImageChange
+                  }
+                  disabled={uploading}
+                  className="hidden"
+                />
+
+                <p className="mt-3 text-xs leading-5 text-dw-muted">
+                  PNG, JPG, WEBP ou GIF.
+                  <br />
+                  Taille maximale : 5 Mo.
                 </p>
 
-                {/* Upload en cours */}
+                {/* IMAGE URL */}
 
-                {uploadingImage && (
-                    <div
-                    className="
-                        mt-3
-                        rounded-xl
-                        border
-                        border-dw-primary/20
-                        bg-dw-primary/10
-                        px-4
-                        py-3
-                        text-sm
-                        text-dw-primary
-                    "
-                    >
-                    Upload de l'image en cours...
-                    </div>
-                )}
+                <div className="mt-5">
+                  <label
+                    htmlFor="image_url"
+                    className="mb-2 block text-xs font-semibold uppercase tracking-wide text-dw-muted"
+                  >
+                    Chemin ou URL de l'image
+                  </label>
 
-                {/* Aperçu */}
-
-                {form.image_url && (
-                    <div className="mt-5">
-                    <div className="mb-2 flex items-center justify-between">
-                        <span className="text-xs font-medium text-dw-muted">
-                        Aperçu
-                        </span>
-
-                        <span className="text-xs font-semibold text-dw-success">
-                        Image téléchargée
-                        </span>
-                    </div>
-
-                    <img
-                        src={
-                        form.image_url.startsWith("http")
-                            ? form.image_url
-                            : `${API_URL}${form.image_url}`
-                        }
-                        alt={
-                        form.title
-                            ? `Aperçu de ${form.title}`
-                            : "Aperçu du projet"
-                        }
-                        className="
-                        h-56
-                        w-full
-                        rounded-2xl
-                        border
-                        border-dw-border
-                        bg-dw-surface
-                        object-cover
-                        "
-                    />
-                    </div>
-                )}
-                </div>
-
-                {/* =================================================
-                    URLS
-                ================================================== */}
-
-                <div className="grid gap-5 md:grid-cols-2">
-                {/* URL du projet */}
-
-                <div>
-                    <label
-                    htmlFor="project_url"
-                    className="
-                        mb-2
-                        block
-                        text-sm
-                        font-medium
-                        text-dw-text
-                    "
-                    >
-                    URL du projet
-                    </label>
-
-                    <input
-                    id="project_url"
-                    type="url"
-                    value={form.project_url}
-                    onChange={(event) =>
-                        updateField(
-                        "project_url",
-                        event.target.value
-                        )
+                  <input
+                    id="image_url"
+                    type="text"
+                    value={
+                      form.image_url
                     }
-                    placeholder="https://..."
-                    className="
-                        w-full
-                        rounded-xl
-                        border
-                        border-dw-border
-                        bg-dw-surface
-                        px-4
-                        py-3
-                        text-sm
-                        text-dw-text
-                        outline-none
-                        placeholder:text-dw-muted/60
-                        focus:border-dw-primary
-                    "
-                    />
-                </div>
+                    onChange={(event) => {
+                      const value =
+                        event.target.value;
 
-                {/* URL démonstration */}
+                      updateField(
+                        "image_url",
+                        value
+                      );
 
-                <div>
-                    <label
-                    htmlFor="demo_url"
-                    className="
-                        mb-2
-                        block
-                        text-sm
-                        font-medium
-                        text-dw-text
-                    "
-                    >
-                    URL de démonstration
-                    </label>
-
-                    <input
-                    id="demo_url"
-                    type="url"
-                    value={form.demo_url}
-                    onChange={(event) =>
-                        updateField(
-                        "demo_url",
-                        event.target.value
+                      setImagePreview(
+                        getProjectImageUrl(
+                          value
                         )
-                    }
-                    placeholder="https://..."
-                    className="
-                        w-full
-                        rounded-xl
-                        border
-                        border-dw-border
-                        bg-dw-surface
-                        px-4
-                        py-3
-                        text-sm
-                        text-dw-text
-                        outline-none
-                        placeholder:text-dw-muted/60
-                        focus:border-dw-primary
-                    "
-                    />
+                      );
+                    }}
+                    placeholder="/uploads/projects/image.jpg ou https://..."
+                    className="w-full rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm text-dw-text outline-none focus:border-dw-primary/50"
+                  />
+
+                  <p className="mt-2 text-xs text-dw-muted">
+                    L'upload automatique renseigne ce champ. Vous n'avez normalement pas besoin de le modifier.
+                  </p>
                 </div>
-                </div>
+              </div>
             </div>
-            </section>
+          </section>
 
-            {/* =================================================
-                TECHNOLOGIES
-            ================================================== */}
+          {/* =================================================
+              URLS
+          ================================================= */}
 
-            <section
-              className="
-                rounded-3xl
-                border
-                border-dw-border
-                bg-dw-card
-                p-6
-                sm:p-8
-              "
-            >
+          <section className="rounded-3xl border border-dw-border bg-dw-card p-6 shadow-sm sm:p-8">
+            <div className="mb-6">
+              <h2 className="text-lg font-bold text-dw-text">
+                Liens du projet
+              </h2>
+
+              <p className="mt-1 text-sm text-dw-muted">
+                Les deux liens sont optionnels.
+              </p>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+
+              <div>
+                <label
+                  htmlFor="project_url"
+                  className="mb-2 block text-sm font-semibold text-dw-text"
+                >
+                  URL du projet
+                </label>
+
+                <input
+                  id="project_url"
+                  type="url"
+                  value={
+                    form.project_url
+                  }
+                  onChange={(event) =>
+                    updateField(
+                      "project_url",
+                      event.target.value
+                    )
+                  }
+                  placeholder="https://..."
+                  className="w-full rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm text-dw-text outline-none focus:border-dw-primary/50"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="demo_url"
+                  className="mb-2 block text-sm font-semibold text-dw-text"
+                >
+                  URL de démonstration
+                </label>
+
+                <input
+                  id="demo_url"
+                  type="url"
+                  value={
+                    form.demo_url
+                  }
+                  onChange={(event) =>
+                    updateField(
+                      "demo_url",
+                      event.target.value
+                    )
+                  }
+                  placeholder="https://..."
+                  className="w-full rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm text-dw-text outline-none focus:border-dw-primary/50"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* =================================================
+              TECHNOLOGIES
+          ================================================= */}
+
+          <section className="rounded-3xl border border-dw-border bg-dw-card p-6 shadow-sm sm:p-8">
+            <div className="mb-6">
               <h2 className="text-lg font-bold text-dw-text">
                 Technologies
               </h2>
 
-              <div className="mt-5 flex gap-2">
-                <input
-                  value={technologyInput}
-                  onChange={(event) =>
-                    setTechnologyInput(
-                      event.target.value
-                    )
-                  }
-                  onKeyDown={(event) => {
-                    if (
-                      event.key === "Enter"
-                    ) {
-                      event.preventDefault();
-                      addTechnology();
-                    }
-                  }}
-                  placeholder="React, Node.js..."
-                  className="
-                    min-w-0
-                    flex-1
-                    rounded-xl
-                    border
-                    border-dw-border
-                    bg-dw-surface
-                    px-4
-                    py-3
-                    text-sm
-                    text-dw-text
-                    outline-none
-                    placeholder:text-dw-muted/60
-                    focus:border-dw-primary
-                  "
-                />
+              <p className="mt-1 text-sm text-dw-muted">
+                Ajoutez les technologies utilisées.
+              </p>
+            </div>
 
-                <button
-                  type="button"
-                  onClick={
-                    addTechnology
-                  }
-                  className="
-                    flex
-                    h-12
-                    w-12
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-xl
-                    bg-dw-primary
-                    text-white
-                  "
-                  aria-label="Ajouter une technologie"
-                >
-                  <Plus size={18} />
-                </button>
-              </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <input
+                type="text"
+                value={
+                  technologyInput
+                }
+                onChange={(event) =>
+                  setTechnologyInput(
+                    event.target.value
+                  )
+                }
+                onKeyDown={
+                  handleTechnologyKeyDown
+                }
+                placeholder="Ex. React, Node.js, PostgreSQL..."
+                className="min-w-0 flex-1 rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm text-dw-text outline-none focus:border-dw-primary/50"
+              />
 
-              <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={
+                  addTechnology
+                }
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-dw-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+              >
+                <Plus size={17} />
+                Ajouter
+              </button>
+            </div>
+
+            {form.technologies.length > 0 && (
+              <div className="mt-5 flex flex-wrap gap-2">
                 {form.technologies.map(
-                  (technology) => (
-                    <button
-                      key={technology}
-                      type="button"
-                      onClick={() =>
-                        removeTechnology(
-                          technology
-                        )
-                      }
-                      className="
-                        inline-flex
-                        items-center
-                        gap-2
-                        rounded-lg
-                        border
-                        border-dw-border
-                        bg-dw-surface
-                        px-3
-                        py-1.5
-                        text-xs
-                        font-medium
-                        text-dw-muted
-                        hover:text-dw-text
-                      "
+                  (
+                    technology,
+                    index
+                  ) => (
+                    <span
+                      key={`technology-${technology}-${index}`}
+                      className="inline-flex items-center gap-2 rounded-xl border border-dw-border bg-dw-surface px-3 py-2 text-xs font-medium text-dw-text"
                     >
                       {technology}
 
-                      <X size={13} />
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeTechnology(
+                            index
+                          )
+                        }
+                        className="text-dw-muted transition hover:text-red-500"
+                        aria-label={`Supprimer ${technology}`}
+                      >
+                        <X size={14} />
+                      </button>
+                    </span>
                   )
                 )}
               </div>
-            </section>
+            )}
+          </section>
 
-            {/* =================================================
-                BENEFITS
-            ================================================== */}
+          {/* =================================================
+              BENEFITS
+          ================================================= */}
 
-            <section
-              className="
-                rounded-3xl
-                border
-                border-dw-border
-                bg-dw-card
-                p-6
-                sm:p-8
-              "
-            >
+          <section className="rounded-3xl border border-dw-border bg-dw-card p-6 shadow-sm sm:p-8">
+            <div className="mb-6">
               <h2 className="text-lg font-bold text-dw-text">
                 Points clés
               </h2>
 
-              <div className="mt-5 flex gap-2">
-                <input
-                  value={benefitInput}
-                  onChange={(event) =>
-                    setBenefitInput(
-                      event.target.value
-                    )
-                  }
-                  onKeyDown={(event) => {
-                    if (
-                      event.key === "Enter"
-                    ) {
-                      event.preventDefault();
-                      addBenefit();
-                    }
-                  }}
-                  placeholder="Gestion centralisée..."
-                  className="
-                    min-w-0
-                    flex-1
-                    rounded-xl
-                    border
-                    border-dw-border
-                    bg-dw-surface
-                    px-4
-                    py-3
-                    text-sm
-                    text-dw-text
-                    outline-none
-                    placeholder:text-dw-muted/60
-                    focus:border-dw-primary
-                  "
-                />
+              <p className="mt-1 text-sm text-dw-muted">
+                Les avantages affichés dans la carte du projet.
+              </p>
+            </div>
 
-                <button
-                  type="button"
-                  onClick={addBenefit}
-                  className="
-                    flex
-                    h-12
-                    w-12
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-xl
-                    bg-dw-primary
-                    text-white
-                  "
-                  aria-label="Ajouter un point clé"
-                >
-                  <Plus size={18} />
-                </button>
-              </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <input
+                type="text"
+                value={
+                  benefitInput
+                }
+                onChange={(event) =>
+                  setBenefitInput(
+                    event.target.value
+                  )
+                }
+                onKeyDown={
+                  handleBenefitKeyDown
+                }
+                placeholder="Ex. Interface responsive"
+                className="min-w-0 flex-1 rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm text-dw-text outline-none focus:border-dw-primary/50"
+              />
 
-              <div className="mt-4 space-y-2">
+              <button
+                type="button"
+                onClick={
+                  addBenefit
+                }
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-dw-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+              >
+                <Plus size={17} />
+                Ajouter
+              </button>
+            </div>
+
+            {form.benefits.length > 0 && (
+              <div className="mt-5 space-y-2">
                 {form.benefits.map(
-                  (benefit) => (
+                  (
+                    benefit,
+                    index
+                  ) => (
                     <div
-                      key={benefit}
-                      className="
-                        flex
-                        items-center
-                        justify-between
-                        gap-3
-                        rounded-xl
-                        border
-                        border-dw-border
-                        bg-dw-surface
-                        px-4
-                        py-3
-                      "
+                      key={`benefit-${benefit}-${index}`}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-dw-border bg-dw-surface px-4 py-3"
                     >
-                      <span className="text-sm text-dw-muted">
-                        {benefit}
-                      </span>
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-dw-primary/10 text-dw-primary">
+                          <Check size={14} />
+                        </div>
+
+                        <span className="text-sm text-dw-text">
+                          {benefit}
+                        </span>
+                      </div>
 
                       <button
                         type="button"
                         onClick={() =>
                           removeBenefit(
-                            benefit
+                            index
                           )
                         }
-                        className="
-                          text-dw-muted
-                          hover:text-red-500
-                        "
+                        className="shrink-0 text-dw-muted transition hover:text-red-500"
                         aria-label={`Supprimer ${benefit}`}
                       >
-                        <X size={15} />
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   )
                 )}
               </div>
-            </section>
+            )}
+          </section>
 
-            {/* =================================================
-                PUBLICATION
-            ================================================== */}
+          {/* =================================================
+              PUBLICATION
+          ================================================= */}
 
-            <section
-              className="
-                rounded-3xl
-                border
-                border-dw-border
-                bg-dw-card
-                p-6
-                sm:p-8
-              "
-            >
+          <section className="rounded-3xl border border-dw-border bg-dw-card p-6 shadow-sm sm:p-8">
+            <div className="mb-6">
               <h2 className="text-lg font-bold text-dw-text">
                 Publication
               </h2>
 
-              <div className="mt-6 grid gap-5 md:grid-cols-3">
-                {/* Status */}
+              <p className="mt-1 text-sm text-dw-muted">
+                Contrôlez la visibilité et l'état du projet.
+              </p>
+            </div>
 
-                <div>
-                  <label
-                    htmlFor="status"
-                    className="
-                      mb-2
-                      block
-                      text-sm
-                      font-medium
-                      text-dw-text
-                    "
-                  >
-                    Statut
-                  </label>
+            <div className="space-y-4">
 
-                  <select
-                    id="status"
-                    value={form.status}
-                    onChange={(event) =>
-                      updateField(
-                        "status",
-                        event.target
-                          .value as FormData["status"]
-                      )
-                    }
-                    className="
-                      w-full
-                      rounded-xl
-                      border
-                      border-dw-border
-                      bg-dw-surface
-                      px-4
-                      py-3
-                      text-sm
-                      text-dw-text
-                      outline-none
-                      focus:border-dw-primary
-                    "
-                  >
-                    <option value="completed">
-                      Terminé
-                    </option>
+              {/* PUBLISHED */}
 
-                    <option value="in-progress">
-                      En cours
-                    </option>
+              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-dw-border bg-dw-surface p-4">
+                <input
+                  type="checkbox"
+                  checked={
+                    form.published
+                  }
+                  onChange={(event) =>
+                    updateField(
+                      "published",
+                      event.target.checked
+                    )
+                  }
+                  className="mt-1 h-4 w-4 rounded border-dw-border text-dw-primary focus:ring-dw-primary"
+                />
 
-                    <option value="maintenance">
-                      Maintenance
-                    </option>
-                  </select>
-                </div>
+                <span>
+                  <span className="block text-sm font-semibold text-dw-text">
+                    Publier le projet
+                  </span>
 
-                {/* Order */}
+                  <span className="mt-1 block text-xs leading-5 text-dw-muted">
+                    Le projet sera visible sur la page Réalisations.
+                  </span>
+                </span>
+              </label>
 
-                <div>
-                  <label
-                    htmlFor="sort_order"
-                    className="
-                      mb-2
-                      block
-                      text-sm
-                      font-medium
-                      text-dw-text
-                    "
-                  >
-                    Ordre
-                  </label>
+              {/* FEATURED */}
 
-                  <input
-                    id="sort_order"
-                    type="number"
-                    min="0"
-                    value={
-                      form.sort_order
-                    }
-                    onChange={(event) =>
-                      updateField(
-                        "sort_order",
-                        Number(
-                          event.target.value
+              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-dw-border bg-dw-surface p-4">
+                <input
+                  type="checkbox"
+                  checked={
+                    form.featured
+                  }
+                  onChange={(event) =>
+                    updateField(
+                      "featured",
+                      event.target.checked
+                    )
+                  }
+                  className="mt-1 h-4 w-4 rounded border-dw-border text-dw-primary focus:ring-dw-primary"
+                />
+
+                <span>
+                  <span className="block text-sm font-semibold text-dw-text">
+                    Mettre en avant
+                  </span>
+
+                  <span className="mt-1 block text-xs leading-5 text-dw-muted">
+                    Marque ce projet comme réalisation importante.
+                  </span>
+                </span>
+              </label>
+
+              {/* STATUS */}
+
+              <div>
+                <label
+                  htmlFor="status"
+                  className="mb-2 block text-sm font-semibold text-dw-text"
+                >
+                  État du projet
+                </label>
+
+                <select
+                  id="status"
+                  value={
+                    form.status
+                  }
+                  onChange={(event) =>
+                    updateField(
+                      "status",
+                      event.target.value as FormState["status"]
+                    )
+                  }
+                  disabled={
+                    !form.published
+                  }
+                  className="w-full rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm text-dw-text outline-none transition focus:border-dw-primary/50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="completed">
+                    Terminé
+                  </option>
+
+                  <option value="in-progress">
+                    En cours
+                  </option>
+
+                  <option value="maintenance">
+                    Maintenance
+                  </option>
+                </select>
+
+                {!form.published && (
+                  <p className="mt-2 text-xs text-dw-muted">
+                    Un projet non publié est envoyé avec le statut « maintenance ».
+                  </p>
+                )}
+              </div>
+
+              {/* SORT ORDER */}
+
+              <div>
+                <label
+                  htmlFor="sort_order"
+                  className="mb-2 block text-sm font-semibold text-dw-text"
+                >
+                  Ordre d'affichage
+                </label>
+
+                <input
+                  id="sort_order"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={
+                    form.sort_order
+                  }
+                  onChange={(event) =>
+                    updateField(
+                      "sort_order",
+                      Math.max(
+                        0,
+                        Number.parseInt(
+                          event.target.value ||
+                            "0",
+                          10
                         )
                       )
-                    }
-                    className="
-                      w-full
-                      rounded-xl
-                      border
-                      border-dw-border
-                      bg-dw-surface
-                      px-4
-                      py-3
-                      text-sm
-                      text-dw-text
-                      outline-none
-                      focus:border-dw-primary
-                    "
-                  />
-                </div>
+                    )
+                  }
+                  className="w-full rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm text-dw-text outline-none focus:border-dw-primary/50"
+                />
 
-                {/* Featured */}
-
-                <label
-                  className="
-                    flex
-                    cursor-pointer
-                    items-center
-                    gap-3
-                    rounded-xl
-                    border
-                    border-dw-border
-                    bg-dw-surface
-                    px-4
-                    py-3
-                  "
-                >
-                  <input
-                    type="checkbox"
-                    checked={
-                      form.featured
-                    }
-                    onChange={(event) =>
-                      updateField(
-                        "featured",
-                        event.target
-                          .checked
-                      )
-                    }
-                    className="
-                      h-4
-                      w-4
-                      accent-dw-primary
-                    "
-                  />
-
-                  <span className="text-sm font-medium text-dw-text">
-                    Projet principal
-                  </span>
-                </label>
+                <p className="mt-2 text-xs text-dw-muted">
+                  0 = premier dans la liste.
+                </p>
               </div>
-            </section>
-
-            {/* =================================================
-                ACTIONS
-            ================================================== */}
-
-            <div
-              className="
-                flex
-                flex-col-reverse
-                gap-3
-                sm:flex-row
-                sm:justify-end
-              "
-            >
-              <Link
-                to="/admin"
-                className="
-                  inline-flex
-                  items-center
-                  justify-center
-                  rounded-xl
-                  border
-                  border-dw-border
-                  bg-dw-card
-                  px-5
-                  py-3.5
-                  text-sm
-                  font-semibold
-                  text-dw-text
-                  hover:border-dw-primary/30
-                "
-              >
-                Annuler
-              </Link>
-
-              <Button
-                type="submit"
-                disabled={
-                  saving ||
-                  uploadingImage
-                }
-              >
-                <Save size={17} />
-
-                {saving
-                  ? "Enregistrement..."
-                  : uploadingImage
-                    ? "Upload de l'image..."
-                    : isEdit
-                      ? "Enregistrer les modifications"
-                      : "Créer la réalisation"}
-              </Button>
             </div>
-          </form>
-        </div>
-      </section>
-    </main>
+          </section>
+
+          {/* =================================================
+              ACTIONS
+          ================================================= */}
+
+          <div className="sticky bottom-4 z-20 flex flex-col-reverse gap-3 rounded-2xl border border-dw-border bg-dw-card/95 p-3 shadow-xl backdrop-blur-md sm:flex-row sm:justify-end">
+
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  "/admin/projects"
+                )
+              }
+              disabled={saving}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-dw-border bg-dw-surface px-5 py-3 text-sm font-semibold text-dw-muted transition hover:text-dw-text disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Annuler
+            </button>
+
+            <button
+              type="submit"
+              disabled={
+                saving ||
+                uploading
+              }
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-dw-primary px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {saving ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+
+                  Enregistrement...
+                </>
+              ) : (
+                <>
+                  <Save size={17} />
+
+                  {isEditMode
+                    ? "Enregistrer les modifications"
+                    : "Créer le projet"}
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </Container>
   );
 }
