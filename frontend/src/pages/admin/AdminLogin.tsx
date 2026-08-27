@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import Button from "../../components/ui/Button";
 
-const API_URL = "http://localhost:4000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
