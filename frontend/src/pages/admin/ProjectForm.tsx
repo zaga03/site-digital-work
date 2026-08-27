@@ -60,11 +60,7 @@ interface FormState {
   benefits: string[];
   featured: boolean;
   published: boolean;
-  status:
-    | "completed"
-    | "in-progress"
-    | "maintenance";
-  sort_order: number;
+  status: "completed" | "in-progress" | "maintenance";
 }
 
 /* =========================================================
@@ -85,7 +81,6 @@ const EMPTY_FORM: FormState = {
   featured: false,
   published: true,
   status: "completed",
-  sort_order: 0,
 };
 
 /* =========================================================
@@ -101,8 +96,8 @@ function normalizeArray(values: string[]): string[] {
     new Set(
       values
         .map((value) => value.trim())
-        .filter(Boolean)
-    )
+        .filter(Boolean),
+    ),
   );
 }
 
@@ -130,10 +125,6 @@ function projectToForm(project: Project): FormState {
     featured: Boolean(project.featured),
     published,
     status: project.status ?? "completed",
-    sort_order:
-      typeof project.sort_order === "number"
-        ? project.sort_order
-        : 0,
   };
 }
 
@@ -186,7 +177,6 @@ function isValidImageReference(value: string): boolean {
 
 export default function ProjectForm() {
   const navigate = useNavigate();
-
   const { id } = useParams<{ id: string }>();
 
   const isEditMode = Boolean(id);
@@ -284,20 +274,20 @@ export default function ProjectForm() {
 
         setImagePreview(
           getProjectImageUrl(
-            nextForm.image_url
-          )
+            nextForm.image_url,
+          ),
         );
       } catch (err) {
         console.error(
           "Erreur chargement projet:",
-          err
+          err,
         );
 
         if (!cancelled) {
           setError(
             err instanceof Error
               ? err.message
-              : "Impossible de charger le projet."
+              : "Impossible de charger le projet.",
           );
         }
       } finally {
@@ -320,7 +310,7 @@ export default function ProjectForm() {
 
   function updateField<K extends keyof FormState>(
     field: K,
-    value: FormState[K]
+    value: FormState[K],
   ) {
     setForm((current) => ({
       ...current,
@@ -344,7 +334,7 @@ export default function ProjectForm() {
       form.technologies.some(
         (technology) =>
           technology.toLowerCase() ===
-          value.toLowerCase()
+          value.toLowerCase(),
       );
 
     if (!exists) {
@@ -353,7 +343,7 @@ export default function ProjectForm() {
         [
           ...form.technologies,
           value,
-        ]
+        ],
       );
     }
 
@@ -365,13 +355,13 @@ export default function ProjectForm() {
       "technologies",
       form.technologies.filter(
         (_, currentIndex) =>
-          currentIndex !== index
-      )
+          currentIndex !== index,
+      ),
     );
   }
 
   function handleTechnologyKeyDown(
-    event: KeyboardEvent<HTMLInputElement>
+    event: KeyboardEvent<HTMLInputElement>,
   ) {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -395,7 +385,7 @@ export default function ProjectForm() {
       form.benefits.some(
         (benefit) =>
           benefit.toLowerCase() ===
-          value.toLowerCase()
+          value.toLowerCase(),
       );
 
     if (!exists) {
@@ -404,7 +394,7 @@ export default function ProjectForm() {
         [
           ...form.benefits,
           value,
-        ]
+        ],
       );
     }
 
@@ -416,13 +406,13 @@ export default function ProjectForm() {
       "benefits",
       form.benefits.filter(
         (_, currentIndex) =>
-          currentIndex !== index
-      )
+          currentIndex !== index,
+      ),
     );
   }
 
   function handleBenefitKeyDown(
-    event: KeyboardEvent<HTMLInputElement>
+    event: KeyboardEvent<HTMLInputElement>,
   ) {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -435,7 +425,7 @@ export default function ProjectForm() {
   ======================================================= */
 
   function handleCategoryChange(
-    value: string
+    value: string,
   ) {
     if (value === "__custom__") {
       setShowCustomCategory(true);
@@ -447,14 +437,14 @@ export default function ProjectForm() {
 
     updateField(
       "category",
-      normalizeCategory(value)
+      normalizeCategory(value),
     );
   }
 
   function addCustomCategory() {
     const value =
       normalizeCategory(
-        customCategory
+        customCategory,
       );
 
     if (!value) {
@@ -465,12 +455,12 @@ export default function ProjectForm() {
       categories.find(
         (category) =>
           category.toLowerCase() ===
-          value.toLowerCase()
+          value.toLowerCase(),
       );
 
     updateField(
       "category",
-      existingCategory ?? value
+      existingCategory ?? value,
     );
 
     setCustomCategory("");
@@ -487,7 +477,7 @@ export default function ProjectForm() {
   ======================================================= */
 
   async function handleImageChange(
-    event: ChangeEvent<HTMLInputElement>
+    event: ChangeEvent<HTMLInputElement>,
   ) {
     const file =
       event.target.files?.[0];
@@ -499,32 +489,26 @@ export default function ProjectForm() {
     setError("");
     setSuccess("");
 
-    /* TYPE */
-
     if (!file.type.startsWith("image/")) {
       setError(
-        "Veuillez sélectionner une image valide."
+        "Veuillez sélectionner une image valide.",
       );
 
       event.target.value = "";
       return;
     }
-
-    /* SIZE */
 
     const maxSize =
       5 * 1024 * 1024;
 
     if (file.size > maxSize) {
       setError(
-        "L'image ne doit pas dépasser 5 Mo."
+        "L'image ne doit pas dépasser 5 Mo.",
       );
 
       event.target.value = "";
       return;
     }
-
-    /* PREVIEW LOCAL */
 
     const localPreview =
       URL.createObjectURL(file);
@@ -534,34 +518,8 @@ export default function ProjectForm() {
     try {
       setUploading(true);
 
-      /*
-       * Upload via projectsApi.ts
-       *
-       * POST:
-       * /api/uploads/project
-       *
-       * multipart/form-data
-       *
-       * field:
-       * image
-       */
-
       const uploaded =
         await uploadProjectImage(file);
-
-      /*
-       * Le backend peut retourner :
-       *
-       * {
-       *   url: "/uploads/projects/xxx.jpg"
-       * }
-       *
-       * ou :
-       *
-       * {
-       *   image_url: "/uploads/projects/xxx.jpg"
-       * }
-       */
 
       const imageUrl =
         uploaded.image_url ??
@@ -570,69 +528,46 @@ export default function ProjectForm() {
 
       if (!imageUrl.trim()) {
         throw new Error(
-          "Le serveur n'a pas retourné le chemin de l'image."
+          "Le serveur n'a pas retourné le chemin de l'image.",
         );
       }
 
-      /*
-       * IMPORTANT
-       *
-       * On sauvegarde EXACTEMENT la valeur
-       * retournée par l'API.
-       *
-       * Exemple :
-       *
-       * /uploads/projects/project-123.jpg
-       *
-       * Cette valeur sera ensuite envoyée
-       * dans ProjectPayload.image_url.
-       */
-
       updateField(
         "image_url",
-        imageUrl.trim()
+        imageUrl.trim(),
       );
-
-      /*
-       * Aperçu avec transformation du chemin
-       * en URL complète.
-       */
 
       setImagePreview(
         getProjectImageUrl(
-          imageUrl
-        )
+          imageUrl,
+        ),
       );
 
       setSuccess(
-        "Image téléchargée avec succès. Elle sera enregistrée avec le projet."
+        "Image téléchargée avec succès. Elle sera enregistrée avec le projet.",
       );
     } catch (err) {
       console.error(
         "Erreur upload image:",
-        err
+        err,
       );
-
-      /*
-       * On restaure l'image précédente.
-       */
 
       setImagePreview(
         getProjectImageUrl(
-          form.image_url
-        )
+          form.image_url,
+        ),
       );
 
       setError(
         err instanceof Error
           ? err.message
-          : "Impossible de télécharger l'image."
+          : "Impossible de télécharger l'image.",
       );
     } finally {
       setUploading(false);
 
       URL.revokeObjectURL(
-        localPreview
+        localPreview,
       );
 
       event.target.value = "";
@@ -646,7 +581,7 @@ export default function ProjectForm() {
   function removeImage() {
     updateField(
       "image_url",
-      ""
+      "",
     );
 
     setImagePreview("");
@@ -671,7 +606,7 @@ export default function ProjectForm() {
 
     const category =
       normalizeCategory(
-        form.category
+        form.category,
       );
 
     const imageUrl =
@@ -705,18 +640,6 @@ export default function ProjectForm() {
       return "Les détails du projet sont trop longs.";
     }
 
-    /*
-     * IMPORTANT :
-     *
-     * image_url accepte :
-     *
-     * /uploads/projects/image.jpg
-     *
-     * uploads/projects/image.jpg
-     *
-     * https://...
-     */
-
     if (
       imageUrl &&
       !isValidImageReference(imageUrl)
@@ -727,7 +650,7 @@ export default function ProjectForm() {
     if (
       form.project_url.trim() &&
       !isValidUrl(
-        form.project_url.trim()
+        form.project_url.trim(),
       )
     ) {
       return "L'URL du projet est invalide.";
@@ -736,19 +659,10 @@ export default function ProjectForm() {
     if (
       form.demo_url.trim() &&
       !isValidUrl(
-        form.demo_url.trim()
+        form.demo_url.trim(),
       )
     ) {
       return "L'URL de démonstration est invalide.";
-    }
-
-    if (
-      !Number.isInteger(
-        form.sort_order
-      ) ||
-      form.sort_order < 0
-    ) {
-      return "L'ordre d'affichage doit être un nombre entier positif ou nul.";
     }
 
     return null;
@@ -759,23 +673,18 @@ export default function ProjectForm() {
   ======================================================= */
 
   async function handleSubmit(
-    event: FormEvent<HTMLFormElement>
+    event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
 
     setError("");
     setSuccess("");
 
-    /*
-     * Sécurité :
-     * impossible d'enregistrer pendant
-     * l'upload de l'image.
-     */
-
     if (uploading) {
       setError(
-        "Veuillez attendre la fin du téléchargement de l'image."
+        "Veuillez attendre la fin du téléchargement de l'image.",
       );
+
       return;
     }
 
@@ -795,70 +704,79 @@ export default function ProjectForm() {
           ? form.status
           : "maintenance";
 
-      /*
-       * IMPORTANT :
-       *
-       * On construit le payload au dernier moment
-       * à partir de form.image_url.
-       *
-       * C'est cette valeur qui sera réellement
-       * envoyée à l'API.
-       */
-
       const imageUrl =
         form.image_url.trim();
 
-   const payload: ProjectPayload = {
-      title: form.title.trim(),
-      short_title: form.short_title.trim() || null,
-      description: form.description.trim(),
-      details: form.details.trim() || null,
-      category: normalizeCategory(form.category),
-      image_url: imageUrl || null,
-      project_url: form.project_url.trim() || null,
-      demo_url: form.demo_url.trim() || null,
-      technologies: normalizeArray(form.technologies),
-      benefits: normalizeArray(form.benefits),
-      featured: Boolean(form.featured),
-      published: Boolean(form.published),
-      status,
-      ...(isEditMode
-        ? {
-            sort_order: Number.isInteger(form.sort_order)
-              ? form.sort_order
-              : 0,
-          }
-        : {}),
-    };
-      /*
-       * Debug utile pendant les tests.
-       *
-       * Dans la console du navigateur tu dois voir :
-       *
-       * image_url: "/uploads/projects/..."
-       */
+      const payload: ProjectPayload = {
+        title: form.title.trim(),
+
+        short_title:
+          form.short_title.trim() ||
+          null,
+
+        description:
+          form.description.trim(),
+
+        details:
+          form.details.trim() ||
+          null,
+
+        category:
+          normalizeCategory(
+            form.category,
+          ),
+
+        image_url:
+          imageUrl || null,
+
+        project_url:
+          form.project_url.trim() ||
+          null,
+
+        demo_url:
+          form.demo_url.trim() ||
+          null,
+
+        technologies:
+          normalizeArray(
+            form.technologies,
+          ),
+
+        benefits:
+          normalizeArray(
+            form.benefits,
+          ),
+
+        featured:
+          Boolean(form.featured),
+
+        published:
+          Boolean(form.published),
+
+        status,
+      };
 
       console.log(
         "[ProjectForm] Payload envoyé:",
-        payload
+        payload,
       );
 
       if (isEditMode && id) {
         await updateProject(
           id,
-          payload
+          payload,
         );
 
         setSuccess(
-          "Projet modifié avec succès."
+          "Projet modifié avec succès.",
         );
       } else {
         await createProject(
-          payload
+          payload,
         );
 
         setSuccess(
-          "Projet créé avec succès."
+          "Projet créé avec succès.",
         );
 
         setForm({
@@ -866,27 +784,25 @@ export default function ProjectForm() {
         });
 
         setImagePreview("");
-
         setTechnologyInput("");
-
         setBenefitInput("");
       }
 
       window.setTimeout(() => {
         navigate(
-          "/admin/projects"
+          "/admin/projects",
         );
       }, 700);
     } catch (err) {
       console.error(
         "Erreur sauvegarde projet:",
-        err
+        err,
       );
 
       setError(
         err instanceof Error
           ? err.message
-          : "Impossible d'enregistrer le projet."
+          : "Impossible d'enregistrer le projet.",
       );
     } finally {
       setSaving(false);
@@ -929,7 +845,7 @@ export default function ProjectForm() {
               type="button"
               onClick={() =>
                 navigate(
-                  "/admin/projects"
+                  "/admin/projects",
                 )
               }
               className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-dw-muted transition hover:text-dw-text"
@@ -1022,7 +938,7 @@ export default function ProjectForm() {
                   onChange={(event) =>
                     updateField(
                       "title",
-                      event.target.value
+                      event.target.value,
                     )
                   }
                   placeholder="Ex. Site web hôtelier"
@@ -1047,7 +963,7 @@ export default function ProjectForm() {
                   onChange={(event) =>
                     updateField(
                       "short_title",
-                      event.target.value
+                      event.target.value,
                     )
                   }
                   placeholder="Ex. Site hôtelier"
@@ -1081,7 +997,7 @@ export default function ProjectForm() {
                   }
                   onChange={(event) =>
                     handleCategoryChange(
-                      event.target.value
+                      event.target.value,
                     )
                   }
                   className="w-full rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm text-dw-text outline-none transition focus:border-dw-primary/50 focus:ring-2 focus:ring-dw-primary/10"
@@ -1098,7 +1014,7 @@ export default function ProjectForm() {
                       >
                         {category}
                       </option>
-                    )
+                    ),
                   )}
 
                   <option value="__custom__">
@@ -1119,12 +1035,10 @@ export default function ProjectForm() {
                       <input
                         id="custom-category"
                         type="text"
-                        value={
-                          customCategory
-                        }
+                        value={customCategory}
                         onChange={(event) =>
                           setCustomCategory(
-                            event.target.value
+                            event.target.value,
                           )
                         }
                         onKeyDown={(event) => {
@@ -1183,13 +1097,11 @@ export default function ProjectForm() {
                 <textarea
                   id="description"
                   rows={6}
-                  value={
-                    form.description
-                  }
+                  value={form.description}
                   onChange={(event) =>
                     updateField(
                       "description",
-                      event.target.value
+                      event.target.value,
                     )
                   }
                   placeholder="Décrivez le projet, son objectif et la solution développée..."
@@ -1214,7 +1126,7 @@ export default function ProjectForm() {
                   onChange={(event) =>
                     updateField(
                       "details",
-                      event.target.value
+                      event.target.value,
                     )
                   }
                   placeholder="Informations complémentaires sur le projet..."
@@ -1286,7 +1198,6 @@ export default function ProjectForm() {
               {/* UPLOAD */}
 
               <div className="flex flex-col justify-center">
-
                 <label
                   htmlFor="project-image"
                   className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dw-border bg-dw-surface px-5 py-3 text-sm font-semibold text-dw-text transition hover:border-dw-primary/30 hover:text-dw-primary ${
@@ -1298,13 +1209,11 @@ export default function ProjectForm() {
                   {uploading ? (
                     <>
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-dw-border border-t-dw-primary" />
-
                       Téléchargement...
                     </>
                   ) : (
                     <>
                       <Upload size={17} />
-
                       Choisir une image
                     </>
                   )}
@@ -1349,13 +1258,13 @@ export default function ProjectForm() {
 
                       updateField(
                         "image_url",
-                        value
+                        value,
                       );
 
                       setImagePreview(
                         getProjectImageUrl(
-                          value
-                        )
+                          value,
+                        ),
                       );
                     }}
                     placeholder="/uploads/projects/image.jpg ou https://..."
@@ -1404,7 +1313,7 @@ export default function ProjectForm() {
                   onChange={(event) =>
                     updateField(
                       "project_url",
-                      event.target.value
+                      event.target.value,
                     )
                   }
                   placeholder="https://..."
@@ -1429,7 +1338,7 @@ export default function ProjectForm() {
                   onChange={(event) =>
                     updateField(
                       "demo_url",
-                      event.target.value
+                      event.target.value,
                     )
                   }
                   placeholder="https://..."
@@ -1462,7 +1371,7 @@ export default function ProjectForm() {
                 }
                 onChange={(event) =>
                   setTechnologyInput(
-                    event.target.value
+                    event.target.value,
                   )
                 }
                 onKeyDown={
@@ -1489,7 +1398,7 @@ export default function ProjectForm() {
                 {form.technologies.map(
                   (
                     technology,
-                    index
+                    index,
                   ) => (
                     <span
                       key={`technology-${technology}-${index}`}
@@ -1501,7 +1410,7 @@ export default function ProjectForm() {
                         type="button"
                         onClick={() =>
                           removeTechnology(
-                            index
+                            index,
                           )
                         }
                         className="text-dw-muted transition hover:text-red-500"
@@ -1510,7 +1419,7 @@ export default function ProjectForm() {
                         <X size={14} />
                       </button>
                     </span>
-                  )
+                  ),
                 )}
               </div>
             )}
@@ -1539,7 +1448,7 @@ export default function ProjectForm() {
                 }
                 onChange={(event) =>
                   setBenefitInput(
-                    event.target.value
+                    event.target.value,
                   )
                 }
                 onKeyDown={
@@ -1566,7 +1475,7 @@ export default function ProjectForm() {
                 {form.benefits.map(
                   (
                     benefit,
-                    index
+                    index,
                   ) => (
                     <div
                       key={`benefit-${benefit}-${index}`}
@@ -1586,7 +1495,7 @@ export default function ProjectForm() {
                         type="button"
                         onClick={() =>
                           removeBenefit(
-                            index
+                            index,
                           )
                         }
                         className="shrink-0 text-dw-muted transition hover:text-red-500"
@@ -1595,7 +1504,7 @@ export default function ProjectForm() {
                         <Trash2 size={16} />
                       </button>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             )}
@@ -1629,7 +1538,7 @@ export default function ProjectForm() {
                   onChange={(event) =>
                     updateField(
                       "published",
-                      event.target.checked
+                      event.target.checked,
                     )
                   }
                   className="mt-1 h-4 w-4 rounded border-dw-border text-dw-primary focus:ring-dw-primary"
@@ -1657,7 +1566,7 @@ export default function ProjectForm() {
                   onChange={(event) =>
                     updateField(
                       "featured",
-                      event.target.checked
+                      event.target.checked,
                     )
                   }
                   className="mt-1 h-4 w-4 rounded border-dw-border text-dw-primary focus:ring-dw-primary"
@@ -1692,7 +1601,7 @@ export default function ProjectForm() {
                   onChange={(event) =>
                     updateField(
                       "status",
-                      event.target.value as FormState["status"]
+                      event.target.value as FormState["status"],
                     )
                   }
                   disabled={
@@ -1719,45 +1628,6 @@ export default function ProjectForm() {
                   </p>
                 )}
               </div>
-
-              {/* SORT ORDER */}
-
-              <div>
-                <label
-                  htmlFor="sort_order"
-                  className="mb-2 block text-sm font-semibold text-dw-text"
-                >
-                  Ordre d'affichage
-                </label>
-
-                <input
-                  id="sort_order"
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={
-                    form.sort_order
-                  }
-                  onChange={(event) =>
-                    updateField(
-                      "sort_order",
-                      Math.max(
-                        0,
-                        Number.parseInt(
-                          event.target.value ||
-                            "0",
-                          10
-                        )
-                      )
-                    )
-                  }
-                  className="w-full rounded-xl border border-dw-border bg-dw-surface px-4 py-3 text-sm text-dw-text outline-none focus:border-dw-primary/50"
-                />
-
-                <p className="mt-2 text-xs text-dw-muted">
-                  0 = premier dans la liste.
-                </p>
-              </div>
             </div>
           </section>
 
@@ -1771,7 +1641,7 @@ export default function ProjectForm() {
               type="button"
               onClick={() =>
                 navigate(
-                  "/admin/projects"
+                  "/admin/projects",
                 )
               }
               disabled={saving}
@@ -1791,7 +1661,6 @@ export default function ProjectForm() {
               {saving ? (
                 <>
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-
                   Enregistrement...
                 </>
               ) : (

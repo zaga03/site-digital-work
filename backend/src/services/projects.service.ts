@@ -6,35 +6,42 @@ import pool from "../database/db.js";
 
 export interface CreateProjectData {
   title: string;
-  short_title?: string | null;
+  short_title?: string | null | undefined;
   description: string;
-  details?: string | null;
+  details?: string | null | undefined;
   category: string;
-  image_url?: string | null;
-  technologies?: string[];
-  benefits?: string[];
-  project_url?: string | null;
-  demo_url?: string | null;
-  featured?: boolean;
-  published?: boolean;
-  status?: "completed" | "in-progress" | "maintenance";
+  image_url?: string | null | undefined;
+  technologies?: string[] | undefined;
+  benefits?: string[] | undefined;
+  project_url?: string | null | undefined;
+  demo_url?: string | null | undefined;
+  featured?: boolean | undefined;
+  published?: boolean | undefined;
+  status?:
+    | "completed"
+    | "in-progress"
+    | "maintenance"
+    | undefined;
 }
 
 export interface UpdateProjectData {
-  title?: string;
-  short_title?: string | null;
-  description?: string;
-  details?: string | null;
-  category?: string;
-  image_url?: string | null;
-  technologies?: string[];
-  benefits?: string[];
-  project_url?: string | null;
-  demo_url?: string | null;
-  featured?: boolean;
-  published?: boolean;
-  status?: "completed" | "in-progress" | "maintenance";
-  sort_order?: number;
+  title?: string | undefined;
+  short_title?: string | null | undefined;
+  description?: string | undefined;
+  details?: string | null | undefined;
+  category?: string | undefined;
+  image_url?: string | null | undefined;
+  technologies?: string[] | undefined;
+  benefits?: string[] | undefined;
+  project_url?: string | null | undefined;
+  demo_url?: string | null | undefined;
+  featured?: boolean | undefined;
+  published?: boolean | undefined;
+  status?:
+    | "completed"
+    | "in-progress"
+    | "maintenance"
+    | undefined;
 }
 
 /* =========================================================
@@ -58,11 +65,10 @@ export async function getProjects() {
       featured,
       published,
       status,
-      sort_order,
       created_at,
       updated_at
     FROM public.projects
-    ORDER BY sort_order ASC, created_at DESC
+    ORDER BY created_at ASC
   `);
 
   return result.rows;
@@ -90,7 +96,6 @@ export async function getProjectById(id: string) {
         featured,
         published,
         status,
-        sort_order,
         created_at,
         updated_at
       FROM public.projects
@@ -106,27 +111,9 @@ export async function getProjectById(id: string) {
    CREATE PROJECT
 ========================================================= */
 
-export async function createProject(data: CreateProjectData) {
-  /*
-   * Le sort_order est maintenant calculé automatiquement.
-   *
-   * Exemple :
-   * 0
-   * 1
-   * 2
-   * 3
-   * puis nouveau projet = 4
-   */
-
-  const sortResult = await pool.query(`
-    SELECT COALESCE(MAX(sort_order), -1) + 1 AS next_sort_order
-    FROM public.projects
-  `);
-
-  const nextSortOrder = Number(
-    sortResult.rows[0]?.next_sort_order ?? 0
-  );
-
+export async function createProject(
+  data: CreateProjectData
+) {
   const result = await pool.query(
     `
       INSERT INTO public.projects (
@@ -142,8 +129,7 @@ export async function createProject(data: CreateProjectData) {
         demo_url,
         featured,
         published,
-        status,
-        sort_order
+        status
       )
       VALUES (
         $1,
@@ -158,8 +144,7 @@ export async function createProject(data: CreateProjectData) {
         $10,
         $11,
         $12,
-        $13,
-        $14
+        $13
       )
       RETURNING *
     `,
@@ -177,10 +162,6 @@ export async function createProject(data: CreateProjectData) {
       data.featured ?? false,
       data.published ?? true,
       data.status ?? "completed",
-
-      // IMPORTANT :
-      // on utilise le prochain ordre calculé
-      nextSortOrder,
     ]
   );
 
@@ -253,7 +234,7 @@ export async function updateProject(
   }
 
   /* =======================================================
-     JSONB FIELDS
+     JSONB
   ======================================================= */
 
   if (data.technologies !== undefined) {
@@ -277,7 +258,7 @@ export async function updateProject(
   }
 
   /* =======================================================
-     URL FIELDS
+     URLS
   ======================================================= */
 
   if (data.project_url !== undefined) {
@@ -295,7 +276,7 @@ export async function updateProject(
   }
 
   /* =======================================================
-     BOOLEAN FIELDS
+     BOOLEAN
   ======================================================= */
 
   if (data.featured !== undefined) {
@@ -324,17 +305,6 @@ export async function updateProject(
   }
 
   /* =======================================================
-     SORT ORDER
-  ======================================================= */
-
-  if (data.sort_order !== undefined) {
-    addField(
-      "sort_order",
-      data.sort_order
-    );
-  }
-
-  /* =======================================================
      NOTHING TO UPDATE
   ======================================================= */
 
@@ -342,18 +312,7 @@ export async function updateProject(
     return getProjectById(id);
   }
 
-  /* =======================================================
-     UPDATED AT
-  ======================================================= */
-
   fields.push("updated_at = NOW()");
-
-  /*
-   * L'id est ajouté en dernier afin de conserver :
-   *
-   * $1, $2, $3...
-   * puis WHERE id = $N
-   */
 
   values.push(id);
 
@@ -367,7 +326,11 @@ export async function updateProject(
     values
   );
 
-  return result.rows[0] ?? null;
+  if (!result.rows[0]) {
+    return null;
+  }
+
+  return getProjectById(id);
 }
 
 /* =========================================================
@@ -386,5 +349,9 @@ export async function deleteProject(
     [id]
   );
 
-  return result.rows[0] ?? null;
+  if (!result.rows[0]) {
+    return null;
+  }
+
+  return result.rows[0];
 }

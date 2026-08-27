@@ -12,7 +12,7 @@ import {
 /* =========================================================
    VALIDATION
 ========================================================= */
-// Validation du schéma de projet pour la création et la mise à jour
+
 const projectSchema = z.object({
   title: z.string().min(1).max(150),
 
@@ -72,11 +72,6 @@ const projectSchema = z.object({
       "maintenance",
     ])
     .default("completed"),
-
-  sort_order: z
-    .number()
-    .int()
-    .default(0),
 });
 
 const updateProjectSchema =
@@ -92,10 +87,14 @@ function getProjectId(
 ): string | null {
   const { id } = req.params;
 
-  if (typeof id !== "string" || id.length === 0) {
+  if (
+    typeof id !== "string" ||
+    id.length === 0
+  ) {
     res.status(400).json({
       success: false,
-      message: "Identifiant du projet invalide.",
+      message:
+        "Identifiant du projet invalide.",
     });
 
     return null;
@@ -105,7 +104,7 @@ function getProjectId(
 }
 
 /* =========================================================
-   GET ALL
+   GET ALL PROJECTS
 ========================================================= */
 
 export async function listProjects(
@@ -134,7 +133,7 @@ export async function listProjects(
 }
 
 /* =========================================================
-   GET ONE
+   GET PROJECT BY ID
 ========================================================= */
 
 export async function showProject(
@@ -179,7 +178,7 @@ export async function showProject(
 }
 
 /* =========================================================
-   CREATE
+   CREATE PROJECT
 ========================================================= */
 
 export async function createProjectController(
@@ -198,28 +197,33 @@ export async function createProjectController(
       data: project,
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error(
+        "Validation projet échouée:",
+        JSON.stringify(
+          error.flatten(),
+          null,
+          2
+        )
+      );
 
-    //changement pour afficher les erreurs temporaire dans la console 
-    // bugg sur la validation 5fois
-   if (error instanceof z.ZodError) {
-  console.error(
-    "❌ Validation projet échouée:",
-    JSON.stringify(error.flatten(), null, 2)
-  );
+      console.error(
+        "Payload reçu:",
+        JSON.stringify(
+          req.body,
+          null,
+          2
+        )
+      );
 
-  console.error(
-    "❌ Payload reçu:",
-    JSON.stringify(req.body, null, 2)
-  );
+      res.status(400).json({
+        success: false,
+        message: "Données invalides.",
+        errors: error.flatten(),
+      });
 
-  res.status(400).json({
-    success: false,
-    message: "Données invalides.",
-    errors: error.flatten(),
-  });
-
-  return;
-}
+      return;
+    }
 
     console.error(
       "createProjectController:",
@@ -235,7 +239,7 @@ export async function createProjectController(
 }
 
 /* =========================================================
-   UPDATE
+   UPDATE PROJECT
 ========================================================= */
 
 export async function updateProjectController(
@@ -253,7 +257,10 @@ export async function updateProjectController(
       updateProjectSchema.parse(req.body);
 
     const project =
-      await updateProject(id, data);
+      await updateProject(
+        id,
+        data
+      );
 
     if (!project) {
       res.status(404).json({
@@ -269,28 +276,33 @@ export async function updateProjectController(
       data: project,
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error(
+        "Validation projet échouée:",
+        JSON.stringify(
+          error.flatten(),
+          null,
+          2
+        )
+      );
 
-    //changement pour afficher les erreurs temporaire dans la console 
-    // bugg sur la validation 5fois pour la update
-   if (error instanceof z.ZodError) {
-  console.error(
-    "❌ Validation projet échouée:",
-    JSON.stringify(error.flatten(), null, 2)
-  );
+      console.error(
+        "Payload reçu:",
+        JSON.stringify(
+          req.body,
+          null,
+          2
+        )
+      );
 
-  console.error(
-    "❌ Payload reçu:",
-    JSON.stringify(req.body, null, 2)
-  );
+      res.status(400).json({
+        success: false,
+        message: "Données invalides.",
+        errors: error.flatten(),
+      });
 
-  res.status(400).json({
-    success: false,
-    message: "Données invalides.",
-    errors: error.flatten(),
-  });
-
-  return;
-}
+      return;
+    }
 
     console.error(
       "updateProjectController:",
@@ -306,7 +318,7 @@ export async function updateProjectController(
 }
 
 /* =========================================================
-   DELETE
+   DELETE PROJECT
 ========================================================= */
 
 export async function deleteProjectController(

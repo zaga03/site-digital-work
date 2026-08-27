@@ -2,44 +2,67 @@ const API_URL = "http://localhost:4000";
 
 const TOKEN_KEY = "digital-work-admin-token";
 
+/* =========================================================
+   TYPES
+========================================================= */
+
 export interface Project {
   id: string;
+
   title: string;
   short_title: string | null;
+
   description: string;
   details: string | null;
+
   category: string;
+
   image_url: string | null;
+
   technologies: string[];
   benefits: string[];
+
   project_url: string | null;
   demo_url: string | null;
+
   featured: boolean;
+
   status:
     | "completed"
     | "in-progress"
     | "maintenance";
-  sort_order: number;
+
   created_at: string;
   updated_at: string;
 }
 
 interface ApiResponse<T> {
   success: boolean;
+
   data?: T;
+
   message?: string;
 }
 
-export function getAdminToken() {
+/* =========================================================
+   AUTHENTICATION
+========================================================= */
+
+export function getAdminToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
 
-export function adminLogout() {
+export function adminLogout(): void {
   localStorage.removeItem(TOKEN_KEY);
+
   localStorage.removeItem(
     "digital-work-admin"
   );
 }
+
+/* =========================================================
+   REQUEST
+========================================================= */
 
 async function request<T>(
   path: string,
@@ -91,17 +114,31 @@ async function request<T>(
   return data.data as T;
 }
 
+/* =========================================================
+   GET PROJECTS
+========================================================= */
+
 export function getProjects() {
   return request<Project[]>(
     "/api/projects"
   );
 }
 
-export function getProject(id: string) {
+/* =========================================================
+   GET PROJECT
+========================================================= */
+
+export function getProject(
+  id: string
+) {
   return request<Project>(
-    `/api/projects/${id}`
+    `/api/projects/${encodeURIComponent(id)}`
   );
 }
+
+/* =========================================================
+   CREATE PROJECT
+========================================================= */
 
 export function createProject(
   data: Omit<
@@ -120,6 +157,10 @@ export function createProject(
   );
 }
 
+/* =========================================================
+   UPDATE PROJECT
+========================================================= */
+
 export function updateProject(
   id: string,
   data: Partial<
@@ -132,7 +173,7 @@ export function updateProject(
   >
 ) {
   return request<Project>(
-    `/api/projects/${id}`,
+    `/api/projects/${encodeURIComponent(id)}`,
     {
       method: "PUT",
       body: JSON.stringify(data),
@@ -140,21 +181,32 @@ export function updateProject(
   );
 }
 
+/* =========================================================
+   DELETE PROJECT
+========================================================= */
+
 export function deleteProject(
   id: string
 ) {
   return request<void>(
-    `/api/projects/${id}`,
+    `/api/projects/${encodeURIComponent(id)}`,
     {
       method: "DELETE",
     }
   );
 }
 
+/* =========================================================
+   UPLOAD PROJECT IMAGE
+========================================================= */
+
 export interface UploadResponse {
   filename: string;
+
   url: string;
+
   size: number;
+
   mimetype: string;
 }
 
@@ -180,11 +232,9 @@ export async function uploadProjectImage(
     `${API_URL}/api/uploads/project`,
     {
       method: "POST",
-
       headers: {
         Authorization: `Bearer ${token}`,
       },
-
       body: formData,
     }
   );

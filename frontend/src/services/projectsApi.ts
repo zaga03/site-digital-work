@@ -8,11 +8,9 @@ export interface Project {
   id: string;
 
   title: string;
-
   short_title: string | null;
 
   description: string;
-
   details: string | null;
 
   category: string;
@@ -20,15 +18,12 @@ export interface Project {
   image_url: string | null;
 
   technologies: string[];
-
   benefits: string[];
 
   project_url: string | null;
-
   demo_url: string | null;
 
   featured: boolean;
-
   published?: boolean;
 
   status:
@@ -36,10 +31,7 @@ export interface Project {
     | "in-progress"
     | "maintenance";
 
-  sort_order: number;
-
   created_at: string;
-
   updated_at: string;
 }
 
@@ -72,8 +64,6 @@ export interface ProjectPayload {
     | "completed"
     | "in-progress"
     | "maintenance";
-
-  sort_order?: number;
 }
 
 interface ApiResponse<T = unknown> {
@@ -94,10 +84,9 @@ function getAuthToken(): string | null {
   /*
    * Clé utilisée actuellement par AdminLogin.tsx
    */
-  const token =
-    localStorage.getItem(
-      "digital-work-admin-token"
-    );
+  const token = localStorage.getItem(
+    "digital-work-admin-token"
+  );
 
   if (token) {
     return token;
@@ -116,8 +105,7 @@ function getAuthToken(): string | null {
   ];
 
   for (const key of possibleKeys) {
-    const value =
-      localStorage.getItem(key);
+    const value = localStorage.getItem(key);
 
     if (value) {
       return value;
@@ -134,17 +122,13 @@ function getAuthToken(): string | null {
 function getJsonHeaders(): HeadersInit {
   const headers: HeadersInit = {
     Accept: "application/json",
-
-    "Content-Type":
-      "application/json",
+    "Content-Type": "application/json",
   };
 
-  const token =
-    getAuthToken();
+  const token = getAuthToken();
 
   if (token) {
-    headers.Authorization =
-      `Bearer ${token}`;
+    headers.Authorization = `Bearer ${token}`;
   }
 
   return headers;
@@ -159,12 +143,10 @@ function getAuthHeaders(): HeadersInit {
     Accept: "application/json",
   };
 
-  const token =
-    getAuthToken();
+  const token = getAuthToken();
 
   if (token) {
-    headers.Authorization =
-      `Bearer ${token}`;
+    headers.Authorization = `Bearer ${token}`;
   }
 
   /*
@@ -174,7 +156,6 @@ function getAuthHeaders(): HeadersInit {
    *
    * multipart/form-data; boundary=...
    */
-
   return headers;
 }
 
@@ -185,9 +166,7 @@ function getAuthHeaders(): HeadersInit {
 async function parseResponse<T>(
   response: Response
 ): Promise<T> {
-  let data:
-    | ApiResponse<T>
-    | null = null;
+  let data: ApiResponse<T> | null = null;
 
   try {
     data =
@@ -202,7 +181,6 @@ async function parseResponse<T>(
        * Si le token est expiré/invalide,
        * on nettoie la session.
        */
-
       localStorage.removeItem(
         "digital-work-admin-token"
       );
@@ -256,18 +234,15 @@ async function parseResponse<T>(
 export async function fetchProjects(): Promise<
   Project[]
 > {
-  const response =
-    await fetch(
-      `${API_URL}/api/projects`,
-      {
-        method: "GET",
-
-        headers: {
-          Accept:
-            "application/json",
-        },
-      }
-    );
+  const response = await fetch(
+    `${API_URL}/api/projects`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
 
   return parseResponse<Project[]>(
     response
@@ -287,18 +262,15 @@ export async function fetchProjectById(
     );
   }
 
-  const response =
-    await fetch(
-      `${API_URL}/api/projects/${encodeURIComponent(id)}`,
-      {
-        method: "GET",
-
-        headers: {
-          Accept:
-            "application/json",
-        },
-      }
-    );
+  const response = await fetch(
+    `${API_URL}/api/projects/${encodeURIComponent(id)}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
 
   return parseResponse<Project>(
     response
@@ -312,21 +284,14 @@ export async function fetchProjectById(
 export async function createProject(
   payload: ProjectPayload
 ): Promise<Project> {
-  const response =
-    await fetch(
-      `${API_URL}/api/projects`,
-      {
-        method: "POST",
-
-        headers:
-          getJsonHeaders(),
-
-        body:
-          JSON.stringify(
-            payload
-          ),
-      }
-    );
+  const response = await fetch(
+    `${API_URL}/api/projects`,
+    {
+      method: "POST",
+      headers: getJsonHeaders(),
+      body: JSON.stringify(payload),
+    }
+  );
 
   return parseResponse<Project>(
     response
@@ -347,21 +312,14 @@ export async function updateProject(
     );
   }
 
-  const response =
-    await fetch(
-      `${API_URL}/api/projects/${encodeURIComponent(id)}`,
-      {
-        method: "PUT",
-
-        headers:
-          getJsonHeaders(),
-
-        body:
-          JSON.stringify(
-            payload
-          ),
-      }
-    );
+  const response = await fetch(
+    `${API_URL}/api/projects/${encodeURIComponent(id)}`,
+    {
+      method: "PUT",
+      headers: getJsonHeaders(),
+      body: JSON.stringify(payload),
+    }
+  );
 
   return parseResponse<Project>(
     response
@@ -381,20 +339,15 @@ export async function deleteProject(
     );
   }
 
-  const response =
-    await fetch(
-      `${API_URL}/api/projects/${encodeURIComponent(id)}`,
-      {
-        method: "DELETE",
-
-        headers:
-          getJsonHeaders(),
-      }
-    );
-
-  await parseResponse<unknown>(
-    response
+  const response = await fetch(
+    `${API_URL}/api/projects/${encodeURIComponent(id)}`,
+    {
+      method: "DELETE",
+      headers: getJsonHeaders(),
+    }
   );
+
+  await parseResponse<unknown>(response);
 }
 
 /* =========================================================
@@ -422,8 +375,7 @@ export async function uploadProjectImage(
     );
   }
 
-  const formData =
-    new FormData();
+  const formData = new FormData();
 
   /*
    * IMPORTANT :
@@ -432,25 +384,16 @@ export async function uploadProjectImage(
    *
    * uploadProjectImage.single("image")
    */
+  formData.append("image", file);
 
-  formData.append(
-    "image",
-    file
+  const response = await fetch(
+    `${API_URL}/api/uploads/project`,
+    {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: formData,
+    }
   );
-
-  const response =
-    await fetch(
-      `${API_URL}/api/uploads/project`,
-      {
-        method: "POST",
-
-        headers:
-          getAuthHeaders(),
-
-        body:
-          formData,
-      }
-    );
 
   return parseResponse<UploadedProjectImage>(
     response
@@ -471,8 +414,7 @@ export function getProjectImageUrl(
     return "";
   }
 
-  const value =
-    imageUrl.trim();
+  const value = imageUrl.trim();
 
   if (!value) {
     return "";
@@ -481,20 +423,11 @@ export function getProjectImageUrl(
   /*
    * URL externe
    */
-
   if (
-    value.startsWith(
-      "http://"
-    ) ||
-    value.startsWith(
-      "https://"
-    ) ||
-    value.startsWith(
-      "data:"
-    ) ||
-    value.startsWith(
-      "blob:"
-    )
+    value.startsWith("http://") ||
+    value.startsWith("https://") ||
+    value.startsWith("data:") ||
+    value.startsWith("blob:")
   ) {
     return value;
   }
@@ -504,16 +437,12 @@ export function getProjectImageUrl(
    *
    * /uploads/projects/file.jpg
    */
-
-  if (
-    value.startsWith("/")
-  ) {
+  if (value.startsWith("/")) {
     return `${API_URL}${value}`;
   }
 
   /*
    * uploads/projects/file.jpg
    */
-
   return `${API_URL}/${value}`;
 }
