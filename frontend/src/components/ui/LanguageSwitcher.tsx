@@ -1,7 +1,4 @@
-import {
-  Languages,
-  ChevronDown,
-} from "lucide-react";
+import { ChevronDown, Languages } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -28,12 +25,11 @@ export default function LanguageSwitcher() {
   const [open, setOpen] = useState(false);
 
   const current =
-    languages.find(
-      (item) => item.code === i18n.language
-    ) ?? languages[0];
+    languages.find((item) => item.code === i18n.language) ??
+    languages[0];
 
   const handleLanguageChange = (
-    language: (typeof languages)[number]["code"]
+    language: (typeof languages)[number]["code"],
   ) => {
     i18n.changeLanguage(language);
     setOpen(false);
@@ -47,18 +43,11 @@ export default function LanguageSwitcher() {
         aria-label={t("common.changeLanguage")}
         aria-expanded={open}
         className="
-          flex
-          items-center
-          gap-2
-          rounded-xl
-          border
-          border-dw-border
-          bg-dw-card
-          px-3
-          py-2
-          text-sm
-          text-dw-text
-          shadow-sm
+          flex items-center gap-2 rounded-xl
+          border border-dw-border
+          bg-dw-card px-3 py-2
+          text-sm text-dw-text shadow-sm
+          transition-colors
           hover:bg-dw-primary/5
         "
       >
@@ -79,55 +68,40 @@ export default function LanguageSwitcher() {
       {open && (
         <div
           className="
-            absolute
-            right-0
-            top-full
-            z-50
-            mt-2
-            w-36
-            overflow-hidden
-            rounded-xl
-            border
-            border-dw-border
-            bg-dw-card
-            p-1
-            shadow-xl
+            absolute right-0 top-full z-50 mt-2
+            w-36 overflow-hidden rounded-xl
+            border border-dw-border
+            bg-dw-card p-1 shadow-xl
           "
         >
-          {languages.map((item) => (
-            <button
-              key={item.code}
-              type="button"
-              onClick={() => handleLanguageChange(item.code)}
-              aria-current={
-                i18n.language === item.code
-                  ? "true"
-                  : undefined
-              }
-              className={`
-                flex
-                w-full
-                items-center
-                justify-between
-                rounded-lg
-                px-3
-                py-2.5
-                text-sm
-                transition
-                ${
-                  i18n.language === item.code
-                    ? "bg-dw-primary/10 text-dw-primary"
-                    : "text-dw-text hover:bg-dw-primary/5"
-                }
-              `}
-            >
-              <span>{item.label}</span>
+          {languages.map((item) => {
+            const active = i18n.language === item.code;
 
-              <span className="text-xs text-dw-muted">
-                {item.short}
-              </span>
-            </button>
-          ))}
+            return (
+              <button
+                key={item.code}
+                type="button"
+                onClick={() => handleLanguageChange(item.code)}
+                aria-current={active ? "true" : undefined}
+                className={`
+                  flex w-full items-center justify-between
+                  rounded-lg px-3 py-2.5
+                  text-sm transition
+                  ${
+                    active
+                      ? "bg-dw-primary/10 text-dw-primary"
+                      : "text-dw-text hover:bg-dw-primary/5"
+                  }
+                `}
+              >
+                <span>{item.label}</span>
+
+                <span className="text-xs text-dw-muted">
+                  {item.short}
+                </span>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

@@ -6,6 +6,8 @@ import { Link, NavLink } from "react-router-dom";
 import Button from "../ui/Button";
 import ThemeSwitcher from "../ui/ThemeSwitcher";
 import logo from "../../assets/logo.png";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../ui/LanguageSwitcher";
 
 /* =========================================================
    NAVIGATION
@@ -45,7 +47,7 @@ const navigation = [
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-
+const { t } = useTranslation();
   /* =======================================================
      ADMIN SECRET ACCESS
      5 clics rapides sur le logo
@@ -164,23 +166,23 @@ export default function Navbar() {
           ================================================== */}
 
           <nav className="hidden items-center gap-1 lg:flex">
-            {navigation.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) => `
-                  rounded-lg px-3 py-2 text-sm font-medium
-                  transition-all duration-200
-                  ${
-                    isActive
-                      ? "bg-dw-primary/10 text-dw-text"
-                      : "text-dw-muted hover:bg-white/[0.03] hover:text-dw-text"
-                  }
-                `}
-              >
-                {item.label}
-              </NavLink>
-            ))}
+           {navigation.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) => `
+                    rounded-lg px-3 py-2 text-sm font-medium
+                    transition-all duration-200
+                    ${
+                      isActive
+                        ? "bg-dw-primary/10 text-dw-text"
+                        : "text-dw-muted hover:bg-white/[0.03] hover:text-dw-text"
+                    }
+                  `}
+                >
+                  {t(`nav.${item.key}`)}
+                </NavLink>
+              ))}
           </nav>
 
           {/* =================================================
@@ -291,7 +293,7 @@ export default function Navbar() {
                     }
                   `}
                 >
-                  {item.label}
+                  {t(`nav.${item.key}`)}
                 </NavLink>
               ))}
 
@@ -299,22 +301,30 @@ export default function Navbar() {
                   MOBILE SETTINGS
               ============================================== */}
 
-              <div className="mt-4 border-t border-white/[0.06] pt-4">
-                <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-dw-muted">
-                  Apparence
-                </p>
+             <div className="mt-4 border-t border-white/[0.06] pt-4">
+              <p className="mb-3 px-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-dw-muted">
+                {t("common.appearance")}
+              </p>
 
+              <div className="flex items-center gap-2">
+                <LanguageSwitcher />
                 <ThemeSwitcher />
               </div>
+            </div>
 
               {/* =============================================
                   MOBILE CTA
               ============================================== */}
 
-              <Button to="/contact">
-                Nous contacter
-                <ArrowRight size={16} />
-              </Button>
+             <div className="hidden items-center gap-2 lg:flex">
+                <LanguageSwitcher />
+                <ThemeSwitcher />
+
+                <Button to="/contact">
+                  {t("nav.contact")}
+                  <ArrowRight size={16} />
+                </Button>
+              </div>
             </nav>
           </motion.div>
         )}

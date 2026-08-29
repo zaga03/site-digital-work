@@ -1,4 +1,3 @@
-
 import {
   ArrowRight,
   Facebook,
@@ -10,67 +9,35 @@ import {
   Phone,
   X,
 } from "lucide-react";
-
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
+import LanguageSwitcher from "../ui/LanguageSwitcher";
 import logo from "../../assets/logo.png";
 import { useTheme } from "../../contexts/ThemeContext";
 
-/* =========================================================
-   FOOTER
-   DARK MODE  → FOOTER BLANC
-   LIGHT MODE → FOOTER SOMBRE
-========================================================= */
+type LegalModal = "mentions" | "confidentialite" | null;
 
 export default function Footer() {
   const { theme } = useTheme();
+  const { t } = useTranslation();
+
   const isDark = theme === "dark";
 
-  /* =======================================================
-     ADMIN SECRET ACCESS
-     5 clics rapides sur le copyright
-  ======================================================= */
+  const [legalModal, setLegalModal] = useState<LegalModal>(null);
 
+  /**
+   * ============================================================
+   * ADMIN SECRET ACCESS
+   * 5 clics rapides sur le copyright
+   * ============================================================
+   */
   const adminClickCount = useRef(0);
 
-  const adminClickTimer =
-    useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  /* =======================================================
-     LEGAL POPUP
-  ======================================================= */
-
-  const [legalModal, setLegalModal] = useState<
-    "mentions" | "confidentialite" | null
-  >(null);
-
-  /* =======================================================
-     LANGUAGE
-  ======================================================= */
-
-  const [language, setLanguage] = useState<"FR" | "EN" | "MG">("FR");
-
-  const handleLanguageChange = (
-    lang: "FR" | "EN" | "MG",
-  ) => {
-    setLanguage(lang);
-
-    /*
-      Événement conservé afin de pouvoir connecter
-      ce sélecteur à ton système multilingue existant.
-    */
-
-    window.dispatchEvent(
-      new CustomEvent("digital-work-language-change", {
-        detail: lang,
-      }),
-    );
-  };
-
-  /* =======================================================
-     ADMIN ACCESS
-  ======================================================= */
+  const adminClickTimer = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const handleAdminAccess = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -100,36 +67,41 @@ export default function Footer() {
     }
   };
 
-  /* =======================================================
-     NAVIGATION
-  ======================================================= */
-
+  /**
+   * ============================================================
+   * NAVIGATION
+   * ============================================================
+   */
   const navigationLinks = [
-    ["/", "Accueil"],
-    ["/services", "Services"],
-    ["/solutions", "Solutions"],
-    ["/realisations", "Réalisations"],
-    ["/a-propos", "À propos"],
-    ["/contact", "Contact"],
-  ];
+    ["/", "footer.home"],
+    ["/services", "footer.services"],
+    ["/solutions", "footer.solutions"],
+    ["/realisations", "footer.projects"],
+    ["/a-propos", "footer.about"],
+    ["/contact", "footer.contact"],
+  ] as const;
 
-  /* =======================================================
-     SERVICES
-  ======================================================= */
-
+  /**
+   * ============================================================
+   * SERVICES
+   * ============================================================
+   */
   const serviceLinks = [
-    ["/services", "Création de sites web"],
-    ["/services", "Applications web"],
-    ["/services", "Applications mobiles"],
-    ["/solutions", "Solutions métiers"],
-    ["/solutions", "Automatisation"],
-    ["/solutions", "Solutions digitales"],
-  ];
+    ["/services", "footer.websites"],
+    ["/services", "footer.webApplications"],
+    ["/services", "footer.mobileApplications"],
+    ["/solutions", "footer.businessSolutions"],
+    ["/solutions", "footer.automation"],
+    ["/solutions", "footer.digitalSolutions"],
+  ] as const;
 
-  /* =======================================================
-     SOCIAL NETWORKS
-  ======================================================= */
-
+  /**
+   * ============================================================
+   * SOCIAL NETWORKS
+   * ============================================================
+   *
+   * Remplace les "#" par tes vraies URLs lorsque disponibles.
+   */
   const socialLinks = [
     {
       name: "Facebook",
@@ -153,12 +125,32 @@ export default function Footer() {
     },
   ];
 
+  /**
+   * ============================================================
+   * COMMON COLORS
+   * ============================================================
+   */
+  const footerText = isDark
+    ? "text-slate-400"
+    : "text-slate-400";
+
+  const footerMuted = isDark
+    ? "text-slate-500"
+    : "text-slate-500";
+
+  const footerHeading = isDark
+    ? "text-slate-900"
+    : "text-white";
+
+  const footerLink = isDark
+    ? "text-slate-600 hover:text-slate-900"
+    : "text-slate-400 hover:text-white";
+
   return (
     <>
-      {/* =====================================================
+      {/* ========================================================
           FOOTER
-      ====================================================== */}
-
+      ======================================================== */}
       <footer
         className={`
           border-t
@@ -171,16 +163,14 @@ export default function Footer() {
           }
         `}
       >
-        {/* =====================================================
+        {/* ======================================================
             MAIN FOOTER
         ====================================================== */}
-
         <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
           <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-12">
-            {/* =================================================
+            {/* ==================================================
                 BRAND
             ================================================== */}
-
             <div className="lg:col-span-4">
               <Link
                 to="/"
@@ -198,11 +188,7 @@ export default function Footer() {
                       text-xl
                       font-bold
                       tracking-tight
-                      ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }
+                      ${isDark ? "text-slate-900" : "text-white"}
                     `}
                   >
                     Digital
@@ -219,14 +205,10 @@ export default function Footer() {
                       font-medium
                       uppercase
                       tracking-[0.25em]
-                      ${
-                        isDark
-                          ? "text-slate-500"
-                          : "text-slate-400"
-                      }
+                      ${footerMuted}
                     `}
                   >
-                    Solutions digitales
+                    {t("footer.tagline")}
                   </div>
                 </div>
               </Link>
@@ -237,20 +219,13 @@ export default function Footer() {
                   max-w-md
                   text-sm
                   leading-7
-                  ${
-                    isDark
-                      ? "text-slate-600"
-                      : "text-slate-400"
-                  }
+                  ${footerText}
                 `}
               >
-                Nous concevons des solutions digitales
-                modernes, performantes et adaptées aux
-                besoins des entreprises.
+                {t("footer.description")}
               </p>
 
               {/* CTA */}
-
               <Link
                 to="/contact"
                 className="
@@ -266,169 +241,108 @@ export default function Footer() {
                   hover:opacity-80
                 "
               >
-                Démarrer un projet
+                <span>{t("footer.contact")}</span>
                 <ArrowRight size={16} />
               </Link>
 
               {/* Expertise */}
-
               <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2">
-                <span
-                  className={`
-                    text-xs
-                    ${
-                      isDark
-                        ? "text-slate-500"
-                        : "text-slate-500"
-                    }
-                  `}
-                >
-                  Web
+                <span className={`text-xs ${footerMuted}`}>
+                  {t("footer.web")}
                 </span>
 
-                <span
-                  className={`
-                    text-xs
-                    ${
-                      isDark
-                        ? "text-slate-500"
-                        : "text-slate-500"
-                    }
-                  `}
-                >
-                  Mobile
+                <span className={`text-xs ${footerMuted}`}>
+                  {t("footer.mobile")}
                 </span>
 
-                <span
-                  className={`
-                    text-xs
-                    ${
-                      isDark
-                        ? "text-slate-500"
-                        : "text-slate-500"
-                    }
-                  `}
-                >
-                  Solutions métiers
+                <span className={`text-xs ${footerMuted}`}>
+                  {t("footer.businessSolutions")}
                 </span>
 
-                <span
-                  className={`
-                    text-xs
-                    ${
-                      isDark
-                        ? "text-slate-500"
-                        : "text-slate-500"
-                    }
-                  `}
-                >
-                  Automatisation
+                <span className={`text-xs ${footerMuted}`}>
+                  {t("footer.automation")}
                 </span>
               </div>
             </div>
 
-            {/* =================================================
+            {/* ==================================================
                 SERVICES
             ================================================== */}
-
             <div className="lg:col-span-2">
               <h3
                 className={`
                   text-sm
                   font-semibold
-                  ${
-                    isDark
-                      ? "text-slate-900"
-                      : "text-white"
-                  }
+                  ${footerHeading}
                 `}
               >
-                Services
+                {t("footer.services")}
               </h3>
 
               <nav className="mt-5 flex flex-col gap-3">
-                {serviceLinks.map(([to, label]) => (
+                {serviceLinks.map(([to, key]) => (
                   <Link
-                    key={`${to}-${label}`}
+                    key={`${to}-${key}`}
                     to={to}
                     className={`
                       text-sm
                       transition-colors
-                      ${
-                        isDark
-                          ? "text-slate-600 hover:text-slate-900"
-                          : "text-slate-400 hover:text-white"
-                      }
+                      ${footerLink}
                     `}
                   >
-                    {label}
+                    {t(key)}
                   </Link>
                 ))}
               </nav>
             </div>
 
-            {/* =================================================
+            {/* ==================================================
                 NAVIGATION
             ================================================== */}
-
             <div className="lg:col-span-2">
               <h3
                 className={`
                   text-sm
                   font-semibold
-                  ${
-                    isDark
-                      ? "text-slate-900"
-                      : "text-white"
-                  }
+                  ${footerHeading}
                 `}
               >
-                Navigation
+                {t("footer.navigation")}
               </h3>
 
               <nav className="mt-5 flex flex-col gap-3">
-                {navigationLinks.map(([to, label]) => (
+                {navigationLinks.map(([to, key]) => (
                   <Link
-                    key={to}
+                    key={`${to}-${key}`}
                     to={to}
                     className={`
                       text-sm
                       transition-colors
-                      ${
-                        isDark
-                          ? "text-slate-600 hover:text-slate-900"
-                          : "text-slate-400 hover:text-white"
-                      }
+                      ${footerLink}
                     `}
                   >
-                    {label}
+                    {t(key)}
                   </Link>
                 ))}
               </nav>
             </div>
 
-            {/* =================================================
+            {/* ==================================================
                 CONTACT
             ================================================== */}
-
             <div className="lg:col-span-4">
               <h3
                 className={`
                   text-sm
                   font-semibold
-                  ${
-                    isDark
-                      ? "text-slate-900"
-                      : "text-white"
-                  }
+                  ${footerHeading}
                 `}
               >
-                Contact
+                {t("footer.contact")}
               </h3>
 
               <div className="mt-5 flex flex-col gap-4">
                 {/* Email */}
-
                 <a
                   href="mailto:rrzafindrafita@gmail.com"
                   className={`
@@ -437,11 +351,7 @@ export default function Footer() {
                     gap-3
                     text-sm
                     transition-colors
-                    ${
-                      isDark
-                        ? "text-slate-600 hover:text-slate-900"
-                        : "text-slate-400 hover:text-white"
-                    }
+                    ${footerLink}
                   `}
                 >
                   <Mail
@@ -455,7 +365,6 @@ export default function Footer() {
                 </a>
 
                 {/* Phone */}
-
                 <a
                   href="tel:+261348428652"
                   className={`
@@ -464,11 +373,7 @@ export default function Footer() {
                     gap-3
                     text-sm
                     transition-colors
-                    ${
-                      isDark
-                        ? "text-slate-600 hover:text-slate-900"
-                        : "text-slate-400 hover:text-white"
-                    }
+                    ${footerLink}
                   `}
                 >
                   <Phone
@@ -476,24 +381,17 @@ export default function Footer() {
                     className="mt-0.5 shrink-0 text-dw-primary"
                   />
 
-                  <span>
-                    +261 34 84 286 52
-                  </span>
+                  <span>+261 34 84 286 52</span>
                 </a>
 
                 {/* Location */}
-
                 <div
                   className={`
                     flex
                     items-start
                     gap-3
                     text-sm
-                    ${
-                      isDark
-                        ? "text-slate-600"
-                        : "text-slate-400"
-                    }
+                    ${footerText}
                   `}
                 >
                   <MapPin
@@ -501,14 +399,13 @@ export default function Footer() {
                     className="mt-0.5 shrink-0 text-dw-primary"
                   />
 
-                  <span>Madagascar</span>
+                  <span>{t("footer.madagascar")}</span>
                 </div>
               </div>
 
-              {/* =================================================
+              {/* ==================================================
                   SOCIAL NETWORKS
               ================================================== */}
-
               <div className="mt-7">
                 <p
                   className={`
@@ -516,14 +413,10 @@ export default function Footer() {
                     font-semibold
                     uppercase
                     tracking-[0.15em]
-                    ${
-                      isDark
-                        ? "text-slate-500"
-                        : "text-slate-400"
-                    }
+                    ${footerMuted}
                   `}
                 >
-                  Suivez-nous
+                  {t("footer.followUs")}
                 </p>
 
                 <div className="mt-4 flex items-center gap-2">
@@ -537,7 +430,9 @@ export default function Footer() {
                         key={name}
                         href={href}
                         target={
-                          href !== "#" ? "_blank" : undefined
+                          href !== "#"
+                            ? "_blank"
+                            : undefined
                         }
                         rel={
                           href !== "#"
@@ -576,112 +471,52 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* =====================================================
+        {/* ======================================================
             LANGUAGE BAR
         ====================================================== */}
-
         <div
           className={`
             border-t
-            ${
-              isDark
-                ? "border-slate-300"
-                : "border-white/10"
-            }
+            ${isDark ? "border-slate-300" : "border-white/10"}
           `}
         >
           <div className="mx-auto max-w-7xl px-5 py-5 sm:px-6 lg:px-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-              {/* Language */}
-
               <div className="flex items-center gap-3">
                 <span
                   className={`
                     text-xs
                     font-medium
-                    ${
-                      isDark
-                        ? "text-slate-500"
-                        : "text-slate-500"
-                    }
+                    ${footerMuted}
                   `}
                 >
-                  Langue
+                  {t("common.language")}
                 </span>
 
-                <div
-                  className={`
-                    flex
-                    items-center
-                    rounded-lg
-                    border
-                    p-1
-                    ${
-                      isDark
-                        ? "border-slate-300 bg-slate-200"
-                        : "border-white/10 bg-white/[0.03]"
-                    }
-                  `}
-                >
-                  {(["FR", "EN", "MG"] as const).map(
-                    (lang) => (
-                      <button
-                        key={lang}
-                        type="button"
-                        onClick={() =>
-                          handleLanguageChange(lang)
-                        }
-                        className={`
-                          rounded-md
-                          px-3
-                          py-1.5
-                          text-xs
-                          font-semibold
-                          transition-all
-                          ${
-                            language === lang
-                              ? "bg-dw-primary text-white shadow-sm"
-                              : isDark
-                                ? "text-slate-600 hover:text-slate-900"
-                                : "text-slate-400 hover:text-white"
-                          }
-                        `}
-                      >
-                        {lang}
-                      </button>
-                    ),
-                  )}
-                </div>
+                <LanguageSwitcher />
               </div>
 
               <p
                 className={`
                   text-xs
-                  ${
-                    isDark
-                      ? "text-slate-500"
-                      : "text-slate-500"
-                  }
+                  ${footerMuted}
                 `}
               >
-                Web · Mobile · Solutions digitales
+                {t("footer.web")} ·{" "}
+                {t("footer.mobile")} ·{" "}
+                {t("footer.digitalSolutions")}
               </p>
             </div>
           </div>
         </div>
 
-        {/* =====================================================
+        {/* ======================================================
             BOTTOM BAR
         ====================================================== */}
-
         <div
           className={`
             border-t
-            ${
-              isDark
-                ? "border-slate-300"
-                : "border-white/10"
-            }
+            ${isDark ? "border-slate-300" : "border-white/10"}
           `}
         >
           <div
@@ -701,7 +536,6 @@ export default function Footer() {
             "
           >
             {/* COPYRIGHT */}
-
             <button
               type="button"
               onClick={handleAdminAccess}
@@ -723,12 +557,11 @@ export default function Footer() {
               `}
               aria-label="Digital Work"
             >
-              © {new Date().getFullYear()} Digital Work.
-              Tous droits réservés.
+              © {new Date().getFullYear()} Digital Work.{" "}
+              {t("footer.allRightsReserved")}
             </button>
 
             {/* LEGAL LINKS */}
-
             <div className="flex items-center gap-5">
               <button
                 type="button"
@@ -743,7 +576,7 @@ export default function Footer() {
                   }
                 `}
               >
-                Mentions légales
+                {t("footer.legal")}
               </button>
 
               <button
@@ -761,17 +594,16 @@ export default function Footer() {
                   }
                 `}
               >
-                Confidentialité
+                {t("footer.privacy")}
               </button>
             </div>
           </div>
         </div>
       </footer>
 
-      {/* =====================================================
-          LEGAL POPUP
-      ====================================================== */}
-
+      {/* ========================================================
+          LEGAL MODAL
+      ======================================================== */}
       {legalModal && (
         <div
           className="
@@ -810,8 +642,7 @@ export default function Footer() {
               }
             `}
           >
-            {/* Close */}
-
+            {/* CLOSE */}
             <button
               type="button"
               onClick={() => setLegalModal(null)}
@@ -833,15 +664,14 @@ export default function Footer() {
                     : "border-white/10 text-slate-400 hover:bg-white/5 hover:text-white"
                 }
               `}
-              aria-label="Fermer"
+              aria-label={t("footer.close")}
             >
               <X size={18} />
             </button>
 
-            {/* =================================================
+            {/* ==================================================
                 MENTIONS LÉGALES
             ================================================== */}
-
             {legalModal === "mentions" && (
               <div className="pr-8">
                 <div className="mb-6">
@@ -854,14 +684,10 @@ export default function Footer() {
                       mt-2
                       text-2xl
                       font-bold
-                      ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }
+                      ${footerHeading}
                     `}
                   >
-                    Mentions légales
+                    {t("footer.legal")}
                   </h2>
                 </div>
 
@@ -870,11 +696,7 @@ export default function Footer() {
                     space-y-6
                     text-sm
                     leading-7
-                    ${
-                      isDark
-                        ? "text-slate-600"
-                        : "text-slate-400"
-                    }
+                    ${footerText}
                   `}
                 >
                   <section>
@@ -882,21 +704,14 @@ export default function Footer() {
                       className={`
                         mb-2
                         font-semibold
-                        ${
-                          isDark
-                            ? "text-slate-900"
-                            : "text-white"
-                        }
+                        ${footerHeading}
                       `}
                     >
-                      Éditeur du site
+                      {t("footer.legalEditor")}
                     </h3>
 
                     <p>
-                      Le présent site est édité par Digital
-                      Work, entreprise spécialisée dans la
-                      conception, le développement et la mise
-                      en œuvre de solutions digitales.
+                      {t("footer.legalEditorText")}
                     </p>
                   </section>
 
@@ -905,22 +720,14 @@ export default function Footer() {
                       className={`
                         mb-2
                         font-semibold
-                        ${
-                          isDark
-                            ? "text-slate-900"
-                            : "text-white"
-                        }
+                        ${footerHeading}
                       `}
                     >
-                      Activité
+                      {t("footer.activity")}
                     </h3>
 
                     <p>
-                      Digital Work accompagne les entreprises,
-                      organisations et particuliers dans leurs
-                      projets numériques : développement web,
-                      applications, solutions digitales,
-                      maintenance et accompagnement technique.
+                      {t("footer.activityText")}
                     </p>
                   </section>
 
@@ -929,14 +736,10 @@ export default function Footer() {
                       className={`
                         mb-2
                         font-semibold
-                        ${
-                          isDark
-                            ? "text-slate-900"
-                            : "text-white"
-                        }
+                        ${footerHeading}
                       `}
                     >
-                      Contact
+                      {t("footer.contact")}
                     </h3>
 
                     <p>
@@ -944,7 +747,7 @@ export default function Footer() {
                       <br />
                       Téléphone : +261 34 84 286 52
                       <br />
-                      Pays : Madagascar
+                      {t("footer.country")} : Madagascar
                     </p>
                   </section>
 
@@ -953,29 +756,22 @@ export default function Footer() {
                       className={`
                         mb-2
                         font-semibold
-                        ${
-                          isDark
-                            ? "text-slate-900"
-                            : "text-white"
-                        }
+                        ${footerHeading}
                       `}
                     >
-                      Propriété intellectuelle
+                      {t("footer.intellectualProperty")}
                     </h3>
 
                     <p>
-                      L'ensemble des éléments présents sur ce
-                      site, notamment les textes, images, logos,
-                      interfaces, graphismes et éléments
-                      logiciels, est protégé par les règles
-                      applicables en matière de propriété
-                      intellectuelle.
+                      {t(
+                        "footer.intellectualPropertyText",
+                      )}
                     </p>
 
                     <p className="mt-3">
-                      Toute reproduction, modification,
-                      distribution ou utilisation sans
-                      autorisation préalable peut être interdite.
+                      {t(
+                        "footer.intellectualPropertyText2",
+                      )}
                     </p>
                   </section>
 
@@ -984,32 +780,23 @@ export default function Footer() {
                       className={`
                         mb-2
                         font-semibold
-                        ${
-                          isDark
-                            ? "text-slate-900"
-                            : "text-white"
-                        }
+                        ${footerHeading}
                       `}
                     >
-                      Responsabilité
+                      {t("footer.responsibility")}
                     </h3>
 
                     <p>
-                      Digital Work s'efforce de maintenir les
-                      informations publiées sur le site à jour.
-                      Toutefois, aucune garantie absolue
-                      concernant l'exhaustivité ou l'absence
-                      d'erreurs ne peut être donnée.
+                      {t("footer.responsibilityText")}
                     </p>
                   </section>
                 </div>
               </div>
             )}
 
-            {/* =================================================
+            {/* ==================================================
                 CONFIDENTIALITÉ
             ================================================== */}
-
             {legalModal === "confidentialite" && (
               <div className="pr-8">
                 <div className="mb-6">
@@ -1022,14 +809,10 @@ export default function Footer() {
                       mt-2
                       text-2xl
                       font-bold
-                      ${
-                        isDark
-                          ? "text-slate-900"
-                          : "text-white"
-                      }
+                      ${footerHeading}
                     `}
                   >
-                    Politique de confidentialité
+                    {t("footer.privacy")}
                   </h2>
                 </div>
 
@@ -1038,11 +821,7 @@ export default function Footer() {
                     space-y-6
                     text-sm
                     leading-7
-                    ${
-                      isDark
-                        ? "text-slate-600"
-                        : "text-slate-400"
-                    }
+                    ${footerText}
                   `}
                 >
                   <section>
@@ -1050,21 +829,14 @@ export default function Footer() {
                       className={`
                         mb-2
                         font-semibold
-                        ${
-                          isDark
-                            ? "text-slate-900"
-                            : "text-white"
-                        }
+                        ${footerHeading}
                       `}
                     >
-                      Protection de vos données
+                      {t("footer.dataProtection")}
                     </h3>
 
                     <p>
-                      Digital Work accorde une importance
-                      particulière à la protection des données
-                      personnelles communiquées par les
-                      utilisateurs du site.
+                      {t("footer.dataProtectionText")}
                     </p>
                   </section>
 
@@ -1073,23 +845,14 @@ export default function Footer() {
                       className={`
                         mb-2
                         font-semibold
-                        ${
-                          isDark
-                            ? "text-slate-900"
-                            : "text-white"
-                        }
+                        ${footerHeading}
                       `}
                     >
-                      Données collectées
+                      {t("footer.collectedData")}
                     </h3>
 
                     <p>
-                      Lorsque vous utilisez les fonctionnalités
-                      de contact du site, certaines informations
-                      peuvent être communiquées volontairement,
-                      notamment votre nom, votre adresse email,
-                      votre numéro de téléphone et les
-                      informations relatives à votre projet.
+                      {t("footer.collectedDataText")}
                     </p>
                   </section>
 
@@ -1098,22 +861,14 @@ export default function Footer() {
                       className={`
                         mb-2
                         font-semibold
-                        ${
-                          isDark
-                            ? "text-slate-900"
-                            : "text-white"
-                        }
+                        ${footerHeading}
                       `}
                     >
-                      Utilisation des informations
+                      {t("footer.informationUse")}
                     </h3>
 
                     <p>
-                      Les informations transmises sont utilisées
-                      principalement pour répondre aux demandes,
-                      communiquer avec les utilisateurs et
-                      assurer le suivi des projets et prestations
-                      proposés par Digital Work.
+                      {t("footer.informationUseText")}
                     </p>
                   </section>
 
@@ -1122,24 +877,16 @@ export default function Footer() {
                       className={`
                         mb-2
                         font-semibold
-                        ${
-                          isDark
-                            ? "text-slate-900"
-                            : "text-white"
-                        }
+                        ${footerHeading}
                       `}
                     >
-                      Conservation et sécurité
+                      {t("footer.storageSecurity")}
                     </h3>
 
                     <p>
-                      Les données sont conservées uniquement
-                      lorsque cela est nécessaire aux finalités
-                      pour lesquelles elles ont été collectées.
-                      Digital Work met en œuvre des mesures
-                      raisonnables afin de protéger ces
-                      informations contre tout accès,
-                      modification ou divulgation non autorisée.
+                      {t(
+                        "footer.storageSecurityText",
+                      )}
                     </p>
                   </section>
 
@@ -1148,23 +895,14 @@ export default function Footer() {
                       className={`
                         mb-2
                         font-semibold
-                        ${
-                          isDark
-                            ? "text-slate-900"
-                            : "text-white"
-                        }
+                        ${footerHeading}
                       `}
                     >
-                      Vos droits
+                      {t("footer.yourRights")}
                     </h3>
 
                     <p>
-                      Vous pouvez contacter Digital Work pour
-                      demander des informations concernant les
-                      données personnelles vous concernant,
-                      demander leur rectification ou solliciter
-                      leur suppression lorsque cela est
-                      applicable.
+                      {t("footer.yourRightsText")}
                     </p>
                   </section>
 
@@ -1173,21 +911,16 @@ export default function Footer() {
                       className={`
                         mb-2
                         font-semibold
-                        ${
-                          isDark
-                            ? "text-slate-900"
-                            : "text-white"
-                        }
+                        ${footerHeading}
                       `}
                     >
-                      Contact
+                      {t("footer.contact")}
                     </h3>
 
                     <p>
-                      Pour toute question relative à la
-                      confidentialité ou au traitement de vos
-                      données :
+                      {t("footer.privacyContact")}
                       <br />
+
                       <span className="font-medium">
                         rrzafindrafita@gmail.com
                       </span>
@@ -1197,10 +930,7 @@ export default function Footer() {
               </div>
             )}
 
-            {/* =================================================
-                CLOSE
-            ================================================== */}
-
+            {/* CLOSE BUTTON */}
             <div className="mt-8 flex justify-end">
               <button
                 type="button"
@@ -1217,7 +947,7 @@ export default function Footer() {
                   hover:opacity-90
                 "
               >
-                Fermer
+                {t("footer.close")}
               </button>
             </div>
           </div>
@@ -1226,4 +956,3 @@ export default function Footer() {
     </>
   );
 }
-
