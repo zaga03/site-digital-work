@@ -1,86 +1,69 @@
 @import "tailwindcss";
 
-
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* =========================================================
    DIGITAL WORK — THEME SYSTEM
-   DARK = TECH CYAN/PURPLE
-   LIGHT = CLEAN TECH
-========================================================= */
+   ========================================================= */
 
 :root,
 [data-theme="dark"] {
-  /* Background */
-  --dw-background: #0d0f14; /* Noir bleuté très profond et moderne */
-  --dw-surface: #161b26;    /* Bleu-gris sombre pour les conteneurs */
-  --dw-card: #212836;       /* Teinte de carte pour faire ressortir les inputs */
+  --dw-background: #0d0f14;
+  --dw-surface: #161b26;
+  --dw-card: #212836;
 
-  /* Text */
-  --dw-text: #f3f4f6;       /* Blanc cassé lumineux pour une lecture optimale */
-  --dw-muted: #9ca3af;      /* Gris moyen pour les textes secondaires */
+  --dw-text: #f3f4f6;
+  --dw-muted: #9ca3af;
 
-  /* Borders */
   --dw-border: rgba(243, 244, 246, 0.08);
 
-  /* Primary (Teintes du logo) */
-  --dw-primary: #3b82f6;       /* Bleu électrique vif du logo */
-  --dw-primary-hover: #1d4ed8; /* Bleu plus foncé pour l'effet survol */
+  --dw-primary: #3b82f6;
+  --dw-primary-hover: #1d4ed8;
 
-  /* Secondary */
-  --dw-cyan: #06b6d4;          /* Cyan / Turquoise pixelisé du logo */
+  --dw-cyan: #06b6d4;
 
-  /* Accent colors */
   --dw-success: #10b981;
   --dw-warning: #f59e0b;
   --dw-danger: #ef4444;
-  --dw-purple: #8b5cf6;        /* Violet néon de la base du logo */
+
+  --dw-purple: #8b5cf6;
   --dw-orange: #f97316;
 
-  /* Grid */
-  --dw-grid: rgba(6, 182, 212, 0.03); /* Grille discrète aux reflets cyan */
+  --dw-grid: rgba(6, 182, 212, 0.03);
 }
-
 
 /* =========================================================
    LIGHT THEME
-========================================================= */
+   ========================================================= */
 
 [data-theme="light"] {
-  /* Background */
-  --dw-background: #f8fafc; /* Blanc ardoise très propre */
-  --dw-surface: #ffffff;    /* Blanc pur pour le corps du formulaire */
-  --dw-card: #f1f5f9;       /* Gris très clair pour les champs de saisie */
+  --dw-background: #f8fafc;
+  --dw-surface: #ffffff;
+  --dw-card: #f1f5f9;
 
-  /* Text */
-  --dw-text: #0f172a;       /* Bleu-noir très foncé et contrasté */
-  --dw-muted: #64748b;      /* Ardoise pour les textes secondaires */
+  --dw-text: #0f172a;
+  --dw-muted: #64748b;
 
-  /* Borders */
   --dw-border: rgba(15, 23, 42, 0.08);
 
-  /* Primary */
-  --dw-primary: #1d4ed8;       /* Bleu royal corporate */
-  --dw-primary-hover: #1e40af; /* Bleu nuit pour le survol */
+  --dw-primary: #1d4ed8;
+  --dw-primary-hover: #1e40af;
 
-  /* Secondary */
-  --dw-cyan: #0891b2;          /* Cyan profond */
+  --dw-cyan: #0891b2;
 
-  /* Accent colors */
   --dw-success: #059669;
   --dw-warning: #d97706;
   --dw-danger: #dc2626;
-  --dw-purple: #7c3aed;        /* Touche de violet pro */
+
+  --dw-purple: #7c3aed;
   --dw-orange: #ea580c;
 
-  /* Grid */
-  --dw-grid: rgba(29, 78, 216, 0.03); /* Grille discrète aux reflets bleus */
+  --dw-grid: rgba(29, 78, 216, 0.03);
 }
-
 
 /* =========================================================
    TAILWIND THEME
-========================================================= */
+   ========================================================= */
 
 @theme {
   --color-dw-background: var(--dw-background);
@@ -96,14 +79,14 @@
   --color-dw-success: var(--dw-success);
   --color-dw-warning: var(--dw-warning);
   --color-dw-danger: var(--dw-danger);
+
   --color-dw-purple: var(--dw-purple);
   --color-dw-orange: var(--dw-orange);
 }
 
-
 /* =========================================================
    BASE
-========================================================= */
+   ========================================================= */
 
 html {
   scroll-behavior: smooth;
@@ -113,6 +96,10 @@ html,
 body,
 #root {
   min-height: 100%;
+}
+
+html {
+  background-color: var(--dw-background);
 }
 
 body {
@@ -136,39 +123,48 @@ body {
     color 300ms ease;
 }
 
-
 /* =========================================================
-   GLOBAL BORDER
-========================================================= */
+   GLOBAL
+   ========================================================= */
 
 * {
   border-color: var(--dw-border);
 }
 
+::selection {
+  background: var(--dw-primary);
+  color: #ffffff;
+}
 
 /* =========================================================
    THEME TRANSITION
-========================================================= */
+   ========================================================= */
 
+html,
 body,
+#root,
 header,
-section,
+footer,
 main,
+section,
 nav,
+article,
+aside,
+div,
 button,
 a,
-div,
-article {
+input,
+textarea,
+select {
   transition:
     background-color 250ms ease,
     border-color 250ms ease,
     color 250ms ease;
 }
 
-
 /* =========================================================
    GRID
-========================================================= */
+   ========================================================= */
 
 .dw-grid {
   background-image:
@@ -186,10 +182,9 @@ article {
   background-size: 40px 40px;
 }
 
-
 /* =========================================================
-   GRADIENT TEXT (Parfait pour le texte "DIGITAL WORK")
-========================================================= */
+   GRADIENT TEXT
+   ========================================================= */
 
 .dw-gradient-text {
   background: linear-gradient(
@@ -205,20 +200,9 @@ article {
   color: transparent;
 }
 
-
-/* =========================================================
-   SELECTION
-========================================================= */
-
-::selection {
-  background: var(--dw-primary);
-  color: #ffffff;
-}
-
-
 /* =========================================================
    SCROLLBAR
-========================================================= */
+   ========================================================= */
 
 ::-webkit-scrollbar {
   width: 9px;
@@ -237,10 +221,9 @@ article {
   background: var(--dw-primary);
 }
 
-
 /* =========================================================
    FOCUS
-========================================================= */
+   ========================================================= */
 
 button:focus-visible,
 a:focus-visible,

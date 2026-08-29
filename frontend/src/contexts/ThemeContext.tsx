@@ -6,51 +6,34 @@ import {
   type ReactNode,
 } from "react";
 
-export type Theme = "dark" | "light";
+type Theme = "light" | "dark";
 
 interface ThemeContextType {
   theme: Theme;
-  setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
+  setTheme: (theme: Theme) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(
-  undefined
-);
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-interface ThemeProviderProps {
-  children: ReactNode;
-}
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setThemeState] = useState<Theme>(() => {
+    const savedTheme = localStorage.getItem("dw-theme");
 
-const STORAGE_KEY = "digital-work-theme";
+    if (savedTheme === "light" || savedTheme === "dark") {
+      return savedTheme;
+    }
 
-function getInitialTheme(): Theme {
-  if (typeof window === "undefined") {
     return "dark";
-  }
-
-  const savedTheme = localStorage.getItem(STORAGE_KEY);
-
-  if (savedTheme === "light" || savedTheme === "dark") {
-    return savedTheme;
-  }
-
-  return "dark";
-}
-
-export function ThemeProvider({
-  children,
-}: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(
-    getInitialTheme
-  );
+  });
 
   useEffect(() => {
     const root = document.documentElement;
 
+    root.classList.toggle("dark", theme === "dark");
     root.setAttribute("data-theme", theme);
 
-    localStorage.setItem(STORAGE_KEY, theme);
+    localStorage.setItem("dw-theme", theme);
   }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
@@ -67,8 +50,8 @@ export function ThemeProvider({
     <ThemeContext.Provider
       value={{
         theme,
-        setTheme,
         toggleTheme,
+        setTheme,
       }}
     >
       {children}
@@ -80,9 +63,7 @@ export function useTheme() {
   const context = useContext(ThemeContext);
 
   if (!context) {
-    throw new Error(
-      "useTheme doit être utilisé dans ThemeProvider"
-    );
+    throw new Error("useTheme must be used inside ThemeProvider");
   }
 
   return context;

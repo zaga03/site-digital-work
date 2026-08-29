@@ -6,9 +6,15 @@ import { useTranslation } from "react-i18next";
 export default function HomeCTA() {
   const { t } = useTranslation();
 
-  const benefits = t("home.cta.benefits", {
+  const rawBenefits = t("cta.benefits", {
     returnObjects: true,
-  }) as string[];
+  });
+
+  const benefits = Array.isArray(rawBenefits)
+    ? rawBenefits.filter(
+        (benefit): benefit is string => typeof benefit === "string",
+      )
+    : [];
 
   return (
     <section
@@ -134,8 +140,7 @@ export default function HomeCTA() {
                 "
               >
                 <Sparkles className="h-4 w-4" aria-hidden="true" />
-
-                <span>{t("home.cta.badge")}</span>
+                <span>{t("cta.badge")}</span>
               </motion.div>
 
               {/* Title */}
@@ -154,7 +159,8 @@ export default function HomeCTA() {
                   dark:text-white
                 "
               >
-                {t("home.cta.title")}{" "}
+                {t("cta.title")}
+
                 <span
                   className="
                     bg-gradient-to-r
@@ -168,7 +174,7 @@ export default function HomeCTA() {
                     dark:to-violet-400
                   "
                 >
-                  {t("home.cta.highlight")}
+                  {t("cta.highlight")}
                 </span>
               </motion.h2>
 
@@ -187,7 +193,7 @@ export default function HomeCTA() {
                   dark:text-slate-300
                 "
               >
-                {t("home.cta.description")}
+                {t("cta.description")}
               </motion.p>
 
               {/* Buttons */}
@@ -228,7 +234,7 @@ export default function HomeCTA() {
                     dark:focus:ring-offset-slate-950
                   "
                 >
-                  {t("home.cta.primaryCta")}
+                  {t("cta.primaryCta")}
 
                   <ArrowRight
                     className="
@@ -269,7 +275,7 @@ export default function HomeCTA() {
                     dark:focus:ring-offset-slate-950
                   "
                 >
-                  {t("home.cta.secondaryCta")}
+                  {t("cta.secondaryCta")}
                 </Link>
               </motion.div>
 
@@ -286,29 +292,28 @@ export default function HomeCTA() {
                   sm:gap-x-6
                 "
               >
-                {Array.isArray(benefits) &&
-                  benefits.map((benefit, index) => (
-                    <div
-                      key={`${benefit}-${index}`}
+                {benefits.map((benefit, index) => (
+                  <div
+                    key={`${benefit}-${index}`}
+                    className="
+                      flex items-center gap-2
+                      text-sm
+                      text-slate-600
+                      dark:text-slate-300
+                    "
+                  >
+                    <CheckCircle2
                       className="
-                        flex items-center gap-2
-                        text-sm
-                        text-slate-600
-                        dark:text-slate-300
+                        h-4 w-4 shrink-0
+                        text-blue-600
+                        dark:text-blue-400
                       "
-                    >
-                      <CheckCircle2
-                        className="
-                          h-4 w-4 shrink-0
-                          text-blue-600
-                          dark:text-blue-400
-                        "
-                        aria-hidden="true"
-                      />
+                      aria-hidden="true"
+                    />
 
-                      <span>{benefit}</span>
-                    </div>
-                  ))}
+                    <span>{benefit}</span>
+                  </div>
+                ))}
               </motion.div>
             </div>
 
@@ -362,7 +367,7 @@ export default function HomeCTA() {
                     dark:text-white
                   "
                 >
-                  {t("home.cta.response")}
+                  {t("cta.response")}
                 </h3>
 
                 <p
@@ -374,7 +379,7 @@ export default function HomeCTA() {
                     dark:text-slate-400
                   "
                 >
-                  {t("home.cta.responseDescription")}
+                  {t("cta.responseDescription")}
                 </p>
 
                 {/* Progress / process visual */}
@@ -394,7 +399,7 @@ export default function HomeCTA() {
                           dark:text-slate-300
                         "
                       >
-                        {t("home.cta.process.analysis")}
+                        {t("cta.process.analysis")}
                       </span>
 
                       <CheckCircle2
@@ -434,7 +439,7 @@ export default function HomeCTA() {
                           dark:text-slate-300
                         "
                       >
-                        {t("home.cta.process.design")}
+                        {t("cta.process.design")}
                       </span>
 
                       <CheckCircle2
@@ -474,7 +479,7 @@ export default function HomeCTA() {
                           dark:text-slate-300
                         "
                       >
-                        {t("home.cta.process.development")}
+                        {t("cta.process.development")}
                       </span>
 
                       <span
@@ -529,7 +534,7 @@ export default function HomeCTA() {
                         dark:text-blue-300
                       "
                     >
-                      {t("home.cta.footerText")}
+                      {t("cta.footerText")}
                     </p>
                   </div>
                 </div>

@@ -1,954 +1,447 @@
+
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
-  ArrowRight,
-  Facebook,
-  Github,
-  Instagram,
-  Linkedin,
   Mail,
   MapPin,
   Phone,
+  Facebook,
+  Instagram,
+  Linkedin,
+  Github,
   X,
 } from "lucide-react";
-import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
-import LanguageSwitcher from "../ui/LanguageSwitcher";
 import logo from "../../assets/logo.png";
-import { useTheme } from "../../contexts/ThemeContext";
 
-type LegalModal = "mentions" | "confidentialite" | null;
+type LegalModal = "legal" | "privacy" | null;
 
 export default function Footer() {
-  const { theme } = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [modal, setModal] = useState<LegalModal>(null);
 
-  const isDark = theme === "dark";
 
-  const [legalModal, setLegalModal] = useState<LegalModal>(null);
-
-  /**
-   * ============================================================
-   * ADMIN SECRET ACCESS
-   * 5 clics rapides sur le copyright
-   * ============================================================
-   */
-  const adminClickCount = useRef(0);
-
-  const adminClickTimer = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
-
-  const handleAdminAccess = (
-    event: React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    event.preventDefault();
-
-    adminClickCount.current += 1;
-
-    if (adminClickTimer.current) {
-      clearTimeout(adminClickTimer.current);
-    }
-
-    adminClickTimer.current = setTimeout(() => {
-      adminClickCount.current = 0;
-      adminClickTimer.current = null;
-    }, 2000);
-
-    if (adminClickCount.current >= 5) {
-      adminClickCount.current = 0;
-
-      if (adminClickTimer.current) {
-        clearTimeout(adminClickTimer.current);
-        adminClickTimer.current = null;
-      }
-
-      window.location.href = "/admin/login";
-    }
+  const changeLanguage = (language: "fr" | "mg" | "en") => {
+    i18n.changeLanguage(language);
   };
 
-  /**
-   * ============================================================
-   * NAVIGATION
-   * ============================================================
-   */
-  const navigationLinks = [
-    ["/", "footer.home"],
-    ["/services", "footer.services"],
-    ["/solutions", "footer.solutions"],
-    ["/realisations", "footer.projects"],
-    ["/a-propos", "footer.about"],
-    ["/contact", "footer.contact"],
-  ] as const;
-
-  /**
-   * ============================================================
-   * SERVICES
-   * ============================================================
-   */
-  const serviceLinks = [
-    ["/services", "footer.websites"],
-    ["/services", "footer.webApplications"],
-    ["/services", "footer.mobileApplications"],
-    ["/solutions", "footer.businessSolutions"],
-    ["/solutions", "footer.automation"],
-    ["/solutions", "footer.digitalSolutions"],
-  ] as const;
-
-  /**
-   * ============================================================
-   * SOCIAL NETWORKS
-   * ============================================================
-   *
-   * Remplace les "#" par tes vraies URLs lorsque disponibles.
-   */
-  const socialLinks = [
-    {
-      name: "Facebook",
-      href: "#",
-      icon: Facebook,
-    },
-    {
-      name: "Instagram",
-      href: "#",
-      icon: Instagram,
-    },
-    {
-      name: "LinkedIn",
-      href: "#",
-      icon: Linkedin,
-    },
-    {
-      name: "GitHub",
-      href: "#",
-      icon: Github,
-    },
+  const languages = [
+    { code: "fr" as const, label: "FR" },
+    { code: "mg" as const, label: "MG" },
+    { code: "en" as const, label: "EN" },
   ];
-
-  /**
-   * ============================================================
-   * COMMON COLORS
-   * ============================================================
-   */
-  const footerText = isDark
-    ? "text-slate-400"
-    : "text-slate-400";
-
-  const footerMuted = isDark
-    ? "text-slate-500"
-    : "text-slate-500";
-
-  const footerHeading = isDark
-    ? "text-slate-900"
-    : "text-white";
-
-  const footerLink = isDark
-    ? "text-slate-600 hover:text-slate-900"
-    : "text-slate-400 hover:text-white";
 
   return (
     <>
-      {/* ========================================================
-          FOOTER
-      ======================================================== */}
-      <footer
-        className={`
-          border-t
-          transition-colors
-          duration-300
-          ${
-            isDark
-              ? "border-slate-200 bg-slate-100 text-slate-900"
-              : "border-slate-800 bg-slate-950 text-white"
-          }
-        `}
-      >
-        {/* ======================================================
-            MAIN FOOTER
-        ====================================================== */}
-        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
-          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-12">
-            {/* ==================================================
-                BRAND
-            ================================================== */}
-            <div className="lg:col-span-4">
-              <Link
-                to="/"
-                className="inline-flex items-center gap-3"
-              >
-                <img
-                  src={logo}
-                  alt="Digital Work"
-                  className="h-12 w-12 object-contain"
-                />
+      <footer className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          {/* Main footer */}
+         <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+            {/* Brand */}
+            <div className="lg:col-span-1">
+                <div>
+                    {/* =================================================
+              LOGO
+          ================================================== */}
 
-                <div className="leading-none">
-                  <div
-                    className={`
-                      text-xl
-                      font-bold
-                      tracking-tight
-                      ${isDark ? "text-slate-900" : "text-white"}
-                    `}
-                  >
-                    Digital
-                    <span className="text-dw-primary">
-                      {" "}
-                      Work
-                    </span>
-                  </div>
+          <Link
+            to="/"
+            className="group flex items-center gap-3"
+            aria-label="Digital Work - Accueil"
+          >
+            {/* Logo icon */}
 
-                  <div
-                    className={`
-                      mt-1
-                      text-[9px]
-                      font-medium
-                      uppercase
-                      tracking-[0.25em]
-                      ${footerMuted}
-                    `}
-                  >
-                    {t("footer.tagline")}
-                  </div>
-                </div>
-              </Link>
+            <img
+              src={logo}
+              alt="Digital Work"
+              className="h-10 w-10 object-contain transition-transform duration-200 group-hover:scale-105"
+            />
 
-              <p
-                className={`
-                  mt-6
-                  max-w-md
-                  text-sm
-                  leading-7
-                  ${footerText}
-                `}
-              >
-                {t("footer.description")}
-              </p>
+            {/* Logo text */}
 
-              {/* CTA */}
-              <Link
-                to="/contact"
-                className="
-                  mt-6
-                  inline-flex
-                  items-center
-                  gap-2
-                  text-sm
-                  font-semibold
-                  text-dw-primary
-                  transition-all
-                  hover:gap-3
-                  hover:opacity-80
-                "
-              >
-                <span>{t("footer.contact")}</span>
-                <ArrowRight size={16} />
-              </Link>
-
-              {/* Expertise */}
-              <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2">
-                <span className={`text-xs ${footerMuted}`}>
-                  {t("footer.web")}
-                </span>
-
-                <span className={`text-xs ${footerMuted}`}>
-                  {t("footer.mobile")}
-                </span>
-
-                <span className={`text-xs ${footerMuted}`}>
-                  {t("footer.businessSolutions")}
-                </span>
-
-                <span className={`text-xs ${footerMuted}`}>
-                  {t("footer.automation")}
+            <div className="leading-none">
+              <div className="text-lg font-bold tracking-tight text-dw-white">
+                Digital
+                <span className="text-dw-primary">
+                  Work
                 </span>
               </div>
+
+              <div className="mt-1 text-[9px] font-medium uppercase tracking-[0.25em] text-dw-muted">
+                Solutions digitales
+              </div>
             </div>
+          </Link>
 
-            {/* ==================================================
-                SERVICES
-            ================================================== */}
-            <div className="lg:col-span-2">
-              <h3
-                className={`
-                  text-sm
-                  font-semibold
-                  ${footerHeading}
-                `}
-              >
-                {t("footer.services")}
-              </h3>
 
-              <nav className="mt-5 flex flex-col gap-3">
-                {serviceLinks.map(([to, key]) => (
+                  <p className="mt-5 max-w-sm text-sm leading-7 text-slate-600 dark:text-slate-400">
+                    {t("footer.description")}
+                  </p>
+
+                  {/* Contact shortcut */}
                   <Link
-                    key={`${to}-${key}`}
-                    to={to}
-                    className={`
-                      text-sm
-                      transition-colors
-                      ${footerLink}
-                    `}
+                    to="/contact"
+                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                   >
-                    {t(key)}
+                    <Mail className="h-4 w-4" />
+                    {t("footer.contact.title")}
                   </Link>
-                ))}
-              </nav>
-            </div>
 
-            {/* ==================================================
-                NAVIGATION
-            ================================================== */}
-            <div className="lg:col-span-2">
-              <h3
-                className={`
-                  text-sm
-                  font-semibold
-                  ${footerHeading}
-                `}
-              >
-                {t("footer.navigation")}
+                  {/* Social */}
+                  <div className="mt-7 flex items-center gap-3">
+                    <a
+                      href="#"
+                      aria-label="Facebook"
+                      className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition-all hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:border-slate-800 dark:text-slate-400 dark:hover:border-blue-500 dark:hover:bg-blue-950/40 dark:hover:text-blue-400"
+                    >
+                      <Facebook className="h-4 w-4" />
+                    </a>
+
+                    <a
+                      href="#"
+                      aria-label="Instagram"
+                      className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition-all hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:border-slate-800 dark:text-slate-400 dark:hover:border-blue-500 dark:hover:bg-blue-950/40 dark:hover:text-blue-400"
+                    >
+                      <Instagram className="h-4 w-4" />
+                    </a>
+
+                    <a
+                      href="#"
+                      aria-label="LinkedIn"
+                      className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition-all hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:border-slate-800 dark:text-slate-400 dark:hover:border-blue-500 dark:hover:bg-blue-950/40 dark:hover:text-blue-400"
+                    >
+                      <Linkedin className="h-4 w-4" />
+                    </a>
+
+                    <a
+                      href="#"
+                      aria-label="GitHub"
+                      className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition-all hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:border-slate-800 dark:text-slate-400 dark:hover:border-blue-500 dark:hover:bg-blue-950/40 dark:hover:text-blue-400"
+                    >
+                      <Github className="h-4 w-4" />
+                    </a>
+                  </div>
+                </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4 lg:contents">  
+            {/* Services */}
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-950 dark:text-white">
+                {t("footer.services.title")}
               </h3>
 
-              <nav className="mt-5 flex flex-col gap-3">
-                {navigationLinks.map(([to, key]) => (
+              <ul className="mt-5 space-y-3">
+                <li>
                   <Link
-                    key={`${to}-${key}`}
-                    to={to}
-                    className={`
-                      text-sm
-                      transition-colors
-                      ${footerLink}
-                    `}
+                    to="/services"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
                   >
-                    {t(key)}
+                    {t("footer.services.websites")}
                   </Link>
-                ))}
-              </nav>
+                </li>
+
+                <li>
+                  <Link
+                    to="/services"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                  >
+                    {t("footer.services.webApplications")}
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/services"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                  >
+                    {t("footer.services.mobileApplications")}
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/solutions"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                  >
+                    {t("footer.services.businessSolutions")}
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/solutions"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                  >
+                    {t("footer.services.automation")}
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/solutions"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                  >
+                    {t("footer.services.digitalSolutions")}
+                  </Link>
+                </li>
+              </ul>
             </div>
 
-            {/* ==================================================
-                CONTACT
-            ================================================== */}
-            <div className="lg:col-span-4">
-              <h3
-                className={`
-                  text-sm
-                  font-semibold
-                  ${footerHeading}
-                `}
-              >
-                {t("footer.contact")}
+            {/* Navigation */}
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-950 dark:text-white">
+                {t("footer.navigation.title")}
               </h3>
 
-              <div className="mt-5 flex flex-col gap-4">
-                {/* Email */}
+              <ul className="mt-5 space-y-3">
+                <li>
+                  <Link
+                    to="/"
+                    className="text-sm text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                  >
+                    {t("footer.navigation.home")}
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/services"
+                    className="text-sm text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                  >
+                    {t("footer.navigation.services")}
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/solutions"
+                    className="text-sm text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                  >
+                    {t("footer.navigation.solutions")}
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/realisations"
+                    className="text-sm text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                  >
+                    {t("footer.navigation.projects")}
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/a-propos"
+                    className="text-sm text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                  >
+                    {t("footer.navigation.about")}
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/contact"
+                    className="text-sm text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                  >
+                    {t("footer.navigation.contact")}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-950 dark:text-white">
+                {t("footer.contact.title")}
+              </h3>
+
+              <div className="mt-5 space-y-4">
                 <a
-                  href="mailto:rrzafindrafita@gmail.com"
-                  className={`
-                    flex
-                    items-start
-                    gap-3
-                    text-sm
-                    transition-colors
-                    ${footerLink}
-                  `}
+                  href={`mailto:${t("footer.contact.email")}`}
+                  className="flex items-start gap-3 text-sm text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
                 >
-                  <Mail
-                    size={17}
-                    className="mt-0.5 shrink-0 text-dw-primary"
-                  />
+                  <Mail className="mt-0.5 h-4 w-4 shrink-0" />
 
-                  <span>
-                    rrzafindrafita@gmail.com
+                  <span className="break-all">
+                    {t("footer.contact.email")}
                   </span>
                 </a>
 
-                {/* Phone */}
                 <a
                   href="tel:+261348428652"
-                  className={`
-                    flex
-                    items-start
-                    gap-3
-                    text-sm
-                    transition-colors
-                    ${footerLink}
-                  `}
+                  className="flex items-start gap-3 text-sm text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
                 >
-                  <Phone
-                    size={17}
-                    className="mt-0.5 shrink-0 text-dw-primary"
-                  />
+                  <Phone className="mt-0.5 h-4 w-4 shrink-0" />
 
-                  <span>+261 34 84 286 52</span>
+                  <span>{t("footer.contact.phone")}</span>
                 </a>
 
-                {/* Location */}
-                <div
-                  className={`
-                    flex
-                    items-start
-                    gap-3
-                    text-sm
-                    ${footerText}
-                  `}
-                >
-                  <MapPin
-                    size={17}
-                    className="mt-0.5 shrink-0 text-dw-primary"
-                  />
+                <div className="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-400">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
 
                   <span>{t("footer.madagascar")}</span>
                 </div>
               </div>
 
-              {/* ==================================================
-                  SOCIAL NETWORKS
-              ================================================== */}
+              {/* Language */}
               <div className="mt-7">
-                <p
-                  className={`
-                    text-xs
-                    font-semibold
-                    uppercase
-                    tracking-[0.15em]
-                    ${footerMuted}
-                  `}
-                >
-                  {t("footer.followUs")}
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  {t("footer.language")}
                 </p>
 
-                <div className="mt-4 flex items-center gap-2">
-                  {socialLinks.map(
-                    ({
-                      name,
-                      href,
-                      icon: Icon,
-                    }) => (
-                      <a
-                        key={name}
-                        href={href}
-                        target={
-                          href !== "#"
-                            ? "_blank"
-                            : undefined
-                        }
-                        rel={
-                          href !== "#"
-                            ? "noopener noreferrer"
-                            : undefined
-                        }
-                        aria-label={name}
-                        onClick={(event) => {
-                          if (href === "#") {
-                            event.preventDefault();
-                          }
-                        }}
-                        className={`
-                          flex
-                          h-9
-                          w-9
-                          items-center
-                          justify-center
-                          rounded-xl
-                          border
-                          transition-all
-                          ${
-                            isDark
-                              ? "border-slate-300 text-slate-500 hover:border-dw-primary/40 hover:bg-slate-200 hover:text-slate-900"
-                              : "border-white/10 text-slate-400 hover:border-dw-primary/40 hover:bg-white/5 hover:text-white"
-                          }
-                        `}
+                <div className="mt-3 flex gap-2">
+                  {languages.map((language) => {
+                    const active = i18n.language.startsWith(language.code);
+
+                    return (
+                      <button
+                        key={language.code}
+                        type="button"
+                        onClick={() => changeLanguage(language.code)}
+                        className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+                          active
+                            ? "bg-blue-600 text-white shadow-sm"
+                            : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                        }`}
+                        aria-pressed={active}
                       >
-                        <Icon size={16} />
-                      </a>
-                    ),
-                  )}
+                        {language.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* ======================================================
-            LANGUAGE BAR
-        ====================================================== */}
-        <div
-          className={`
-            border-t
-            ${isDark ? "border-slate-300" : "border-white/10"}
-          `}
-        >
-          <div className="mx-auto max-w-7xl px-5 py-5 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-3">
-                <span
-                  className={`
-                    text-xs
-                    font-medium
-                    ${footerMuted}
-                  `}
-                >
-                  {t("common.language")}
-                </span>
-
-                <LanguageSwitcher />
-              </div>
-
-              <p
-                className={`
-                  text-xs
-                  ${footerMuted}
-                `}
-              >
-                {t("footer.web")} ·{" "}
-                {t("footer.mobile")} ·{" "}
-                {t("footer.digitalSolutions")}
-              </p>
             </div>
-          </div>
         </div>
+          {/* Bottom */}
+          <div className="mt-14 border-t border-slate-200 pt-8 dark:border-slate-800">
+            <div className="flex flex-col gap-5 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-slate-500 dark:text-slate-500">
+                © {new Date().getFullYear()} Digital Work.{" "}
+                {t("footer.copyright")}
+              </p>
 
-        {/* ======================================================
-            BOTTOM BAR
-        ====================================================== */}
-        <div
-          className={`
-            border-t
-            ${isDark ? "border-slate-300" : "border-white/10"}
-          `}
-        >
-          <div
-            className="
-              mx-auto
-              flex
-              max-w-7xl
-              flex-col
-              gap-4
-              px-5
-              py-6
-              sm:px-6
-              md:flex-row
-              md:items-center
-              md:justify-between
-              lg:px-8
-            "
-          >
-            {/* COPYRIGHT */}
-            <button
-              type="button"
-              onClick={handleAdminAccess}
-              className={`
-                m-0
-                cursor-default
-                border-0
-                bg-transparent
-                p-0
-                text-left
-                text-sm
-                outline-none
-                transition-colors
-                ${
-                  isDark
-                    ? "text-slate-500 hover:text-slate-700"
-                    : "text-slate-400 hover:text-slate-300"
-                }
-              `}
-              aria-label="Digital Work"
-            >
-              © {new Date().getFullYear()} Digital Work.{" "}
-              {t("footer.allRightsReserved")}
-            </button>
+              <div className="flex items-center gap-5">
+                <button
+                  type="button"
+                  onClick={() => setModal("legal")}
+                  className="text-slate-500 transition-colors hover:text-slate-900 dark:hover:text-white"
+                >
+                  {t("footer.legal")}
+                </button>
 
-            {/* LEGAL LINKS */}
-            <div className="flex items-center gap-5">
-              <button
-                type="button"
-                onClick={() => setLegalModal("mentions")}
-                className={`
-                  text-xs
-                  transition-colors
-                  ${
-                    isDark
-                      ? "text-slate-500 hover:text-slate-900"
-                      : "text-slate-400 hover:text-white"
-                  }
-                `}
-              >
-                {t("footer.legal")}
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setLegalModal("confidentialite")
-                }
-                className={`
-                  text-xs
-                  transition-colors
-                  ${
-                    isDark
-                      ? "text-slate-500 hover:text-slate-900"
-                      : "text-slate-400 hover:text-white"
-                  }
-                `}
-              >
-                {t("footer.privacy")}
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setModal("privacy")}
+                  className="text-slate-500 transition-colors hover:text-slate-900 dark:hover:text-white"
+                >
+                  {t("footer.privacy")}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </footer>
 
-      {/* ========================================================
-          LEGAL MODAL
-      ======================================================== */}
-      {legalModal && (
+      {/* Legal / Privacy modal */}
+      {modal && (
         <div
-          className="
-            fixed
-            inset-0
-            z-[9999]
-            flex
-            items-center
-            justify-center
-            bg-black/70
-            p-5
-            backdrop-blur-sm
-          "
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              setLegalModal(null);
-            }
-          }}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm"
+          onClick={() => setModal(null)}
         >
           <div
-            className={`
-              relative
-              max-h-[85vh]
-              w-full
-              max-w-2xl
-              overflow-y-auto
-              rounded-3xl
-              border
-              p-6
-              shadow-2xl
-              sm:p-8
-              ${
-                isDark
-                  ? "border-slate-200 bg-white text-slate-900"
-                  : "border-white/10 bg-slate-950 text-white"
-              }
-            `}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="footer-modal-title"
+            className="relative max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-900 sm:p-8"
+            onClick={(event) => event.stopPropagation()}
           >
-            {/* CLOSE */}
+            {/* Close */}
             <button
               type="button"
-              onClick={() => setLegalModal(null)}
-              className={`
-                absolute
-                right-5
-                top-5
-                flex
-                h-9
-                w-9
-                items-center
-                justify-center
-                rounded-xl
-                border
-                transition
-                ${
-                  isDark
-                    ? "border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                    : "border-white/10 text-slate-400 hover:bg-white/5 hover:text-white"
-                }
-              `}
-              aria-label={t("footer.close")}
+              onClick={() => setModal(null)}
+              className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
+              aria-label={t("footer.modal.close")}
             >
-              <X size={18} />
+              <X className="h-5 w-5" />
             </button>
 
-            {/* ==================================================
-                MENTIONS LÉGALES
-            ================================================== */}
-            {legalModal === "mentions" && (
-              <div className="pr-8">
-                <div className="mb-6">
-                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-dw-primary">
-                    Digital Work
-                  </p>
+            <div className="pr-10">
+              <p className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
+                Digital Work
+              </p>
 
-                  <h2
-                    className={`
-                      mt-2
-                      text-2xl
-                      font-bold
-                      ${footerHeading}
-                    `}
-                  >
-                    {t("footer.legal")}
-                  </h2>
-                </div>
-
-                <div
-                  className={`
-                    space-y-6
-                    text-sm
-                    leading-7
-                    ${footerText}
-                  `}
-                >
-                  <section>
-                    <h3
-                      className={`
-                        mb-2
-                        font-semibold
-                        ${footerHeading}
-                      `}
-                    >
-                      {t("footer.legalEditor")}
-                    </h3>
-
-                    <p>
-                      {t("footer.legalEditorText")}
-                    </p>
-                  </section>
-
-                  <section>
-                    <h3
-                      className={`
-                        mb-2
-                        font-semibold
-                        ${footerHeading}
-                      `}
-                    >
-                      {t("footer.activity")}
-                    </h3>
-
-                    <p>
-                      {t("footer.activityText")}
-                    </p>
-                  </section>
-
-                  <section>
-                    <h3
-                      className={`
-                        mb-2
-                        font-semibold
-                        ${footerHeading}
-                      `}
-                    >
-                      {t("footer.contact")}
-                    </h3>
-
-                    <p>
-                      Email : rrzafindrafita@gmail.com
-                      <br />
-                      Téléphone : +261 34 84 286 52
-                      <br />
-                      {t("footer.country")} : Madagascar
-                    </p>
-                  </section>
-
-                  <section>
-                    <h3
-                      className={`
-                        mb-2
-                        font-semibold
-                        ${footerHeading}
-                      `}
-                    >
-                      {t("footer.intellectualProperty")}
-                    </h3>
-
-                    <p>
-                      {t(
-                        "footer.intellectualPropertyText",
-                      )}
-                    </p>
-
-                    <p className="mt-3">
-                      {t(
-                        "footer.intellectualPropertyText2",
-                      )}
-                    </p>
-                  </section>
-
-                  <section>
-                    <h3
-                      className={`
-                        mb-2
-                        font-semibold
-                        ${footerHeading}
-                      `}
-                    >
-                      {t("footer.responsibility")}
-                    </h3>
-
-                    <p>
-                      {t("footer.responsibilityText")}
-                    </p>
-                  </section>
-                </div>
-              </div>
-            )}
-
-            {/* ==================================================
-                CONFIDENTIALITÉ
-            ================================================== */}
-            {legalModal === "confidentialite" && (
-              <div className="pr-8">
-                <div className="mb-6">
-                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-dw-primary">
-                    Digital Work
-                  </p>
-
-                  <h2
-                    className={`
-                      mt-2
-                      text-2xl
-                      font-bold
-                      ${footerHeading}
-                    `}
-                  >
-                    {t("footer.privacy")}
-                  </h2>
-                </div>
-
-                <div
-                  className={`
-                    space-y-6
-                    text-sm
-                    leading-7
-                    ${footerText}
-                  `}
-                >
-                  <section>
-                    <h3
-                      className={`
-                        mb-2
-                        font-semibold
-                        ${footerHeading}
-                      `}
-                    >
-                      {t("footer.dataProtection")}
-                    </h3>
-
-                    <p>
-                      {t("footer.dataProtectionText")}
-                    </p>
-                  </section>
-
-                  <section>
-                    <h3
-                      className={`
-                        mb-2
-                        font-semibold
-                        ${footerHeading}
-                      `}
-                    >
-                      {t("footer.collectedData")}
-                    </h3>
-
-                    <p>
-                      {t("footer.collectedDataText")}
-                    </p>
-                  </section>
-
-                  <section>
-                    <h3
-                      className={`
-                        mb-2
-                        font-semibold
-                        ${footerHeading}
-                      `}
-                    >
-                      {t("footer.informationUse")}
-                    </h3>
-
-                    <p>
-                      {t("footer.informationUseText")}
-                    </p>
-                  </section>
-
-                  <section>
-                    <h3
-                      className={`
-                        mb-2
-                        font-semibold
-                        ${footerHeading}
-                      `}
-                    >
-                      {t("footer.storageSecurity")}
-                    </h3>
-
-                    <p>
-                      {t(
-                        "footer.storageSecurityText",
-                      )}
-                    </p>
-                  </section>
-
-                  <section>
-                    <h3
-                      className={`
-                        mb-2
-                        font-semibold
-                        ${footerHeading}
-                      `}
-                    >
-                      {t("footer.yourRights")}
-                    </h3>
-
-                    <p>
-                      {t("footer.yourRightsText")}
-                    </p>
-                  </section>
-
-                  <section>
-                    <h3
-                      className={`
-                        mb-2
-                        font-semibold
-                        ${footerHeading}
-                      `}
-                    >
-                      {t("footer.contact")}
-                    </h3>
-
-                    <p>
-                      {t("footer.privacyContact")}
-                      <br />
-
-                      <span className="font-medium">
-                        rrzafindrafita@gmail.com
-                      </span>
-                    </p>
-                  </section>
-                </div>
-              </div>
-            )}
-
-            {/* CLOSE BUTTON */}
-            <div className="mt-8 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setLegalModal(null)}
-                className="
-                  rounded-xl
-                  bg-dw-primary
-                  px-5
-                  py-2.5
-                  text-sm
-                  font-semibold
-                  text-white
-                  transition
-                  hover:opacity-90
-                "
+              <h2
+                id="footer-modal-title"
+                className="mt-2 text-2xl font-black tracking-tight text-slate-950 dark:text-white"
               >
-                {t("footer.close")}
-              </button>
+                {modal === "legal"
+                  ? t("footer.legal")
+                  : t("footer.privacy")}
+              </h2>
+
+              <div className="mt-6 space-y-5 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                {modal === "legal" ? (
+                  <>
+                    <p>{t("footer.legalContent.introduction")}</p>
+
+                    <div>
+                      <h3 className="font-bold text-slate-950 dark:text-white">
+                        {t("footer.legalContent.editorTitle")}
+                      </h3>
+                      <p>{t("footer.legalContent.editor")}</p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-slate-950 dark:text-white">
+                        {t("footer.legalContent.hostingTitle")}
+                      </h3>
+                      <p>{t("footer.legalContent.hosting")}</p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-slate-950 dark:text-white">
+                        {t("footer.legalContent.intellectualTitle")}
+                      </h3>
+                      <p>{t("footer.legalContent.intellectual")}</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p>{t("footer.privacyContent.introduction")}</p>
+
+                    <div>
+                      <h3 className="font-bold text-slate-950 dark:text-white">
+                        {t("footer.privacyContent.dataTitle")}
+                      </h3>
+                      <p>{t("footer.privacyContent.data")}</p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-slate-950 dark:text-white">
+                        {t("footer.privacyContent.usageTitle")}
+                      </h3>
+                      <p>{t("footer.privacyContent.usage")}</p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-slate-950 dark:text-white">
+                        {t("footer.privacyContent.rightsTitle")}
+                      </h3>
+                      <p>{t("footer.privacyContent.rights")}</p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-slate-950 dark:text-white">
+                        {t("footer.privacyContent.contactTitle")}
+                      </h3>
+                      <p>{t("footer.privacyContent.contact")}</p>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -956,3 +449,4 @@ export default function Footer() {
     </>
   );
 }
+

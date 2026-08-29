@@ -1,5 +1,5 @@
-
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
   ArrowUpRight,
   ExternalLink,
@@ -19,6 +19,17 @@ interface Realisation {
   featured?: boolean;
 }
 
+/**
+ * Les informations des projets restent dans leur langue d'origine.
+ *
+ * IMPORTANT :
+ * - title       → ne pas traduire
+ * - category    → ne pas traduire
+ * - description → ne pas traduire
+ * - technologies → ne pas traduire
+ *
+ * Ces données pourront ensuite venir directement de l'API / base de données.
+ */
 const realisations: Realisation[] = [
   {
     title: "Digital Work",
@@ -73,6 +84,8 @@ const cardVariants = {
 };
 
 export default function HomeRealisations() {
+  const { t } = useTranslation();
+
   return (
     <section
       id="realisations"
@@ -84,6 +97,7 @@ export default function HomeRealisations() {
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
         <div className="absolute -right-40 top-20 h-80 w-80 rounded-full bg-blue-500/5 blur-3xl dark:bg-blue-500/10" />
+
         <div className="absolute -left-40 bottom-20 h-80 w-80 rounded-full bg-indigo-500/5 blur-3xl dark:bg-indigo-500/10" />
       </div>
 
@@ -98,19 +112,19 @@ export default function HomeRealisations() {
         >
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
             <FolderKanban className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            Nos réalisations
+
+            {t("realisations.eyebrow")}
           </div>
 
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl lg:text-5xl">
-            Des projets conçus pour{" "}
+            {t("realisations.title")}{" "}
             <span className="text-blue-600 dark:text-blue-400">
-              créer de la valeur
+              {t("realisations.titleHighlight")}
             </span>
           </h2>
 
           <p className="mt-6 text-base leading-8 text-slate-600 dark:text-slate-400 sm:text-lg">
-            Découvrez quelques exemples de solutions digitales développées
-            avec une approche orientée performance, simplicité et évolutivité.
+            {t("realisations.description")}
           </p>
         </motion.div>
 
@@ -130,7 +144,9 @@ export default function HomeRealisations() {
                 key={project.title}
                 variants={cardVariants}
                 className={`group relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-500/10 dark:border-slate-800 dark:bg-slate-900/70 dark:hover:border-blue-900 ${
-                  project.featured ? "lg:min-h-[380px]" : "lg:min-h-[340px]"
+                  project.featured
+                    ? "lg:min-h-[380px]"
+                    : "lg:min-h-[340px]"
                 } ${index === 2 ? "lg:col-span-2" : ""}`}
               >
                 {/* Project visual area */}
@@ -151,12 +167,14 @@ export default function HomeRealisations() {
                     <Icon className="h-9 w-9 text-blue-600 dark:text-blue-400" />
                   </div>
 
+                  {/* Featured badge — translated */}
                   {project.featured && (
                     <span className="absolute left-5 top-5 rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white shadow-lg shadow-blue-600/20">
-                      Projet phare
+                      {t("realisations.featured")}
                     </span>
                   )}
 
+                  {/* Category — ORIGINAL PROJECT DATA */}
                   <span className="absolute right-5 top-5 rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-xs font-medium text-slate-600 backdrop-blur dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-300">
                     {project.category}
                   </span>
@@ -166,10 +184,12 @@ export default function HomeRealisations() {
                 <div className="flex flex-col p-7 sm:p-8">
                   <div className="flex items-start justify-between gap-5">
                     <div>
+                      {/* Project title — ORIGINAL PROJECT DATA */}
                       <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
                         {project.title}
                       </h3>
 
+                      {/* Project description — ORIGINAL PROJECT DATA */}
                       <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-400">
                         {project.description}
                       </p>
@@ -182,7 +202,7 @@ export default function HomeRealisations() {
                     </div>
                   </div>
 
-                  {/* Technologies */}
+                  {/* Technologies — ORIGINAL PROJECT DATA */}
                   <div className="mt-6 flex flex-wrap gap-2">
                     {project.technologies.map((technology) => (
                       <span
@@ -194,6 +214,7 @@ export default function HomeRealisations() {
                     ))}
                   </div>
 
+                  {/* Project status / link */}
                   {project.href ? (
                     <a
                       href={project.href}
@@ -201,12 +222,13 @@ export default function HomeRealisations() {
                       rel="noopener noreferrer"
                       className="mt-7 inline-flex w-fit items-center gap-2 text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                     >
-                      Voir le projet
+                      {t("realisations.viewProject")}
+
                       <ExternalLink className="h-4 w-4" />
                     </a>
                   ) : (
                     <div className="mt-7 inline-flex w-fit items-center gap-2 text-sm font-semibold text-slate-400 dark:text-slate-500">
-                      Projet en développement
+                      {t("realisations.inDevelopment")}
                     </div>
                   )}
                 </div>
@@ -224,14 +246,15 @@ export default function HomeRealisations() {
           className="mt-12 text-center"
         >
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Vous avez un projet similaire ou une idée à concrétiser ?
+            {t("realisations.cta.description")}
           </p>
 
           <a
-            href="#contact"
+            href="/contact"
             className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
           >
-            Parlons de votre projet
+            {t("realisations.cta.button")}
+
             <ArrowUpRight className="h-4 w-4" />
           </a>
         </motion.div>
@@ -239,4 +262,3 @@ export default function HomeRealisations() {
     </section>
   );
 }
-

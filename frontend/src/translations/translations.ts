@@ -1,23 +1,88 @@
 
-// src/translations/translations.ts
 
 export type Language = "fr" | "mg" | "en";
+
+// ===========================================================
+// TRADUCTIONS
+// ===========================================================
 
 export const translations = {
   // =========================================================
   // FRANÇAIS
   // =========================================================
+
   fr: {
+    // =======================================================
+    // NAVIGATION
+    // =======================================================
+    technologies: {
+      eyebrow: "Notre stack technologique",
+      title: "Les technologies au service de vos projets",
+      description:
+        "Nous sélectionnons les technologies en fonction de vos objectifs, de vos contraintes et de la capacité de votre solution à évoluer dans le temps.",
+
+      categories: {
+        frontend: "Frontend",
+        mobile: "Mobile",
+        backend: "Backend",
+        engineering: "Ingénierie",
+        database: "Base de données",
+        web: "Web",
+        infrastructure: "Infrastructure",
+        optimization: "Optimisation",
+      },
+
+      items: {
+        react:
+          "Interfaces web modernes, rapides et maintenables avec une architecture basée sur les composants.",
+        reactNative:
+          "Applications mobiles Android et iOS avec une expérience utilisateur cohérente.",
+        nodejs:
+          "APIs et services backend performants pour connecter efficacement vos applications.",
+        typescript:
+          "Code plus robuste, typé et évolutif pour réduire les erreurs et faciliter la maintenance.",
+        postgresql:
+          "Gestion fiable des données avec une base relationnelle conçue pour les applications modernes.",
+        webTechnologies:
+          "HTML, CSS, JavaScript et outils modernes pour construire des expériences web performantes.",
+        security:
+          "Bonnes pratiques de sécurité intégrées dès la conception des applications et APIs.",
+        performance:
+          "Optimisation du chargement, du rendu et des performances pour une meilleure expérience utilisateur.",
+      },
+
+      mastered: "Technologie maîtrisée",
+
+      architecture: {
+        eyebrow: "Architecture moderne",
+        title: "Une stack pensée pour durer",
+        description:
+          "Notre approche ne consiste pas à empiler des technologies. Chaque choix technique répond à un besoin concret : performance, sécurité, maintenabilité, évolutivité et expérience utilisateur.",
+
+        web: "Applications",
+        mobile: "Android & iOS",
+        api: "Services backend",
+        data: "Données structurées",
+      },
+
+      closing:
+        "La technologie reste un moyen. Notre objectif est de construire une solution utile, fiable et adaptée à votre activité.",
+    },
     nav: {
       home: "Accueil",
       services: "Services",
       solutions: "Solutions",
       projects: "Réalisations",
       about: "À propos",
-      contact: "Contact",
+      contact: "Nous contacter",
       quote: "Demander un devis",
-    },  
-      common: {
+    },
+
+    // =======================================================
+    // COMMUN
+    // =======================================================
+
+    common: {
       language: "Langue",
       changeLanguage: "Changer de langue",
       appearance: "Apparence",
@@ -27,6 +92,7 @@ export const translations = {
     // =======================================================
     // HERO
     // =======================================================
+
     hero: {
       badge: "Solutions digitales sur mesure",
       title: "Transformez votre activité avec le digital.",
@@ -41,14 +107,14 @@ export const translations = {
     // PILIERS
     // =======================================================
     pillars: {
-      eyebrow: "Nos piliers",
-      title: "Une approche construite pour créer",
-      highlight: "de la valeur",
+      eyebrow: "Notre expertise",
+      title: "Une expertise pensée pour",
+      highlight: "vos projets digitaux",
       description:
-        "Digital Work combine expertise technique, compréhension métier et vision produit pour transformer vos idées en solutions numériques concrètes.",
+        "Nous combinons expertise technique, compréhension métier et approche produit pour concevoir des solutions digitales fiables, performantes et évolutives.",
 
-      items: {
-        technical: {
+      items: [
+        {
           number: "01",
           title: "Expertise technique",
           description:
@@ -59,8 +125,7 @@ export const translations = {
             "Architecture moderne",
           ],
         },
-
-        custom: {
+        {
           number: "02",
           title: "Solutions sur mesure",
           description:
@@ -71,8 +136,7 @@ export const translations = {
             "Fonctionnalités personnalisées",
           ],
         },
-
-        performance: {
+        {
           number: "03",
           title: "Performance & évolution",
           description:
@@ -83,8 +147,7 @@ export const translations = {
             "Évolutions facilitées",
           ],
         },
-
-        reliability: {
+        {
           number: "04",
           title: "Fiabilité & accompagnement",
           description:
@@ -95,32 +158,13 @@ export const translations = {
             "Support technique",
           ],
         },
-        nav: {
-          home: "Accueil",
-          services: "Services",
-          solutions: "Solutions",
-          projects: "Réalisations",
-          about: "À propos",
-          contact: "Nous contacter",
-        },
-
-         footer: {
-            services: "Services",
-            navigation: "Navigation",
-            contact: "Contact",
-            followUs: "Suivez-nous",
-            startProject: "Démarrer un projet",
-            legal: "Mentions légales",
-            privacy: "Confidentialité",
-            copyright: "Tous droits réservés.",
-            country: "Madagascar",
-          },
-      },
+      ],
     },
 
     // =======================================================
     // PROBLÈMES
     // =======================================================
+
     problems: {
       eyebrow: "Vos défis",
       title: "Les défis qui ralentissent",
@@ -177,6 +221,7 @@ export const translations = {
     // =======================================================
     // SERVICES
     // =======================================================
+
     services: {
       eyebrow: "Nos expertises",
       title: "Des solutions digitales pensées pour votre activité.",
@@ -209,8 +254,9 @@ export const translations = {
     },
 
     // =======================================================
-    // POSITIONING
+    // POSITIONNEMENT
     // =======================================================
+
     positioning: {
       badge: "Plus qu'un site web",
       title: "Nous construisons des outils qui font avancer votre entreprise.",
@@ -242,6 +288,7 @@ export const translations = {
     // =======================================================
     // RÉSULTATS
     // =======================================================
+
     results: {
       eyebrow: "Des résultats concrets",
       title: "La technologie au service de",
@@ -307,7 +354,9 @@ export const translations = {
       title: "Une méthode simple.",
       titleHighlight: "Des solutions concrètes.",
       description:
-        "Nous avançons étape par étape afin de transformer un besoin métier en une solution digitale réellement utile à votre entreprise.",
+        "Nous avançons étape par étape pour transformer les besoins de votre entreprise en solutions digitales réellement utiles.",
+
+      button: "Parlons de votre projet",
 
       steps: {
         analysis: {
@@ -319,7 +368,7 @@ export const translations = {
         design: {
           title: "Conception",
           description:
-            "Nous définissons l'expérience utilisateur, l'architecture et les fonctionnalités adaptées.",
+            "Nous définissons l'expérience utilisateur, l'architecture et les fonctionnalités nécessaires.",
         },
 
         development: {
@@ -336,9 +385,9 @@ export const translations = {
       },
 
       reassurance: {
-        title: "Pas de solution standard imposée",
+        title: "Aucune solution standard imposée",
         description:
-          "Chaque projet est construit selon votre activité, vos objectifs et les contraintes réelles de votre organisation.",
+          "Chaque projet est conçu selon votre activité, vos objectifs et les contraintes réelles de votre entreprise.",
       },
 
       cta: "Parlons de votre projet",
@@ -347,117 +396,227 @@ export const translations = {
     // =======================================================
     // RÉALISATIONS
     // =======================================================
-    realisations: {
+
+    realisations: { 
       eyebrow: "Nos réalisations",
-      title: "Des projets conçus pour",
-      titleHighlight: "créer de la valeur",
-      description:
-        "Découvrez quelques exemples de solutions digitales développées avec une approche orientée performance, simplicité et évolutivité.",
-
-      featured: "Projet phare",
-
-      categories: {
-        platform: "Plateforme digitale",
-        network: "Solution réseau",
-        mobile: "Mobile",
-      },
-
-      projects: {
-        digitalWork: {
-          title: "Digital Work",
-          description:
-            "Une plateforme moderne pensée pour présenter les services, les réalisations et l'expertise de Digital Work.",
-          technologies: [
-            "React",
-            "TypeScript",
-            "Tailwind CSS",
-          ],
-        },
-
-        hotspot: {
-          title: "Hotspot Management",
-          description:
-            "Une solution de gestion de hotspots permettant d'administrer les utilisateurs, sessions, vouchers, routeurs et statistiques.",
-          technologies: [
-            "React",
-            "Node.js",
-            "PostgreSQL",
-            "MikroTik",
-          ],
-        },
-
-        mobile: {
-          title: "Applications mobiles",
-          description:
-            "Des applications mobiles conçues pour offrir une expérience rapide, intuitive et adaptée aux besoins métier.",
-          technologies: [
-            "React Native",
-            "Expo",
-            "Firebase",
-          ],
-        },
-      },
-
-      projectInDevelopment: "Projet en développement",
-      viewProject: "Voir le projet",
-
-      bottomText:
-        "Vous avez un projet similaire ou une idée à concrétiser ?",
-
-      bottomLink: "Parlons de votre projet",
-    },
+       title: "Des solutions conçues pour créer de la", 
+       titleHighlight: "valeur",
+        description: "Découvrez une sélection de projets et de solutions numériques développés par Digital Work, avec une approche centrée sur les besoins métier, la performance et l'évolutivité.", featured: "Projet phare", 
+        viewProject: "Voir le projet", 
+        inDevelopment: "En développement", 
+        projects: { digitalWork: 
+          { category: "Plateforme digitale",
+             title: "Digital Work", 
+             description: "Le site de Digital Work, conçu comme une véritable vitrine digitale pour présenter nos services, notre expertise et nos réalisations, tout en facilitant la prise de contact avec les futurs clients.", }, 
+             hotspotManagement: { category: "Solution réseau", title: "Hotspot Management V2", 
+              description: "Une plateforme de gestion de hotspots permettant d'administrer les utilisateurs, les sessions, les vouchers, les routeurs, les sites et les statistiques depuis une interface centralisée.", },
+               mobileApplications: { category: "Applications mobiles", 
+                title: "Applications mobiles", 
+                description: "Des applications Android et iOS développées avec React Native pour répondre à des besoins métier spécifiques, avec une attention particulière portée à l'expérience utilisateur et à la simplicité d'utilisation.", }, },
+                 cta: {
+                   description: "Vous avez un besoin similaire ou une idée que vous souhaitez transformer en solution digitale ?",
+                    button: "Parlons de votre projet", }, },
 
     // =======================================================
     // CTA
     // =======================================================
+
     cta: {
+      badge: "Construisons votre projet",
       title: "Un projet digital en tête ?",
+      highlight: "Donnons-lui vie.",
       description:
-        "Présentez-nous votre besoin. Nous vous aiderons à définir une solution adaptée à votre activité.",
+        "Présentez-nous votre besoin. Nous vous aiderons à définir une solution digitale adaptée à votre activité et à vos objectifs.",
+      primaryCta: "Parlons de votre projet",
       button: "Parlons de votre projet",
+      secondaryCta: "Voir nos réalisations",
+
+      benefits: [
+        "Solution adaptée à vos besoins",
+        "Accompagnement de la conception au déploiement",
+        "Technologies modernes et évolutives",
+      ],
+
+      response: "Une réponse claire à votre projet",
+      responseDescription:
+        "Nous analysons votre besoin, concevons la solution et développons un produit pensé pour votre activité.",
+
+      process: {
+        analysis: "Analyse du besoin",
+        design: "Conception & design",
+        development: "Développement",
+      },
+
+      footerText:
+        "Chaque projet commence par une discussion. Expliquez-nous votre idée et construisons la suite ensemble.",
     },
 
     // =======================================================
     // FOOTER
     // =======================================================
+
     footer: {
-      description:
-        "Solutions digitales modernes pour entreprises ambitieuses.",
-      navigation: "Navigation",
-      services: "Services",
-      company: "Entreprise",
-      contact: "Contact",
-      rights: "Tous droits réservés.",
-    },
+      language: "Langue",
+      legal: "Mentions légales",
+      privacy: "Confidentialité",
+
+      modal: {
+        close: "Fermer",
+      },
+
+  legalContent: {
+    introduction:
+      "Les présentes mentions légales définissent les conditions d'utilisation du site Digital Work.",
+
+    editorTitle: "Éditeur du site",
+    editor:
+      "Digital Work est une structure spécialisée dans la conception de solutions numériques, sites web, applications et services digitaux.",
+
+    hostingTitle: "Hébergement",
+    hosting:
+      "Les informations relatives à l'hébergement du site sont disponibles sur demande auprès de Digital Work.",
+
+    intellectualTitle: "Propriété intellectuelle",
+    intellectual:
+      "L'ensemble des contenus, éléments graphiques, textes, logos et composants présents sur ce site sont protégés par les dispositions applicables en matière de propriété intellectuelle.",
+  },
+
+  privacyContent: {
+    introduction:
+      "Digital Work accorde une importance particulière à la protection de vos données personnelles.",
+
+    dataTitle: "Données collectées",
+    data:
+      "Les données transmises via les formulaires de contact sont utilisées uniquement pour répondre aux demandes et assurer le suivi des échanges.",
+
+    usageTitle: "Utilisation des données",
+    usage:
+      "Les données collectées ne sont pas utilisées à des fins incompatibles avec la demande initiale et ne sont pas vendues à des tiers.",
+
+    rightsTitle: "Vos droits",
+    rights:
+      "Vous pouvez demander l'accès, la modification ou la suppression de vos données personnelles en contactant Digital Work.",
+
+    contactTitle: "Contact",
+    contact:
+      "Pour toute question concernant la confidentialité de vos données, contactez-nous à l'adresse rrzafindrafita@gmail.com.",
+  },
+
+
+  tagline: "Digital Work",
+  description:
+    "Des solutions digitales modernes pour les entreprises ambitieuses.",
+
+  services: {
+    title: "Services",
+    websites: "Création de sites web",
+    webApplications: "Applications web",
+    mobileApplications: "Applications mobiles",
+    businessSolutions: "Solutions métier",
+    automation: "Automatisation",
+    digitalSolutions: "Solutions digitales",
+  },
+
+  navigation: {
+    title: "Navigation",
+    home: "Accueil",
+    services: "Services",
+    solutions: "Solutions",
+    projects: "Réalisations",
+    about: "À propos",
+    contact: "Contact",
+  },
+
+  contact: {
+    title: "Contact",
+    email: "rrzafindrafita@gmail.com",
+    phone: "+261 34 84 286 52",
+  },
+
+  followUs: "Suivez-nous",
+
+
+  copyright: "Tous droits réservés.",
+  madagascar: "Madagascar",
+
+  startProject: "Démarrer un projet",
+},
   },
 
   // =========================================================
   // MALAGASY
   // =========================================================
+
   mg: {
+    technologies: {
+      eyebrow: "Ny teknolojia ampiasainay",
+      title: "Teknolojia manampy amin'ny fanatanterahana ny tetikasanao",
+      description:
+        "Misafidy ny teknolojia izahay araka ny tanjonao, ny fepetra misy ary ny fahafahan'ny vahaolana hivoatra miaraka amin'ny orinasanao.",
+
+      categories: {
+        frontend: "Frontend",
+        mobile: "Mobile",
+        backend: "Backend",
+        engineering: "Injeniera",
+        database: "Tahiry angona",
+        web: "Web",
+        infrastructure: "Fotodrafitrasa",
+        optimization: "Fanatsarana",
+      },
+
+      items: {
+        react:
+          "Interface web maoderina, haingana ary mora tazomina, mifototra amin'ny architecture mampiasa composants.",
+        reactNative:
+          "Application mobile Android sy iOS manome traikefa mirindra sy mora ampiasaina.",
+        nodejs:
+          "API sy services backend mahomby hampifandraisana tsara ny application-nao.",
+        typescript:
+          "Code matanjaka kokoa, misy typage ary mora ampitomboina mba hampihenana ny fahadisoana sy hanamora ny maintenance.",
+        postgresql:
+          "Fitantanana angona azo antoka miaraka amin'ny base de données relationnelle natao ho an'ny application maoderina.",
+        webTechnologies:
+          "HTML, CSS, JavaScript ary fitaovana maoderina hananganana traikefa web haingana sy mahomby.",
+        security:
+          "Fomba fanao tsara momba ny fiarovana ampidirina hatrany am-piandohan'ny famolavolana ny application sy API.",
+        performance:
+          "Fanatsarana ny fotoana famahanana, ny affichage ary ny performance mba hanomezana traikefa tsara kokoa ho an'ny mpampiasa.",
+      },
+
+      mastered: "Teknolojia voafehy",
+
+      architecture: {
+        eyebrow: "Architecture maoderina",
+        title: "Stack natao haharitra",
+        description:
+          "Tsy ny fanangonana teknolojia maro no tanjonay. Ny safidy ara-teknika tsirairay dia mifototra amin'ny filàna mazava : performance, fiarovana, maintenance, fahafahana mivoatra ary traikefan'ny mpampiasa.",
+
+        web: "Application",
+        mobile: "Android & iOS",
+        api: "Services backend",
+        data: "Angona voalamina",
+      },
+
+      closing:
+        "Fitaovana ihany ny teknolojia. Ny tanjonay dia ny mamorona vahaolana mahasoa, azo itokisana ary mifanaraka amin'ny asanao.",
+    },
+
     nav: {
       home: "Fandraisana",
       services: "Tolotra",
       solutions: "Vahaolana",
       projects: "Tetikasa",
-      about: "Momba anay",
+      about: "Mombamomba",
       contact: "Fifandraisana",
       quote: "Mangataka devis",
     },
 
-     footer: {
-      services: "Tolotra",
-      solutions: "Vahaolana",
-      navigation: "Fikarohana",
-      contact: "Fifandraisana",
-      followUs: "Araho izahay",
-      startProject: "Hanomboka tetikasa",
-      legal: "Fepetra ara-dalàna",
-      privacy: "Tsiambaratelo",
-      copyright: "Zo rehetra voatokana.",
-      description:
-        "Vahaolana nomerika maoderina ho an'ny orinasa te-handroso.",
-      country: "Madagasikara",
+    common: {
+      language: "Fiteny",
+      changeLanguage: "Hanova fiteny",
+      appearance: "Endrika",
+      close: "Hidio",
     },
 
     hero: {
@@ -468,67 +627,62 @@ export const translations = {
       primary: "Hanomboka tetikasa",
       secondary: "Hijery ny tetikasanay",
       discover: "Hijery bebe kokoa",
-      services:"",
     },
 
-    pillars: {
-      eyebrow: "Ireo andry iorenanay",
-      title: "Fomba fiasa natao hamoronana",
-      highlight: "tombontsoa",
+   pillars: {
+  eyebrow: "Ny fahaiza-manaonay",
+  title: "Fahaiza-manao natao ho an'ny",
+  highlight: "tetikasa nomerikao",
+  description:
+    "Ampifandraisinay ny fahaiza-manao ara-teknika, ny fahatakarana ny filàn'ny orinasa ary ny fomba fiasa mifantoka amin'ny vokatra mba hamoronana vahaolana nomerika azo itokisana, haingana ary mora ampivoarina.",
+
+  items: [
+    {
+      number: "01",
+      title: "Fahaiza-manao ara-teknika",
       description:
-        "Digital Work dia mampifandray ny fahaiza-manao ara-teknika, ny fahatakarana ny filan'ny orinasa ary ny fahitana lavitra mba hanovana ny hevitrao ho vahaolana nomerika azo ampiharina.",
-
-      items: {
-        technical: {
-          number: "01",
-          title: "Fahaiza-manao ara-teknika",
-          description:
-            "Vahaolana novolavolaina amin'ny teknolojia maoderina, architecture madio ary code afaka mivoatra.",
-          highlights: [
-            "React & React Native",
-            "Node.js & API",
-            "Architecture maoderina",
-          ],
-        },
-
-        custom: {
-          number: "02",
-          title: "Vahaolana mifanaraka aminao",
-          description:
-            "Ny tetikasa tsirairay dia amboarina araka ny tanjon'ny orinasanao, ny mpampiasa ary ny fepetra misy.",
-          highlights: [
-            "Famakafakana ny filàna",
-            "UX/UI mifanaraka",
-            "Fonctionnalités manokana",
-          ],
-        },
-
-        performance: {
-          number: "03",
-          title: "Fahombiazana sy fivoarana",
-          description:
-            "Mamorona vokatra haingana, mora tazomina ary afaka mitombo miaraka amin'ny orinasanao izahay.",
-          highlights: [
-            "Performance nohatsaraina",
-            "Scalabilité",
-            "Fanavaozana mora",
-          ],
-        },
-
-        reliability: {
-          number: "04",
-          title: "Azo itokisana sy fanohanana",
-          description:
-            "Fanohanana voalamina manomboka amin'ny famolavolana ka hatramin'ny fametrahana sy ny fanatsarana manaraka.",
-          highlights: [
-            "Fanaraha-maso ny tetikasa",
-            "Kalitao sy fiarovana",
-            "Fanohanana ara-teknika",
-          ],
-        },
-      },
+        "Vahaolana novolavolaina amin'ny teknolojia maoderina, rafitra madio ary kaody natao mba hahafahana mampivoatra azy hatrany.",
+      highlights: [
+        "React & React Native",
+        "Node.js & API",
+        "Architecture maoderina",
+      ],
     },
-
+    {
+      number: "02",
+      title: "Vahaolana mifanaraka amin'ny filàna",
+      description:
+        "Ny tetikasa tsirairay dia amboarina araka ny tanjon'ny orinasa, ny mpampiasa ary ny fepetra tena misy.",
+      highlights: [
+        "Famakafakana ny filàna",
+        "UX/UI mifanaraka",
+        "Fonctionnalités manokana",
+      ],
+    },
+    {
+      number: "03",
+      title: "Performance & fampivoarana",
+      description:
+        "Manangana vokatra haingana, mora karakaraina ary afaka manaraka ny fitomboan'ny asan'ny orinasa izahay.",
+      highlights: [
+        "Performance nohatsaraina",
+        "Scalabilité",
+        "Mora ampivoarina",
+      ],
+    },
+    {
+      number: "04",
+      title: "Azo itokisana & fanohanana",
+      description:
+        "Fanohanana voalamina manomboka amin'ny famolavolana ka hatramin'ny famoahana ny tetikasa ary ny fampivoarana manaraka.",
+      highlights: [
+        "Fanaraha-maso ny tetikasa",
+        "Kalitao & fiarovana",
+        "Fanohanana ara-teknika",
+      ],
+    },
+  ],
+},
     problems: {
       eyebrow: "Ireo olana sedrainao",
       title: "Ireo olana manakana",
@@ -697,13 +851,14 @@ export const translations = {
         goals: "Tanjona tratra",
       },
     },
-
     method: {
       eyebrow: "Ny fomba fiasanay",
       title: "Fomba fiasa tsotra.",
       titleHighlight: "Vahaolana azo ampiharina.",
       description:
         "Mandroso tsikelikely izahay mba hanovana ny filàn'ny orinasa ho vahaolana nomerika tena ilaina.",
+
+      button: "Andao hiresaka momba ny tetikasanao",
 
       steps: {
         analysis: {
@@ -742,83 +897,255 @@ export const translations = {
 
     realisations: {
       eyebrow: "Ireo tetikasanay",
-      title: "Tetikasa natao hamoronana",
-      titleHighlight: "tombontsoa",
+
+      title: "Tetikasa natao",
+
+      titleHighlight: "hamorona tombontsoa",
+
       description:
-        "Jereo ny ohatra amin'ny vahaolana nomerika novolavolaina tamin'ny fomba fiasa mifantoka amin'ny fahombiazana, fahatsorana ary fivoarana.",
+        "Jereo ireo ohatra vitsivitsy amin'ny vahaolana nomerika novolavolainay, mifantoka amin'ny fahombiazana, fahatsorana ary fahafahana mivoatra.",
 
       featured: "Tetikasa lehibe",
 
-      categories: {
-        platform: "Plateforme digitale",
-        network: "Vahaolana réseau",
-        mobile: "Mobile",
-      },
+      viewProject: "Hijery ny tetikasa",
+
+      inDevelopment: "Eo am-pamolavolana",
 
       projects: {
         digitalWork: {
           title: "Digital Work",
+          category: "Plateforme nomerika",
           description:
             "Plateforme maoderina natao hanehoana ny tolotra, ny tetikasa ary ny fahaiza-manaon'ny Digital Work.",
-          technologies: [
-            "React",
-            "TypeScript",
-            "Tailwind CSS",
-          ],
         },
 
-        hotspot: {
+        hotspotManagement: {
           title: "Hotspot Management",
+          category: "Vahaolana amin'ny tambajotra",
           description:
-            "Vahaolana fitantanana hotspot ahafahana mitantana utilisateurs, sessions, vouchers, routeurs ary statistiques.",
-          technologies: [
-            "React",
-            "Node.js",
-            "PostgreSQL",
-            "MikroTik",
-          ],
+            "Vahaolana fitantanana hotspot ahafahana mitantana mpampiasa, sessions, vouchers, routeurs ary statistika.",
         },
 
-        mobile: {
-          title: "Applications mobiles",
+        mobileApplications: {
+          title: "Application mobile",
+          category: "Mobile",
           description:
-            "Applications mobiles natao hanomezana expérience haingana, mora ampiasaina ary mifanaraka amin'ny filàn'ny asa.",
-          technologies: [
-            "React Native",
-            "Expo",
-            "Firebase",
-          ],
+            "Application mobile natao hanomezana traikefa haingana, mora ampiasaina ary mifanaraka amin'ny filan'ny asa.",
         },
       },
 
-      projectInDevelopment: "Tetikasa mbola eo am-pamolavolana",
-      viewProject: "Hijery ny tetikasa",
-      bottomText:
-        "Manana tetikasa mitovy amin'izany na hevitra tianao hampiharina ve ianao?",
-      bottomLink: "Andao hiresaka momba ny tetikasanao",
+      cta: {
+        description:
+          "Manana tetikasa mitovitovy amin'izany ve ianao na hevitra tianao hotanterahina?",
+
+        button: "Andao hiresaka momba ny tetikasanao",
+      },
     },
 
     cta: {
+      badge: "Andao hanangana ny tetikasanao",
       title: "Manana tetikasa digital ve ianao?",
-      description:
-        "Lazao aminay ny zavatra ilainao ary hanampy anao hamaritra vahaolana mifanaraka amin'ny orinasanao izahay.",
+      highlight: "Andao hampivoatra azy.",
       button: "Andao hiresaka momba ny tetikasanao",
+      description:
+        "Lazao aminay ny zavatra ilainao. Hanampy anao hamaritra vahaolana digital mifanaraka amin'ny orinasanao sy ny tanjonao izahay.",
+      primaryCta: "Andao hiresaka momba ny tetikasanao",
+      secondaryCta: "Jereo ny tetikasanay",
+
+      benefits: [
+        "Vahaolana mifanaraka amin'ny filanao",
+        "Fanohanana manomboka amin'ny famolavolana ka hatramin'ny famoahana",
+        "Teknolojia maoderina sy azo havaozina",
+      ],
+
+      response: "Valiny mazava ho an'ny tetikasanao",
+      responseDescription:
+        "Hodinihinay ny zavatra ilainao, hamolavola ny vahaolana ary hamolavola vokatra mifanaraka amin'ny asanao izahay.",
+
+      process: {
+        analysis: "Famakafakana ny filàna",
+        design: "Famolavolana & design",
+        development: "Fampandrosoana",
+      },
+
+      footerText:
+        "Ny tetikasa tsirairay dia manomboka amin'ny fifampiresahana. Lazao aminay ny hevitrao ary andao hiara-hanangana ny dingana manaraka.",
     },
 
+    footer: {
+      language: "Fiteny",
+      legal: "Fampahafantarana ara-dalàna",
+      privacy: "Fiainana manokana",
+
+      modal: {
+        close: "Hidio",
+      },
+
+      legalContent: {
+        introduction:
+          "Ireo fampahafantarana ara-dalàna ireo dia mamaritra ny fepetra sy fitsipika ampiharina amin'ny fampiasana ny tranokalan'ny Digital Work.",
+
+        editorTitle: "Mpitantana ny tranokala",
+        editor:
+          "Digital Work dia miasa amin'ny famolavolana sy fampandrosoana vahaolana nomerika, tranokala, rindranasa ary tolotra nomerika.",
+
+        hostingTitle: "Fampiantranoana",
+        hosting:
+          "Ny fampahalalana momba ny fampiantranoana ity tranokala ity dia azo alaina amin'ny fangatahana atao amin'ny Digital Work.",
+
+        intellectualTitle: "Zo ara-tsaina",
+        intellectual:
+          "Ny votoaty, sary, lahatsoratra, logo ary singa rehetra hita amin'ity tranokala ity dia voaaro araka ny lalàna momba ny fananana ara-tsaina.",
+      },
+
+      privacyContent: {
+        introduction:
+          "Digital Work dia manome lanja lehibe ny fiarovana ny angon-drakitra manokan'ny mpampiasa.",
+
+        dataTitle: "Angon-drakitra angonina",
+        data:
+          "Ny vaovao alefa amin'ny alalan'ny formulaire fifandraisana dia ampiasaina ihany mba hamaliana ny fangatahana sy hitantanana ny fifandraisana.",
+
+        usageTitle: "Fampiasana ny angon-drakitra",
+        usage:
+          "Ny angon-drakitra angonina dia tsy ampiasaina amin'ny tanjona tsy mifanaraka amin'ny fangatahana voalohany ary tsy amidy amin'ny antoko fahatelo.",
+
+        rightsTitle: "Ny zonao",
+        rights:
+          "Azonao atao ny mangataka ny hahazo, hanova na hamafa ny angon-drakitra manokana momba anao amin'ny alalan'ny fifandraisana amin'ny Digital Work.",
+
+        contactTitle: "Fifandraisana",
+        contact:
+          "Raha manana fanontaniana momba ny fiarovana ny angon-drakitrao ianao dia afaka mifandray aminay amin'ny rrzafindrafita@gmail.com.",
+      },
+
+
+      tagline: "Digital Work",
+      description:
+        "Vahaolana nomerika maoderina ho an'ny orinasa mikendry ny handroso.",
+
+      services: {
+        title: "Tolotra",
+        websites: "Famoronana tranonkala",
+        webApplications: "Application web",
+        mobileApplications: "Application mobile",
+        businessSolutions: "Vahaolana ho an'ny orinasa",
+        automation: "Automatisation",
+        digitalSolutions: "Vahaolana nomerika",
+      },
+
+      navigation: {
+        title: "Fikarohana",
+        home: "Fandraisana",
+        services: "Tolotra",
+        solutions: "Vahaolana",
+        projects: "Tetikasa",
+        about: "Momba anay",
+        contact: "Fifandraisana",
+      },
+
+      contact: {
+        title: "Fifandraisana",
+        email: "rrzafindrafita@gmail.com",
+        phone: "+261 34 84 286 52",
+      },
+
+      followUs: "Araho izahay",
+
+      copyright: "Zo rehetra voatokana.",
+      madagascar: "Madagasikara",
+
+      startProject: "Hanomboka tetikasa",
+    },
   },
 
   // =========================================================
   // ENGLISH
   // =========================================================
+
   en: {
+  technologies: {
+  eyebrow: "Our technology stack",
+
+  title: "Technology powering your projects",
+
+  description:
+    "We select technologies based on your objectives, constraints, and your solution's ability to evolve over time.",
+
+  categories: {
+    frontend: "Frontend",
+    mobile: "Mobile",
+    backend: "Backend",
+    engineering: "Engineering",
+    database: "Database",
+    web: "Web",
+    infrastructure: "Infrastructure",
+    optimization: "Optimization",
+  },
+
+  items: {
+    react:
+      "Modern, fast and maintainable web interfaces built with a component-based architecture.",
+
+    reactNative:
+      "Android and iOS mobile applications providing a consistent and seamless user experience.",
+
+    nodejs:
+      "High-performance APIs and backend services designed to efficiently connect your applications.",
+
+    typescript:
+      "More robust, strongly typed and scalable code that reduces errors and simplifies maintenance.",
+
+    postgresql:
+      "Reliable data management with a relational database designed for modern applications.",
+
+    webTechnologies:
+      "HTML, CSS, JavaScript and modern tools for building high-performance web experiences.",
+
+    security:
+      "Security best practices integrated from the initial design of applications and APIs.",
+
+    performance:
+      "Optimization of loading times, rendering and overall performance for a better user experience.",
+  },
+
+  mastered: "Technology mastered",
+
+  architecture: {
+    eyebrow: "Modern architecture",
+
+    title: "A stack built to last",
+
+    description:
+      "Our approach is not about stacking technologies. Every technical choice addresses a concrete need: performance, security, maintainability, scalability, and user experience.",
+
+    web: "Applications",
+
+    mobile: "Android & iOS",
+
+    api: "Backend services",
+
+    data: "Structured data",
+  },
+
+  closing:
+    "Technology is only a means. Our goal is to build a useful, reliable solution adapted to your business.",
+},
     nav: {
       home: "Home",
       services: "Services",
       solutions: "Solutions",
       projects: "Projects",
       about: "About",
-      contact: "Contact",
+      contact: "Contact us",
       quote: "Request a quote",
+    },
+
+    common: {
+      language: "Language",
+      changeLanguage: "Change language",
+      appearance: "Appearance",
+      close: "Close",
     },
 
     hero: {
@@ -830,65 +1157,60 @@ export const translations = {
       secondary: "View our projects",
       discover: "Discover",
     },
-
     pillars: {
-      eyebrow: "Our pillars",
-      title: "An approach built to create",
-      highlight: "real value",
+      eyebrow: "Our expertise",
+      title: "Expertise designed for",
+      highlight: "your digital projects",
       description:
-        "Digital Work combines technical expertise, business understanding and product thinking to turn your ideas into concrete digital solutions.",
+        "We combine technical expertise, business understanding and a product-oriented approach to build reliable, high-performance and scalable digital solutions.",
 
-      items: {
-        technical: {
+      items: [
+        {
           number: "01",
           title: "Technical expertise",
           description:
-            "Solutions built with modern technologies, clean architecture and code designed to evolve.",
+            "Solutions built with modern technologies, clean architecture and maintainable code designed to evolve.",
           highlights: [
             "React & React Native",
             "Node.js & APIs",
             "Modern architecture",
           ],
         },
-
-        custom: {
+        {
           number: "02",
-          title: "Tailored solutions",
+          title: "Custom solutions",
           description:
-            "Every project is designed around your business objectives, users and real-world constraints.",
+            "Every project is designed around your business objectives, your users and your real-world constraints.",
           highlights: [
             "Needs analysis",
             "Tailored UX/UI",
-            "Custom functionality",
+            "Custom features",
           ],
         },
-
-        performance: {
+        {
           number: "03",
           title: "Performance & scalability",
           description:
-            "We build fast, maintainable products that can support the growth of your business.",
+            "We build fast, maintainable products capable of supporting the growth of your business.",
           highlights: [
             "Optimized performance",
             "Scalability",
-            "Easy evolution",
+            "Easy future improvements",
           ],
         },
-
-        reliability: {
+        {
           number: "04",
           title: "Reliability & support",
           description:
-            "Structured support from design through production and future improvements.",
+            "Structured support from initial design through production deployment and future improvements.",
           highlights: [
             "Project monitoring",
             "Quality & security",
             "Technical support",
           ],
         },
-      },
+      ],
     },
-
     problems: {
       eyebrow: "Your challenges",
       title: "Challenges that slow",
@@ -1015,13 +1337,6 @@ export const translations = {
           "Optimized interfaces and applications designed to improve performance and user experience.",
       },
 
-       common: {
-      language: "Language",
-      changeLanguage: "Change language",
-      appearance: "Appearance",
-      close: "Close",
-      },
-      
       productivity: {
         value: "2×",
         label: "Productivity",
@@ -1066,127 +1381,210 @@ export const translations = {
     },
 
     method: {
-      eyebrow: "Our method",
-      title: "A simple method.",
-      titleHighlight: "Concrete solutions.",
+      eyebrow: "Our approach",
+      title: "A simple approach.",
+      titleHighlight: "Practical solutions.",
       description:
-        "We move step by step to transform a business need into a digital solution that is genuinely useful to your company.",
+        "We move step by step to turn your business needs into digital solutions that deliver real value.",
+
+      button: "Let's discuss your project",
 
       steps: {
         analysis: {
           title: "Analysis",
           description:
-            "We understand your business, objectives, users and real-world constraints.",
+            "We understand your business, objectives, users, and constraints.",
         },
 
         design: {
           title: "Design",
           description:
-            "We define the user experience, architecture and features that fit your needs.",
+            "We define the user experience, architecture, and features your solution needs.",
         },
 
         development: {
           title: "Development",
           description:
-            "We build the solution using modern, reliable and scalable technologies.",
+            "We build the solution with modern, reliable, and scalable technologies.",
         },
 
         deployment: {
           title: "Deployment",
           description:
-            "We deploy the solution and support you during its adoption and use.",
+            "We deploy the solution to production and support you during its implementation.",
         },
       },
 
       reassurance: {
         title: "No one-size-fits-all solution",
         description:
-          "Every project is built around your business, objectives and the real constraints of your organization.",
+          "Every project is designed around your business, objectives, and actual constraints.",
       },
 
       cta: "Let's discuss your project",
     },
-
     realisations: {
       eyebrow: "Our projects",
+
       title: "Projects designed to",
+
       titleHighlight: "create value",
+
       description:
-        "Discover examples of digital solutions developed with a focus on performance, simplicity and scalability.",
+        "Discover some examples of digital solutions we have developed with a focus on performance, simplicity, and scalability.",
 
       featured: "Featured project",
 
-      categories: {
-        platform: "Digital platform",
-        network: "Network solution",
-        mobile: "Mobile",
-      },
+      viewProject: "View project",
+
+      inDevelopment: "Project in development",
 
       projects: {
         digitalWork: {
           title: "Digital Work",
+          category: "Digital platform",
           description:
-            "A modern platform designed to showcase Digital Work's services, projects and expertise.",
-          technologies: [
-            "React",
-            "TypeScript",
-            "Tailwind CSS",
-          ],
+            "A modern platform designed to showcase Digital Work's services, projects, and expertise.",
         },
 
-        hotspot: {
+        hotspotManagement: {
           title: "Hotspot Management",
+          category: "Network solution",
           description:
-            "A hotspot management solution for handling users, sessions, vouchers, routers and statistics.",
-          technologies: [
-            "React",
-            "Node.js",
-            "PostgreSQL",
-            "MikroTik",
-          ],
+            "A hotspot management solution for administering users, sessions, vouchers, routers, and statistics.",
         },
 
-        mobile: {
+        mobileApplications: {
           title: "Mobile applications",
+          category: "Mobile",
           description:
             "Mobile applications designed to provide a fast, intuitive experience adapted to business needs.",
-          technologies: [
-            "React Native",
-            "Expo",
-            "Firebase",
-          ],
         },
       },
 
-      projectInDevelopment: "Project in development",
-      viewProject: "View project",
+      cta: {
+        description:
+          "Do you have a similar project or an idea you would like to bring to life?",
 
-      bottomText:
-        "Do you have a similar project or an idea you want to bring to life?",
-
-      bottomLink: "Let's discuss your project",
+        button: "Let's discuss your project",
+      },
     },
-
     cta: {
+      badge: "Let's build your project",
       title: "Have a digital project in mind?",
+      highlight: "Let's bring it to life.",
       description:
-        "Tell us about your needs. We will help you define a solution adapted to your business.",
+        "Tell us about your needs. We will help you define a digital solution adapted to your business and goals.",
+      primaryCta: "Let's discuss your project",
+      secondaryCta: "View our projects",
+
+      benefits: [
+        "A solution tailored to your needs",
+        "Support from design to deployment",
+        "Modern and scalable technologies",
+      ],
       button: "Let's discuss your project",
+      response: "A clear response to your project",
+      responseDescription:
+        "We analyze your needs, design the solution and develop a product built around your business.",
+
+      process: {
+        analysis: "Needs analysis",
+        design: "Design & conception",
+        development: "Development",
+      },
+
+      footerText:
+        "Every project starts with a conversation. Tell us your idea and let's build the next step together.",
     },
 
     footer: {
-      description:
-        "Modern digital solutions for ambitious businesses.",
-       services: "Services",
-      navigation: "Navigation",
-      contact: "Contact",
-      followUs: "Follow us",
-      startProject: "Start a project",
-      legal: "Legal notice",
-      privacy: "Privacy",
-      copyright: "All rights reserved.",
-      country: "Madagascar",
-    },
+
+  language: "Language",
+  legal: "Legal notice",
+  privacy: "Privacy",
+
+  modal: {
+    close: "Close",
+  },
+
+  legalContent: {
+    introduction:
+      "This legal notice defines the terms and conditions applicable to the use of the Digital Work website.",
+
+    editorTitle: "Website operator",
+    editor:
+      "Digital Work specializes in the design and development of digital solutions, websites, applications and digital services.",
+
+    hostingTitle: "Hosting",
+    hosting:
+      "Information regarding the hosting of this website is available upon request from Digital Work.",
+
+    intellectualTitle: "Intellectual property",
+    intellectual:
+      "All content, graphic elements, texts, logos and components available on this website are protected by applicable intellectual property laws.",
+  },
+
+  privacyContent: {
+    introduction:
+      "Digital Work places particular importance on protecting your personal data.",
+
+    dataTitle: "Data collected",
+    data:
+      "Information submitted through contact forms is used only to respond to requests and manage communications.",
+
+    usageTitle: "Use of data",
+    usage:
+      "Collected data is not used for purposes incompatible with the original request and is not sold to third parties.",
+
+    rightsTitle: "Your rights",
+    rights:
+      "You may request access to, modification or deletion of your personal data by contacting Digital Work.",
+
+    contactTitle: "Contact",
+    contact:
+      "For any questions regarding the privacy of your data, contact us at rrzafindrafita@gmail.com.",
+  },
+
+
+
+  tagline: "Digital Work",
+  description:
+    "Modern digital solutions for ambitious businesses.",
+
+  services: {
+    title: "Services",
+    websites: "Websites",
+    webApplications: "Web applications",
+    mobileApplications: "Mobile applications",
+    businessSolutions: "Business solutions",
+    automation: "Automation",
+    digitalSolutions: "Digital solutions",
+  },
+
+  navigation: {
+    title: "Navigation",
+    home: "Home",
+    services: "Services",
+    solutions: "Solutions",
+    projects: "Projects",
+    about: "About",
+    contact: "Contact",
+  },
+
+  contact: {
+    title: "Contact",
+    email: "rrzafindrafita@gmail.com",
+    phone: "+261 34 84 286 52",
+  },
+
+  followUs: "Follow us",
+
+  copyright: "All rights reserved.",
+  madagascar: "Madagascar",
+
+  startProject: "Start a project",
+},
   },
 } as const;
 

@@ -189,19 +189,15 @@ const { t } = useTranslation();
               DESKTOP ACTIONS
           ================================================== */}
 
-          <div className="hidden items-center gap-2 lg:flex">
-            {/* Theme */}
-
+         <div className="hidden items-center gap-2 lg:flex">
+            <LanguageSwitcher />
             <ThemeSwitcher />
 
-            {/* Contact */}
-
             <Button to="/contact">
-              Nous contacter
+              {t("nav.contact")}
               <ArrowRight size={16} />
             </Button>
           </div>
-
           {/* =================================================
               MOBILE MENU BUTTON
           ================================================== */}
@@ -300,31 +296,29 @@ const { t } = useTranslation();
               {/* =============================================
                   MOBILE SETTINGS
               ============================================== */}
+                {/* MOBILE SETTINGS */}
+                <div className="mt-4 border-t border-white/[0.06] pt-4">
+                  <p className="mb-3 px-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-dw-muted">
+                    {t("common.appearance")}
+                  </p>
 
-             <div className="mt-4 border-t border-white/[0.06] pt-4">
-              <p className="mb-3 px-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-dw-muted">
-                {t("common.appearance")}
-              </p>
+                  <div className="flex items-center gap-2">
+                    <LanguageSwitcher />
+                    <ThemeSwitcher />
+                  </div>
+                </div>
 
-              <div className="flex items-center gap-2">
-                <LanguageSwitcher />
-                <ThemeSwitcher />
-              </div>
-            </div>
-
-              {/* =============================================
-                  MOBILE CTA
-              ============================================== */}
-
-             <div className="hidden items-center gap-2 lg:flex">
-                <LanguageSwitcher />
-                <ThemeSwitcher />
-
-                <Button to="/contact">
-                  {t("nav.contact")}
-                  <ArrowRight size={16} />
-                </Button>
-              </div>
+                {/* MOBILE CTA */}
+                <div className="mt-4">
+                  <Button
+                    to="/contact"
+                    onClick={closeMobileMenu}
+                    className="w-full justify-center"
+                  >
+                    {t("nav.contact")}
+                    <ArrowRight size={16} />
+                  </Button>
+                </div>
             </nav>
           </motion.div>
         )}
